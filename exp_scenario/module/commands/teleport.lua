@@ -10,6 +10,24 @@ local Commands = require("modules/exp_commands")
 local Roles = require("modules.exp_legacy.expcore.roles") --- @dep expcore.roles
 local player_allowed = Roles.player_allowed
 
+local s = {}
+
+function s.teleport(player, other_player)
+    if not other_player then
+        return Commands.status.error{ "exp-commands_teleport.unavailable" }
+    elseif other_player == player then
+        if not teleport_player(player, game.surfaces.nauvis, { 0, 0 }, "dismount") then
+            return Commands.status.error{ "exp-commands_teleport.unavailable" }
+        end
+    elseif player_allowed(player, "command/spawn/always") then
+        if not teleport_player(other_player, game.surfaces.nauvis, { 0, 0 }, "dismount") then
+            return Commands.status.error{ "exp-commands_teleport.unavailable" }
+        end
+    else
+        return Commands.status.unauthorised()
+    end
+end
+
 --- Teleports a player to another player.
 Commands.new("teleport", { "exp-commands_teleport.description-teleport" })
     :argument("player", { "exp-commands_teleport.arg-player-teleport" }, Commands.types.player_alive)
@@ -68,17 +86,7 @@ Commands.new("spawn", { "exp-commands_teleport.description-spawn" })
         end,
     }
     :register(function(player, other_player)
-        if not other_player then
-            return Commands.status.error{ "exp-commands_teleport.unavailable" }
-        elseif other_player == player then
-            if not teleport_player(player, game.surfaces.nauvis, { 0, 0 }, "dismount") then
-                return Commands.status.error{ "exp-commands_teleport.unavailable" }
-            end
-        elseif player_allowed(player, "command/spawn/always") then
-            if not teleport_player(other_player, game.surfaces.nauvis, { 0, 0 }, "dismount") then
-                return Commands.status.error{ "exp-commands_teleport.unavailable" }
-            end
-        else
-            return Commands.status.unauthorised()
-        end
+        s.teleport(player, other_player)
     end)
+
+return s
