@@ -13,13 +13,14 @@ return {
         limit = 20,
     },
     file_name = "log/research.log",
-    milestone = {},
-    --[[
     milestone = {
         ["automation"] = 600,
         ["logistics"] = 300,
         ["steel-processing"] = 300,
         ["logistic-science-pack"] = 300,
+    },
+    --[[
+    milestone = {
         ["electronics"] = 300,
         ["fast-inserter"] = 300,
         ["steel-axe"] = 300,
