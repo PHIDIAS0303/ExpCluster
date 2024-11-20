@@ -8,6 +8,8 @@ local format_player_name = Commands.format_player_name_locale
 
 local config = require("modules.exp_legacy.config.research") --- @dep config.research
 
+local r = {}
+
 local research = {
     res_queue_enable = false
 }
@@ -18,7 +20,7 @@ end)
 
 --- @param force LuaForce
 --- @param silent boolean True when no message should be printed
-local function res_queue(force, silent)
+function r.res_queue(force, silent)
     local res_q = force.research_queue
     local res
 
@@ -74,5 +76,6 @@ local e = defines.events
 return {
     events = {
         [e.on_research_finished] = on_research_finished,
-    }
+    },
+    c = r
 }
