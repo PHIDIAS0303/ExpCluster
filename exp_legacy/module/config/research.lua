@@ -13,6 +13,7 @@ return {
         limit = 20,
     },
     file_name = "log/research.log",
+    --[[
     milestone = {
         ["automation"] = 600,
         ["logistics"] = 300,
@@ -60,6 +61,7 @@ return {
         ["rocket-silo"] = 300,
         ["space-science-pack"] = 300,
     },
+    ]]
     inf_res = {
         -- Mining Productivity
         ["mining-productivity-4"] = 4,
