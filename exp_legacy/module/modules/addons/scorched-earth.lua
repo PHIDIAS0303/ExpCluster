@@ -87,7 +87,7 @@ end)
 
 -- When an entity is build there is a much higher chance that the tiles will degrade
 Event.add(defines.events.on_built_entity, function(event)
-    local entity = event.created_entity
+    local entity = event.entity
     local surface = entity.surface
     local position = entity.position
     local strength = get_tile_strength(surface, position)
@@ -99,7 +99,7 @@ end)
 
 -- Same as above but with robots
 Event.add(defines.events.on_robot_built_entity, function(event)
-    local entity = event.created_entity
+    local entity = event.entity
     local surface = entity.surface
     local position = entity.position
     local strength = get_tile_strength(surface, position)
