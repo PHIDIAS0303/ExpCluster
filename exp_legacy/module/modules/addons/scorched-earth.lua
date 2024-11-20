@@ -86,25 +86,19 @@ Event.add(defines.events.on_player_changed_position, function(event)
 end)
 
 -- When an entity is build there is a much higher chance that the tiles will degrade
-Event.add(defines.events.on_built_entity, function(event)
-    local entity = event.created_entity
-    local surface = entity.surface
-    local position = entity.position
-    local strength = get_tile_strength(surface, position)
+local function obe(e)
+    local entity = e.entity
+    local strength = get_tile_strength(entity.surface, entity.position)
     if not strength then return end
     if get_probability(strength) * config.weakness_value > math.random() then
         degrade_entity(entity)
     end
+end
+
+Event.add(defines.events.on_built_entity, function(event)
+    obe(event)
 end)
 
--- Same as above but with robots
 Event.add(defines.events.on_robot_built_entity, function(event)
-    local entity = event.created_entity
-    local surface = entity.surface
-    local position = entity.position
-    local strength = get_tile_strength(surface, position)
-    if not strength then return end
-    if get_probability(strength) * config.weakness_value > math.random() then
-        degrade_entity(entity)
-    end
+    obe(event)
 end)
