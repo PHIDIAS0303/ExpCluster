@@ -13,6 +13,7 @@ return {
         limit = 20,
     },
     file_name = "log/research.log",
+    milestone = {},
     --[[
     milestone = {
         ["automation"] = 600,
