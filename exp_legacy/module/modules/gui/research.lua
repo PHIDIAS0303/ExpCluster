@@ -60,7 +60,7 @@ local function research_add_log()
         result_data[res["disp"][i]["raw_name"]] = research.time[i]
     end
 
-    write_file(config.file_name, table_to_json(result_data) .. "\n", true, 0)
+    write_file(config.file_name, helper.table_to_json(result_data) .. "\n", true, 0)
 end
 
 local function research_res_n(res_)
@@ -102,9 +102,11 @@ local function research_notification(event)
                 end
             end
 
+            --[[
             if config.pollution_ageing_by_research then
                 game.map_settings.pollution.ageing = math.min(10, event.research.level / 5)
             end
+            ]]
         else
             if not (event.by_script) then
                 game.print{ "research.inf", research_time_format(game.tick), event.research.name, event.research.level - 1 }
