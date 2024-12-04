@@ -17,6 +17,8 @@ local function drop_target(entity)
 
         if #entities > 0 then
             return entities[1]
+        else
+            return nil
         end
     end
 end
@@ -58,6 +60,10 @@ end
 
 local function chest_check(entity)
     local target = drop_target(entity)
+
+    if target == nil then
+        return
+    end
 
     if check_entity(entity) then
         return
