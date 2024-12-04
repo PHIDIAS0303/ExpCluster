@@ -27,11 +27,11 @@ local function check_entity(entity)
         return true
     end
 
-    local egcn = entity.get_circuit_network()
+    local egcn = entity.get_wire_connectors()
 
     if egcn then
-        for _, v in pairs(egcn) do
-            if v.wire_type == defines.wire_type.red or v.wire_type == defines.wire_type.green then
+        for k, _ in pairs(egcn) do
+            if k == defines.wire_connector_id.circuit_red or k == defines.wire_connector_id.circuit_green then
                 -- connected to circuit network
                 return true
             end
