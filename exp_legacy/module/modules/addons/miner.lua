@@ -27,9 +27,15 @@ local function check_entity(entity)
         return true
     end
 
-    if next(entity.circuit_connected_entities.red) ~= nil or next(entity.circuit_connected_entities.green) ~= nil then
-        -- connected to circuit network
-        return true
+    local egcn = entity.get_circuit_network()
+
+    if egcn then
+        for _, v in pairs(egcn) do
+            if v.wire_type == defines.wire_type.red or v.wire_type == defines.wire_type.green then
+                -- connected to circuit network
+                return true
+            end
+        end
     end
 
     if not entity.minable then
