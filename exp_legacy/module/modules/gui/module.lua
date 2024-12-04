@@ -102,14 +102,14 @@ local function apply_module(player, area, machine, modules)
 
         if m_current_recipe then
             if config.module_allowed[m_current_recipe.name] then
-                entity.surface.create_entity{ name = "item-request-proxy", target = entity, position = entity.position, force = entity.force, modules = modules["n"] }
+                entity.surface.create_entity{ name = "item-request-proxy", target = entity, position = entity.position, force = entity.force, item = modules["n"] }
                 entity.last_user = player
             else
-                entity.surface.create_entity{ name = "item-request-proxy", target = entity, position = entity.position, force = entity.force, modules = modules["p"] }
+                entity.surface.create_entity{ name = "item-request-proxy", target = entity, position = entity.position, force = entity.force, item = modules["p"] }
                 entity.last_user = player
             end
         else
-            entity.surface.create_entity{ name = "item-request-proxy", target = entity, position = entity.position, force = entity.force, modules = modules["n"] }
+            entity.surface.create_entity{ name = "item-request-proxy", target = entity, position = entity.position, force = entity.force, item = modules["n"] }
             entity.last_user = player
         end
     end
