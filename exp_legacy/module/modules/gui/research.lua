@@ -60,7 +60,7 @@ local function research_add_log()
         result_data[res["disp"][i]["raw_name"]] = research.time[i]
     end
 
-    write_file(config.file_name, helpers.table_to_json(result_data) .. "\n", true, 0)
+    write_file(config.file_name, table_to_json(result_data) .. "\n", true, 0)
 end
 
 local function research_res_n(res_)
