@@ -19,8 +19,14 @@ return {
         ["steel-processing"] = 300,
         ["logistic-science-pack"] = 300,
     },
-    --[[
     milestone = {
+        ["logistic-science-pack"] = 2400,
+        ["military-science-pack"] = 2400,
+        ["chemical-science-pack"] = 2400,
+        ["utility-science-pack"] = 2400,
+        ["production-science-pack"] = 2400,
+        ["space-science-pack"] = 2400,
+        --[[
         ["electronics"] = 300,
         ["fast-inserter"] = 300,
         ["steel-axe"] = 300,
@@ -62,8 +68,8 @@ return {
         ["speed-module-3"] = 300,
         ["rocket-silo"] = 300,
         ["space-science-pack"] = 300,
+        ]]
     },
-    ]]
     inf_res = {
         -- Mining Productivity
         ["mining-productivity-4"] = 4,
