@@ -231,31 +231,4 @@ types.color =
         end
     end)
 
---[[
---- A player who has joined the game at least once, with a lower role
-types.lower_role_player =
-add("lower_role_player", function(input, player)
-    local player_i = game.get_player(input)
-    local player = game.get_player(player)
-
-    if Roles.get_player_highest_role(player_i).index <= Roles.get_player_highest_role(player).index then
-        return invalid{ "exp-commands-parse.player", input }
-    else
-        return valid(player)
-    end
-end)
-
---- A role that is lower than given user
-types.lower_role =
-    add("lower_role", function(input)
-        local player = game.get_player(input)
-
-        if Roles.config.roles[input] and (Roles.config.roles[input].index >= Roles.get_player_highest_role(player).index) then
-            return valid(player)
-        else
-            return invalid{ "exp-commands-parse.role", input }
-        end
-    end)
-]]
-
 return types
