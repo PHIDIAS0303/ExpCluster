@@ -94,8 +94,8 @@ end
 -- @tparam string location the location tag that is in the config file
 function Public.spawn_compilatron(surface, location)
     local position = locations[location]
-    local pos = surface.find_non_colliding_position("small-biter", position, 1.5, 0.5)
-    local compi = surface.create_entity{ name = "small-biter", position = pos, force = game.forces.neutral }
+    local pos = surface.find_non_colliding_position("behemoth-biter", position, 1.5, 0.5)
+    local compi = surface.create_entity{ name = "behemoth-biter", position = pos, force = game.forces.neutral }
     Public.add_compilatron(compi, location)
 end
 

@@ -145,7 +145,8 @@ local rocket_entry =
             local button = toggle_launch(flow)
             button.tooltip = silo_data.toggle_tooltip
             button.sprite = silo_data.toggle_sprite
-        end]]
+        end
+        ]]
 
         -- Add the remote launch if the player is allowed it
         if check_player_permissions(player, "remote_launch") then
