@@ -25,8 +25,6 @@ local Commands = require("modules/exp_commands")
 local add, parse = Commands.add_data_type, Commands.parse_input
 local valid, invalid = Commands.status.success, Commands.status.invalid_input
 
-local Roles = require("modules.exp_legacy.expcore.roles") --- @dep expcore.roles
-
 local types = {} --- @class Commands._types
 
 --- A boolean value where true is one of: yes, y, true, 1
