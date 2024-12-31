@@ -115,7 +115,7 @@ local welcome_time_format = ExpUtil.format_time_factory_locale{ format = "long",
 -- @element welcome_content
 define_tab({ "readme.welcome-tab" }, { "readme.welcome-tooltip" },
     Gui.element(function(_, parent)
-        local server_details = { name = "ExpGaming S0 - Local", welcome = "Failed to load description: disconnected from external api.", reset_time = "Non Set", branch = "Unknown" }
+        local server_details = { name = "APERX S0 - Local", welcome = "Failed to load description: disconnected from external api.", reset_time = "Non Set", branch = "Unknown" }
         if External.valid() then server_details = External.get_current_server() end
         local container = parent.add{ type = "flow", direction = "vertical" }
         local player = Gui.get_player_from_element(parent)
