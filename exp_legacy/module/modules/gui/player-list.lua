@@ -117,7 +117,6 @@ local add_player_base =
         local selected_player = game.players[selected_player_name]
         if event.button == defines.mouse_button_type.left then
             -- LMB will open the map to the selected player
-            local position = selected_player.physical_position
             event.player.set_controller{ type = defines.controllers.remote, position = selected_player.physical_position, surface = selected_player.physical_surface }
         else
             -- RMB will toggle the settings
