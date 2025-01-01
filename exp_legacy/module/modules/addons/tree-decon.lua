@@ -119,11 +119,10 @@ Event.add(defines.events.on_entity_damaged, function(event)
     local driver = event.cause.get_driver()
 
     if driver and driver.player then
-        driver = driver.player
-        if get_permission(driver.index) == "fast" and HasEnabledDecon:get(driver) then
+        if get_permission(driver.player.index) == "fast" and HasEnabledDecon:get(driver.player) then
             event.entity.destroy()
         else
-            event.entity.order_deconstruction(event.force, driver)
+            event.entity.order_deconstruction(event.force, driver.player)
         end
     end
 end)
