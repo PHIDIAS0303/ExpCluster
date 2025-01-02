@@ -103,6 +103,7 @@ Event.on_nth_tick(300, function()
 end)
 
 -- Clear trees when hit with a car
+--- @param event EventData.on_entity_damaged
 Event.add(defines.events.on_entity_damaged, function(event)
     if not (event.damage_type.name == "impact" and event.force) then
         return
@@ -117,12 +118,16 @@ Event.add(defines.events.on_entity_damaged, function(event)
     end
 
     local driver = event.cause.get_driver()
+    if not driver then return end
+    if driver.object_name ~= "LuaPlayer" then
+        driver = driver.player
+        if not driver then return end
+    end
 
-    if driver and driver.player then
-        if get_permission(driver.player.index) == "fast" and HasEnabledDecon:get(driver.player) then
-            event.entity.destroy()
-        else
-            event.entity.order_deconstruction(event.force, driver.player)
-        end
+    local allow = get_permission(driver.index)
+    if allow == "fast" and HasEnabledDecon:get(driver) then
+        event.entity.destroy()
+    else
+        event.entity.order_deconstruction(event.force, driver)
     end
 end)
