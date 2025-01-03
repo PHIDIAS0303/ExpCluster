@@ -382,7 +382,11 @@ end
 --- Get the top order based on the players settings
 Gui.inject_top_flow_order(function(player)
     local order = ToolbarState:get(player)
-
+    -- Check the type of order must be a table
+    if type(order) ~= "table" then
+        error("Invalid order type (table expected): " .. type(order))
+        return {}
+    end
     local elements = {}
     for index, state in ipairs(order) do
         elements[index] = Gui.defines[state.element_uid]
