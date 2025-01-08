@@ -8,16 +8,16 @@ return {
     },
     messages = { --- @setting messages the messages that each one will say, must be same name as its location
         ["Spawn"] = {
-            { "info.website" },
+            -- { "info.website" },
             { "info.read-readme" },
-            { "info.discord" },
+            -- { "info.discord" },
             { "info.softmod" },
             { "info.redmew" },
             { "info.custom-commands" },
-            { "info.status" },
+            -- { "info.status" },
             { "info.lhd" },
-            { "info.github" },
-            { "info.patreon" },
+            -- { "info.github" },
+            -- { "info.patreon" },
         },
     },
 }
