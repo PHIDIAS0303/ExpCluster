@@ -26,6 +26,7 @@ Roles.new_role("System", "SYS")
     :set_flag("is_spectator")
     :set_flag("report-immune")
     :set_flag("instant-respawn")
+    :set_flag("deconlog-bypass")
     :set_allow_all()
 
 Roles.new_role("Senior Administrator", "SAdmin")
@@ -36,6 +37,7 @@ Roles.new_role("Senior Administrator", "SAdmin")
     :set_flag("is_spectator")
     :set_flag("report-immune")
     :set_flag("instant-respawn")
+    :set_flag("deconlog-bypass")
     :set_parent("Administrator")
     :set_allow_all()
 
@@ -46,6 +48,7 @@ Roles.new_role("Administrator", "Admin")
     :set_flag("is_spectator")
     :set_flag("report-immune")
     :set_flag("instant-respawn")
+    :set_flag("deconlog-bypass")
     :set_parent("Senior Moderator")
     :allow{
         "command/_rcon",
@@ -62,6 +65,7 @@ Roles.new_role("Senior Moderator", "SMod")
     :set_flag("is_spectator")
     :set_flag("report-immune")
     :set_flag("instant-respawn")
+    :set_flag("deconlog-bypass")
     :set_parent("Moderator")
     :allow{
         "gui/warp-list/bypass-proximity",
@@ -76,6 +80,7 @@ Roles.new_role("Moderator", "Mod")
     :set_flag("is_spectator")
     :set_flag("report-immune")
     :set_flag("instant-respawn")
+    :set_flag("deconlog-bypass")
     :set_parent("Trainee Moderator")
     :allow{
     }
@@ -86,6 +91,7 @@ Roles.new_role("Trainee Moderator", "Trainee")
     :set_flag("is_admin")
     :set_flag("is_spectator")
     :set_flag("report-immune")
+    :set_flag("deconlog-bypass")
     :set_parent("Board Member")
     :allow{
         "command/assign-role",
@@ -132,6 +138,7 @@ Roles.new_role("Board Member", "Board")
     :set_flag("is_spectator")
     :set_flag("report-immune")
     :set_flag("instant-respawn")
+    :set_flag("deconlog-bypass")
     :set_parent("Supporter")
     :allow{
     }
@@ -140,6 +147,7 @@ Roles.new_role("Supporter", "Sup")
     :set_permission_group("Trusted")
     :set_custom_color{ r = 230, g = 99, b = 34 }
     :set_flag("is_spectator")
+    :set_flag("deconlog-bypass")
     :set_parent("Partner")
     :allow{
     }
@@ -148,6 +156,7 @@ Roles.new_role("Partner", "Part")
     :set_permission_group("Trusted")
     :set_custom_color{ r = 24, g = 172, b = 188 }
     :set_flag("is_spectator")
+    :set_flag("deconlog-bypass")
     :set_parent("Senior Member")
     :allow{
     }
@@ -156,6 +165,7 @@ Roles.new_role("Senior Member", "SMem")
     :set_permission_group("Trusted")
     :set_custom_color{ r = 24, g = 172, b = 188 }
     :set_flag("is_spectator")
+    :set_flag("deconlog-bypass")
     :set_parent("Member")
     :allow{
         "command/set-join-message",
@@ -195,6 +205,7 @@ local hours6, hours250 = 6 * 216000, 250 * 60
 Roles.new_role("Veteran", "Vet")
     :set_permission_group("Trusted")
     :set_custom_color{ r = 140, g = 120, b = 200 }
+    :set_flag("deconlog-bypass")
     :set_parent("Regular")
     :allow{
         "gui/surveillance",
