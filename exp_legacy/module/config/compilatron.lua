@@ -9,12 +9,13 @@ return {
     messages = { --- @setting messages the messages that each one will say, must be same name as its location
         ["Spawn"] = {
             { "info.website" },
+            { "info.cloud" },
+            { "info.github" },
+            { "info.graph" },
             { "info.read-readme" },
             { "info.softmod" },
             { "info.custom-commands" },
             { "info.lhd" },
-            { "info.github" },
-            { "info.graph" },
         },
     },
 }
