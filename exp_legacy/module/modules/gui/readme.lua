@@ -236,8 +236,7 @@ define_tab({ "readme.servers-tab" }, { "readme.servers-tooltip" },
 
         -- Add the external links
         local external_links = title_table(scroll_pane, 235, { "readme.servers-external" }, 2)
-        -- "discord", "website", "patreon", "github"
-        for _, key in ipairs{ "github" } do
+        for _, key in ipairs{ "website", "cloud", "graph", "github" } do
             local upper_key = key:gsub("^%l", string.upper)
             Gui.centered_label(external_links, 110, upper_key)
             Gui.centered_label(external_links, 460, { "links." .. key }, { "readme.servers-open-in-browser" })
