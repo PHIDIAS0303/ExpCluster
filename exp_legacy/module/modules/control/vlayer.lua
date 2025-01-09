@@ -364,23 +364,48 @@ local function handle_input_interfaces()
 
             for name, v in pairs(inventory.get_contents()) do
                 if config.allowed_items[name] then
-                    if config.allowed_items[name].modded then
-                        if config.modded_auto_downgrade then
-                            -- TODO Quality Insert 7 + 3N items based on quailty level.
-                            -- For example, level 1: 10 = 10, level 2: 10 = 13
-                            vlayer.insert_item(config.modded_items[name].base_game_equivalent, v.count * config.modded_items[name].multiplier)
-                        else
-                            vlayer.insert_item(name, v.count)
-                        end
-                    else
-                        if vlayer_data.storage.power_items[name] then
-                            vlayer_data.storage.power_items[name].count = vlayer_data.storage.power_items[name].count + v.count
-                        else
-                            vlayer.insert_item(name, v.count)
-                        end
-                    end
+                    --[[
+                        TODO
+                        there are no quality support currently.
+                        so instead, using the stats projection value for higher quality.
+                    ]]
+                    if v.quality.level > 1 and v.count >= 10 then
+                        local batch_to_convert = math.floor(v.count / 10)
+                        local count_projection = batch_to_convert * (7 + (v.quality.level * 3))
 
-                    inventory.remove{ name = name, count = v.count, quality = v.quality }
+                        if config.allowed_items[name].modded then
+                            if config.modded_auto_downgrade then
+                                vlayer.insert_item(config.modded_items[name].base_game_equivalent, count_projection * config.modded_items[name].multiplier)
+                            else
+                                vlayer.insert_item(name, count_projection)
+                            end
+                        else
+                            if vlayer_data.storage.power_items[name] then
+                                vlayer_data.storage.power_items[name].count = vlayer_data.storage.power_items[name].count + count_projection
+                            else
+                                vlayer.insert_item(name, count_projection)
+                            end
+                        end
+
+                        inventory.remove{ name = name, count = batch_to_convert * 10, quality = v.quality }
+
+                    elseif v.quality.level == 1 then
+                        if config.allowed_items[name].modded then
+                            if config.modded_auto_downgrade then
+                                vlayer.insert_item(config.modded_items[name].base_game_equivalent, v.count * config.modded_items[name].multiplier)
+                            else
+                                vlayer.insert_item(name, v.count)
+                            end
+                        else
+                            if vlayer_data.storage.power_items[name] then
+                                vlayer_data.storage.power_items[name].count = vlayer_data.storage.power_items[name].count + v.count
+                            else
+                                vlayer.insert_item(name, v.count)
+                            end
+                        end
+
+                        inventory.remove{ name = name, count = v.count, quality = v.quality }
+                    end
                 end
             end
         end
