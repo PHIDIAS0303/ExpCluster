@@ -228,7 +228,7 @@ define_tab({ "readme.servers-tab" }, { "readme.servers-tooltip" },
             end
         else
             local factorio_servers = title_table(scroll_pane, 225, { "readme.servers-factorio" }, 2)
-            for i = 1, 8 do
+            for _, i in pairs{ 1, 2, 3, 5, 6, 8 } do
                 Gui.centered_label(factorio_servers, 110, { "readme.servers-" .. i })
                 Gui.centered_label(factorio_servers, 460, { "readme.servers-d" .. i })
             end
@@ -261,10 +261,10 @@ define_tab({ "readme.backers-tab" }, { "readme.backers-tooltip" },
         local done = {}
         local groups = {
             { _roles = { "Senior Administrator", "Administrator" }, _title = { "readme.backers-management" }, _width = 230 },
-            { _roles = { "Board Member", "Senior Backer" }, _title = { "readme.backers-board" }, _width = 145 }, -- change role to board
-            { _roles = { "Sponsor", "Supporter" }, _title = { "readme.backers-backers" }, _width = 196 }, -- change to backer
-            { _roles = { "Moderator", "Trainee" }, _title = { "readme.backers-staff" }, _width = 235 },
-            { _roles = {}, _time = 3 * 3600 * 60, _title = { "readme.backers-active" }, _width = 235 },
+            { _roles = { "Senior Moderator", "Moderator", "Trainee Moderator" }, _title = { "readme.backers-staff" }, _width = 230 },
+            { _roles = { "Board Member", "Supporter", "Partner" }, _title = { "readme.backers-backers" }, _width = 230 }, -- change role to board
+            { _roles = { "Veteran" }, _title = { "readme.backers-active" }, _width = 230 },
+            -- _time = 3 * 3600 * 60
         }
 
         -- Fill by player roles
