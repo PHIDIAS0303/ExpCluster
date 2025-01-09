@@ -362,8 +362,8 @@ local function handle_input_interfaces()
         else
             local inventory = interface.get_inventory(defines.inventory.chest)
 
-            for name, v in pairs(inventory.get_contents()) do
-                if config.allowed_items[name] then
+            for _, v in pairs(inventory.get_contents()) do
+                if config.allowed_items[v.name] then
                     --[[
                         TODO
                         there are no quality support currently.
@@ -382,21 +382,21 @@ local function handle_input_interfaces()
                     end
 
                     if count_deduct and count_add then
-                        if config.allowed_items[name].modded then
+                        if config.allowed_items[v.name].modded then
                             if config.modded_auto_downgrade then
-                                vlayer.insert_item(config.modded_items[name].base_game_equivalent, count_add * config.modded_items[name].multiplier)
+                                vlayer.insert_item(config.modded_items[v.name].base_game_equivalent, count_add * config.modded_items[v.name].multiplier)
                             else
-                                vlayer.insert_item(name, count_add)
+                                vlayer.insert_item(v.name, count_add)
                             end
                         else
-                            if vlayer_data.storage.power_items[name] then
-                                vlayer_data.storage.power_items[name].count = vlayer_data.storage.power_items[name].count + count_add
+                            if vlayer_data.storage.power_items[v.name] then
+                                vlayer_data.storage.power_items[v.name].count = vlayer_data.storage.power_items[v.name].count + count_add
                             else
-                                vlayer.insert_item(name, count_add)
+                                vlayer.insert_item(v.name, count_add)
                             end
                         end
 
-                        inventory.remove{ name = name, count = count_deduct, quality = v.quality }
+                        inventory.remove{ name = v.name, count = count_deduct, quality = v.quality }
                     end
                 end
             end
