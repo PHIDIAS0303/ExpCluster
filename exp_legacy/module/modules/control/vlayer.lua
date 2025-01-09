@@ -194,7 +194,7 @@ local function get_sustained_multiplier()
         return mul
     end
 
-    -- For nauvis vanilla: 208s + (1/2 x (83s + 83s))
+    -- For nauvis vanilla: 210s + (1/2 x (84s + 84s))
     local day_duration = 1 - surface.dawn + surface.dusk
     local sunset_duration = surface.evening - surface.dusk
     local sunrise_duration = surface.dawn - surface.morning
