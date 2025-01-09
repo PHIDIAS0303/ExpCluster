@@ -376,7 +376,7 @@ local function handle_input_interfaces()
                         count_deduct = v.count
                         count_add = v.count
 
-                    elseif v.quality.level > 1 and v.count >= 10 then
+                    elseif prototypes.quality[v.quality].level > 1 and v.count >= 10 then
                         count_deduct = math.floor(v.count / 10)
                         count_add = count_deduct * (7 + (v.quality.level * 3))
                     end
