@@ -564,11 +564,11 @@ local function handle_circuit_interfaces()
             -- Set the virtual signals based on the vlayer stats
             for stat_name, signal_name in pairs(circuit) do
                 if stat_name:find("energy") then
-                    circuit_oc.set_slot(signal_index, { value = { type = "virtual", name = signal_name }, min = math.floor(stats[stat_name] / mega) })
+                    circuit_oc.set_slot(signal_index, { value = { type = "virtual", name = signal_name, quality	= "normal" }, min = math.floor(stats[stat_name] / mega) })
                 elseif stat_name == "production_multiplier" then
-                    circuit_oc.set_slot(signal_index, { value = { type = "virtual", name = signal_name }, min = math.floor(stats[stat_name] * 10000) })
+                    circuit_oc.set_slot(signal_index, { value = { type = "virtual", name = signal_name, quality	= "normal" }, min = math.floor(stats[stat_name] * 10000) })
                 else
-                    circuit_oc.set_slot(signal_index, { value = { type = "virtual", name = signal_name }, min = math.floor(stats[stat_name]) })
+                    circuit_oc.set_slot(signal_index, { value = { type = "virtual", name = signal_name, quality	= "normal" }, min = math.floor(stats[stat_name]) })
                 end
 
                 signal_index = signal_index + 1
@@ -577,7 +577,7 @@ local function handle_circuit_interfaces()
             -- Set the item signals based on stored items
             for item_name, count in pairs(vlayer_data.storage.items) do
                 if prototypes.item[item_name] and count > 0 then
-                    circuit_oc.set_slot(signal_index, { value = { type = "item", name = item_name }, min = count })
+                    circuit_oc.set_slot(signal_index, { value = { type = "item", name = item_name, quality	= "normal" }, min = count })
                     signal_index = signal_index + 1
                 end
             end
