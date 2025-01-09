@@ -558,18 +558,17 @@ local function handle_circuit_interfaces()
             vlayer_data.entity_interfaces.circuit[index] = nil
         else
             local circuit_oc = interface.get_or_create_control_behavior()
-            local max_signals = circuit_oc.signals_count
             local signal_index = 1
             local circuit = vlayer.get_circuits()
 
             -- Set the virtual signals based on the vlayer stats
             for stat_name, signal_name in pairs(circuit) do
                 if stat_name:find("energy") then
-                    circuit_oc.set_signal(signal_index, { signal = { type = "virtual", name = signal_name }, count = math.floor(stats[stat_name] / mega) })
+                    circuit_oc.set_slot(signal_index, { signal = { type = "virtual", name = signal_name }, count = math.floor(stats[stat_name] / mega) })
                 elseif stat_name == "production_multiplier" then
-                    circuit_oc.set_signal(signal_index, { signal = { type = "virtual", name = signal_name }, count = math.floor(stats[stat_name] * 10000) })
+                    circuit_oc.set_slot(signal_index, { signal = { type = "virtual", name = signal_name }, count = math.floor(stats[stat_name] * 10000) })
                 else
-                    circuit_oc.set_signal(signal_index, { signal = { type = "virtual", name = signal_name }, count = math.floor(stats[stat_name]) })
+                    circuit_oc.set_slot(signal_index, { signal = { type = "virtual", name = signal_name }, count = math.floor(stats[stat_name]) })
                 end
 
                 signal_index = signal_index + 1
@@ -578,21 +577,18 @@ local function handle_circuit_interfaces()
             -- Set the item signals based on stored items
             for item_name, count in pairs(vlayer_data.storage.items) do
                 if prototypes.item[item_name] and count > 0 then
-                    circuit_oc.set_signal(signal_index, { signal = { type = "item", name = item_name }, count = count })
+                    circuit_oc.set_slot(signal_index, { signal = { type = "item", name = item_name }, count = count })
                     signal_index = signal_index + 1
-                    if signal_index > max_signals then
-                        return -- No more signals can be added
-                    end
                 end
             end
 
             -- Clear remaining signals to prevent outdated values being present (caused by count > 0 check)
-            for clear_index = signal_index, max_signals do
-                if not circuit_oc.get_signal(clear_index).signal then
+            for clear_index = signal_index, #circuit do
+                if not circuit_oc.get_slot(clear_index).signal then
                     break -- There are no more signals to clear
                 end
 
-                circuit_oc.set_signal(clear_index, nil)
+                circuit_oc.clear_slot(clear_index)
             end
         end
     end
