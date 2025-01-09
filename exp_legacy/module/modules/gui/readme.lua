@@ -115,7 +115,7 @@ local welcome_time_format = ExpUtil.format_time_factory_locale{ format = "long",
 -- @element welcome_content
 define_tab({ "readme.welcome-tab" }, { "readme.welcome-tooltip" },
     Gui.element(function(_, parent)
-        local server_details = { name = "ExpGaming S0 - Local", welcome = "Failed to load description: disconnected from external api.", reset_time = "Non Set", branch = "Unknown" }
+        local server_details = { name = "APERX S0 - Local", welcome = "Failed to load description: disconnected from external api.", reset_time = "Non Set", branch = "Unknown" }
         if External.valid() then server_details = External.get_current_server() end
         local container = parent.add{ type = "flow", direction = "vertical" }
         local player = Gui.get_player_from_element(parent)
@@ -236,7 +236,7 @@ define_tab({ "readme.servers-tab" }, { "readme.servers-tooltip" },
 
         -- Add the external links
         local external_links = title_table(scroll_pane, 235, { "readme.servers-external" }, 2)
-        for _, key in ipairs{ "discord", "website", "patreon", "status", "github" } do
+        for _, key in ipairs{ "website", "cloud", "graph", "github" } do
             local upper_key = key:gsub("^%l", string.upper)
             Gui.centered_label(external_links, 110, upper_key)
             Gui.centered_label(external_links, 460, { "links." .. key }, { "readme.servers-open-in-browser" })
