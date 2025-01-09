@@ -382,6 +382,7 @@ local function handle_input_interfaces()
                     end
 
                     if count_deduct and count_add then
+                        game.print(count_add)
                         if config.allowed_items[name].modded then
                             if config.modded_auto_downgrade then
                                 vlayer.insert_item(config.modded_items[name].base_game_equivalent, count_add * config.modded_items[name].multiplier)
