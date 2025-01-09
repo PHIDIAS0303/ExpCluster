@@ -132,17 +132,17 @@ function vlayer.get_interfaces()
 end
 
 --[[
-    25,000 / 416 s
+    25,200 / 420 s
     昼      208秒   ソーラー効率100%
     夕方    83秒    1秒ごとにソーラー発電量が約1.2%ずつ下がり、やがて0%になる
     夜      41秒    ソーラー発電量が0%になる
     朝方    83秒    1秒ごとにソーラー発電量が約1.2%ずつ上がり、やがて100%になる
 
-    (surface.dawn)      0.75    18,750   Day         12,500  208s
+    (surface.dawn)      0.75    18,900   Day         12,600  210s
                         0.00    0       Noon
-    (surface.dusk)      0.25    6,250    Sunset      5,000   83s
-    (surface.evening)   0.45    11,250   Night       2,500   41s
-    (surface.morning)   0.55    13,750   Sunrise     5,000   83s
+    (surface.dusk)      0.25    6,300    Sunset      5,040   84s
+    (surface.evening)   0.45    11,340   Night       2,520   42s
+    (surface.morning)   0.55    13,860   Sunrise     5,040   84s
 ]]
 
 --- Get the power multiplier based on the surface time
