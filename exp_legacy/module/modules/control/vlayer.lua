@@ -362,23 +362,25 @@ local function handle_input_interfaces()
         else
             local inventory = interface.get_inventory(defines.inventory.chest)
 
-            for name, count in pairs(inventory.get_contents()) do
+            for name, v in pairs(inventory.get_contents()) do
                 if config.allowed_items[name] then
                     if config.allowed_items[name].modded then
                         if config.modded_auto_downgrade then
-                            vlayer.insert_item(config.modded_items[name].base_game_equivalent, count * config.modded_items[name].multiplier)
+                            -- TODO Quality Insert 7 + 3N items based on quailty level.
+                            -- For example, level 1: 10 = 10, level 2: 10 = 13
+                            vlayer.insert_item(config.modded_items[name].base_game_equivalent, v.count * config.modded_items[name].multiplier)
                         else
-                            vlayer.insert_item(name, count)
+                            vlayer.insert_item(name, v.count)
                         end
                     else
                         if vlayer_data.storage.power_items[name] then
-                            vlayer_data.storage.power_items[name].count = vlayer_data.storage.power_items[name].count + count
+                            vlayer_data.storage.power_items[name].count = vlayer_data.storage.power_items[name].count + v.count
                         else
-                            vlayer.insert_item(name, count)
+                            vlayer.insert_item(name, v.count)
                         end
                     end
 
-                    inventory.remove{ name = name, count = count }
+                    inventory.remove{ name = name, count = v.count, quality = v.quality }
                 end
             end
         end
