@@ -23,7 +23,7 @@ Commands.new("kill", { "exp-commands_kill.description" })
         elseif other_player == player then
             -- You can always kill yourself
             other_player.character.die()
-        elseif highest_role(player).index > highest_role(other_player).index then
+        elseif highest_role(other_player).index < highest_role(player).index then
             -- Can kill lower role players
             other_player.character.die()
         else
