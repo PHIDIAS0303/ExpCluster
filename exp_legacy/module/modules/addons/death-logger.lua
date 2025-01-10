@@ -73,10 +73,10 @@ Event.add(defines.events.on_player_died, function(event)
             inventory = inventory,
             surface = corpse.surface,
             position = corpse.position,
-            name = "iron-chest",
+            name = "steel-chest",
             allow_creation = true,
         }
-        
+
         corpse.destroy()
         corpse = chest
     end
@@ -155,7 +155,7 @@ if config.auto_collect_bodies then
         ExpUtil.transfer_inventory_to_surface{
             inventory = inventory,
             surface = corpse.surface,
-            name = "iron-chest",
+            name = "steel-chest",
             allow_creation = true,
         }
     end)

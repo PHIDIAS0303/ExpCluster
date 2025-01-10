@@ -8,7 +8,7 @@ return {
 
     unlimited_capacity = false, --- @setting unlimited_capacity When true the vlayer has an unlimited energy capacity, accumulators are not required
     unlimited_surface_area = false, --- @setting unlimited_surface_area When true the vlayer has an unlimited surface area, landfill is not required
-    modded_auto_downgrade = false, --- @setting modded_auto_downgrade When true modded items will be converted into their base game equivalent, original items can not be recovered
+    modded_auto_downgrade = true, --- @setting modded_auto_downgrade When true modded items will be converted into their base game equivalent, original items can not be recovered
 
     mimic_surface = "nauvis", --- @setting mimic_surface Surface name/index the vlayer will copy its settings from, use nil to use the settings below
     surface = { --- @setting surface When mimic_surface is nil these settings will be used instead, see LuaSurface for details
@@ -68,22 +68,22 @@ return {
             required_area = 0,
             surface_area = 0,
             fuel_value = 4, -- MJ
-            power = false, -- turn all coal to power to reduce trash
+            power = true, -- turn all coal to power to reduce trash
         },
         ["solid-fuel"] = {
             starting_value = 0,
             required_area = 0,
             surface_area = 0,
             fuel_value = 12, -- MJ
-            power = false, -- turn all solid fuel to power to reduce trash
+            power = true, -- turn all solid fuel to power to reduce trash
         },
         ["rocket-fuel"] = {
             starting_value = 0,
             required_area = 0,
             surface_area = 0,
             fuel_value = 100, -- MJ
-            power = false, -- turn all rocket fuel to power to reduce trash
-        }
+            power = true, -- turn all rocket fuel to power to reduce trash
+        },
     },
 
     modded_items = { --- @setting modded_items List of all modded items allowed in vlayer storage and their base game equivalent
