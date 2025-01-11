@@ -37,7 +37,7 @@ UsesServerUps:on_load(function(player_name, visible)
 
     --- @diagnostic disable-next-line undefined-field      
     if not External.valid() or not storage.ext.var.server_ups then visible = false end
-    label.visible = visible or false
+    label.visible = visible
 end)
 
 --- Toggles if the server ups is visbile
