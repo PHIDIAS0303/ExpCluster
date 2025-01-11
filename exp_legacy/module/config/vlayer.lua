@@ -24,10 +24,10 @@ return {
     },
 
     interface_limit = { --- @setting interface_limit Sets the limit for the number of vlayer interfaces that can be created
-        energy = 1, -- >1 allows for disconnected power networks to receive power
+        energy = 20, -- >1 allows for disconnected power networks to receive power
         circuit = 20, -- No caveats
         storage_input = 20, -- No caveats
-        storage_output = 1, -- >0 allows for item teleportation (allowed_items only)
+        storage_output = 20, -- >0 allows for item teleportation (allowed_items only)
     },
 
     allowed_items = { --- @setting allowed_items List of all items allowed in vlayer storage and their properties
