@@ -35,11 +35,11 @@ UsesServerUps:on_load(function(player_name, visible)
     local player = game.players[player_name]
     local label = player.gui.screen[server_ups.name]
 
-    --- @diagnostic disable-next-line undefined-field
-    if External.valid() and storage.ext and storage.ext.var and storage.ext.var.server_ups then
-        label.visible = true
-    else
+    --- @diagnostic disable-next-line undefined-field      
+    if not External.valid() or not storage.ext.var.server_ups then
         label.visible = false
+    else
+        label.visible = label.visible or false
     end
 end)
 
