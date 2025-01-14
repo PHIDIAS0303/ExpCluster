@@ -34,5 +34,6 @@ script = {
     ---@param data table Table with extra data that will be passed to the event handler. Any invalid LuaObjects will silently stop the event from being raised.
     raise_event = function(event, data) end;
 }
+
 ---@class LuaObject:userdata
 --https://github.com/justarandomgeek/vscode-factoriomod-debug/issues/165
