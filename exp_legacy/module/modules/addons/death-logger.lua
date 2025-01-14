@@ -152,14 +152,12 @@ if config.auto_collect_bodies then
     Event.add(defines.events.on_character_corpse_expired, function(event)
         local corpse = event.corpse
         local inventory = assert(corpse.get_inventory(defines.inventory.character_corpse))
-        --[[
         ExpUtil.transfer_inventory_to_surface{
             inventory = inventory,
             surface = corpse.surface,
             name = "steel-chest",
             allow_creation = true,
         }
-        ]]
     end)
 end
 
