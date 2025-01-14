@@ -9,20 +9,23 @@ local Groups = require("modules.exp_legacy.expcore.permission_groups") --- @dep 
 
 Groups.new_group("Admin")
     :allow_all()
+
+Groups.new_group('Mod')
+    :allow_all()
     :disallow{
-        "add_permission_group", -- admin
-        "delete_permission_group",
-        "edit_permission_group",
-        "import_permissions_string",
-        "map_editor_action",
-        "toggle_map_editor",
-        "change_multiplayer_config",
-        "set_heat_interface_mode",
-        "set_heat_interface_temperature",
-        "set_infinity_container_filter_item",
-        "set_infinity_container_remove_unfiltered_items",
-        "set_infinity_pipe_filter",
-    }
+        'add_permission_group', -- admin
+        'delete_permission_group',
+        'edit_permission_group',
+        'import_permissions_string',
+        'map_editor_action',
+        'toggle_map_editor',
+        'change_multiplayer_config',
+        'set_heat_interface_mode',
+        'set_heat_interface_temperature',
+        'set_infinity_container_filter_item',
+        'set_infinity_container_remove_unfiltered_items',
+        'set_infinity_pipe_filter'
+        }
 
 Groups.new_group("Trusted")
     :allow_all()
@@ -59,9 +62,8 @@ Groups.new_group("Standard")
         "set_infinity_pipe_filter",
         "admin_action", -- trusted
         "change_programmable_speaker_alert_parameters", -- standard
-        "drop_item",
         "open_new_platform_button_from_rocket_silo",
-        "set_rocket_silo_send_to_orbit_automated_mode",
+        "set_rocket_silo_send_to_orbit_automated_mode"
     }
 
 Groups.new_group("Guest")
