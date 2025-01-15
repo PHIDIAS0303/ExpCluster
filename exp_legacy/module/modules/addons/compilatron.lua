@@ -44,7 +44,7 @@ local speech_bubble_async =
 local function circle_messages()
     for name, ent in pairs(Public.compilatrons) do
         if not ent.valid then
-            Public.spawn_compilatron(game.players[1].surface or game.surfaces[1], name)
+            Public.spawn_compilatron(game.surfaces[1] or game.players[1].surface, name)
         end
         local current_message = Public.current_messages[name]
         local msg_number
