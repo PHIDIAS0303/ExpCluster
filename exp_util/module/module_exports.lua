@@ -277,15 +277,15 @@ function ExpUtil.extract_time_units(ticks, units)
 
     -- Remove units that are not requested
     if not units.days then
-        rtn.hours = rtn.hours + (rtn.days or 0) * 24
+        rtn.hours = (rtn.hours or 0) + (rtn.days or 0) * 24
         rtn.days = nil
     end
     if not units.hours then
-        rtn.minutes = rtn.minutes + (rtn.hours or 0) * 60
+        rtn.minutes = (rtn.minutes or 0) + (rtn.hours or 0) * 60
         rtn.hours = nil
     end
     if not units.minutes then
-        rtn.seconds = rtn.seconds + (rtn.minutes or 0) * 60
+        rtn.seconds = (rtn.seconds or 0) + (rtn.minutes or 0) * 60
         rtn.minutes = nil
     end
     if not units.seconds then
