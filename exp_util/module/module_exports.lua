@@ -269,10 +269,10 @@ function ExpUtil.extract_time_units(ticks, units)
     local max_days, max_hours, max_minutes, max_seconds = ticks / 5184000, ticks / 216000, ticks / 3600, ticks / 60
 
     local rtn = {
-        day = floor(max_days) or 0,
-        hours = floor(max_hours - floor(max_days) * 24) or 0,
-        minutes = floor(max_minutes - floor(max_hours) * 60) or 0,
-        seconds = floor(max_seconds - floor(max_minutes) * 60) or 0,
+        days = floor(max_days),
+        hours = floor(max_hours - floor(max_days) * 24),
+        minutes = floor(max_minutes - floor(max_hours) * 60),
+        seconds = floor(max_seconds - floor(max_minutes) * 60),
     }
 
     -- Remove units that are not requested
