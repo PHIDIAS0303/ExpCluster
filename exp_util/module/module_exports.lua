@@ -265,6 +265,7 @@ end
 --- @param units Common.format_time_param_units A table selecting which units should be displayed, options are: days, hours, minutes, seconds
 --- @return Common.extract_time_units_return
 function ExpUtil.extract_time_units(ticks, units)
+    ticks = ticks or 0
     -- Calculate the values to be determine the display values
     local max_days, max_hours, max_minutes, max_seconds = ticks / 5184000, ticks / 216000, ticks / 3600, ticks / 60
 
@@ -277,15 +278,15 @@ function ExpUtil.extract_time_units(ticks, units)
 
     -- Remove units that are not requested
     if not units.days then
-        rtn.hours = (rtn.hours or 0) + (rtn.days or 0) * 24
+        rtn.hours = rtn.hours + rtn.days * 24
         rtn.days = nil
     end
     if not units.hours then
-        rtn.minutes = (rtn.minutes or 0) + (rtn.hours or 0) * 60
+        rtn.minutes = rtn.minutes + rtn.hours * 60
         rtn.hours = nil
     end
     if not units.minutes then
-        rtn.seconds = (rtn.seconds or 0) + (rtn.minutes or 0) * 60
+        rtn.seconds = rtn.seconds + rtn.minutes * 60
         rtn.minutes = nil
     end
     if not units.seconds then
