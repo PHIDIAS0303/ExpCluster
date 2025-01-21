@@ -309,6 +309,15 @@ Event.add(defines.events.on_research_finished, function(event)
     end
 end)
 
+Event.add(defines.events.on_research_started, function(event)
+    local r = event.research
+    local res_name = config.limit_res[r.name]
+
+    if res_name and r.level > res_name then
+        table.remove(r.force.research_queue)
+    end
+end)
+
 Event.on_nth_tick(60, function()
     local current_time = research_time_format(game.tick)
 
