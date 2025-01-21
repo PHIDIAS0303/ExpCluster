@@ -311,10 +311,12 @@ end)
 
 Event.add(defines.events.on_research_started, function(event)
     local r = event.research
-    local rn = config.limit_res[r.name]
+    local rq = r.force.research_queue
 
-    if rn and r.level > rn then
-        r.force.cancel_current_research()
+    for i = #rq, 1, -1 do
+        if config.limit_res[rq[i]] and rq[i].level > config.limit_res[rq[i]] then
+            r.force.cancel_current_research()
+        end
     end
 end)
 
