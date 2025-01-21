@@ -309,16 +309,18 @@ Event.add(defines.events.on_research_finished, function(event)
     end
 end)
 
+--[[
 Event.add(defines.events.on_research_started, function(event)
     local r = event.research
     local rq = r.force.research_queue
 
     for i = #rq, 1, -1 do
-        if config.limit_res[rq[i]] and rq[i].level > config.limit_res[rq[i]] then
+        if config.limit_res[rq[i] ] and rq[i].level > config.limit_res[rq[i] ] then
             r.force.cancel_current_research()
         end
     end
 end)
+]]
 
 Event.on_nth_tick(60, function()
     local current_time = research_time_format(game.tick)
