@@ -311,9 +311,9 @@ end)
 
 Event.add(defines.events.on_research_started, function(event)
     local r = event.research
-    local res_name = config.limit_res[r.name]
+    local rn = config.limit_res[r.name]
 
-    if res_name and r.level > res_name then
+    if rn and r.level > rn then
         table.remove(r.force.research_queue)
     end
 end)
