@@ -106,7 +106,7 @@ Selection.on_selection(SelectionConvertArea, function(event)
 
     local e = entities[1]
     local e_pos = { x = string.format("%.1f", e.position.x), y = string.format("%.1f", e.position.y) }
-    local e_circ = {} -- e.circuit_connected_entities --- TODO use new circuit api
+    local e_circ = e.get_wire_connectors
 
     if not e.get_inventory(defines.inventory.chest).is_empty() then
         player.print{ "vlayer.steel-chest-empty" }
