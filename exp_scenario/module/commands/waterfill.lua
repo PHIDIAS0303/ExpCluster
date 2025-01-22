@@ -44,10 +44,8 @@ Selection.on_selection(SelectionName, function(event)
 
     local item_count_cliff = player.get_item_count("cliff-explosives")
     local item_count_craft = math.min(math.floor(player.get_item_count("explosives") / 10), player.get_item_count("barrel"), player.get_item_count("grenade"))
-    local item_count_cliff_ne = false
-    local item_count_craft_ne = false
 
-    if item_count_cliff < area_size and item_count_craft < area_size then
+    if (item_count_cliff < area_size) and (item_count_craft < area_size) then
         player.print({ "exp-commands_waterfill.too-few-explosives", area_size, item_count_cliff }, Commands.print_settings.error)
         return
     end
@@ -68,7 +66,7 @@ Selection.on_selection(SelectionName, function(event)
     local remaining_tiles = surface.count_tiles_filtered{ area = area, name = "water-mud" }
     local t_diff = tile_count - remaining_tiles
 
-    if (not item_count_cliff_ne) and item_count_craft_ne then
+    if item_count_cliff >= area_size then
         player.remove_item{ name = "cliff-explosives", count = t_diff }
     else
         player.remove_item{ name = "explosives", count = 10 * t_diff }
