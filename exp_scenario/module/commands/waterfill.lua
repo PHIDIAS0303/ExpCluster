@@ -47,13 +47,7 @@ Selection.on_selection(SelectionName, function(event)
     local item_count_cliff_ne = false
     local item_count_craft_ne = false
 
-    if item_count_cliff < area_size then
-        item_count_cliff_ne = true
-    elseif item_count_craft < area_size then
-        item_count_craft_ne = true
-    end
-
-    if item_count_cliff_ne and item_count_craft_ne then
+    if item_count_cliff < area_size and item_count_craft < area_size then
         player.print({ "exp-commands_waterfill.too-few-explosives", area_size, item_count_cliff }, Commands.print_settings.error)
         return
     end
