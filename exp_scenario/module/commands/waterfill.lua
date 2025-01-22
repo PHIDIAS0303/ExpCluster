@@ -36,7 +36,6 @@ Selection.on_selection(SelectionName, function(event)
     ]]
 
     local area_size = (area.right_bottom.x - area.left_top.x) * (area.right_bottom.y - area.left_top.y)
-
     if area_size > 1000 then
         player.print({ "exp-commands_waterfill.area-too-large", 1000, area_size }, Commands.print_settings.error)
         return
