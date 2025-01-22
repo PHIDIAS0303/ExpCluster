@@ -108,7 +108,7 @@ Selection.on_selection(SelectionConvertArea, function(event)
     local e_pos = { x = string.format("%.1f", e.position.x), y = string.format("%.1f", e.position.y) }
     local e_circ = nil -- e.get_wire_connectors{ or_create = false }
 
-    if not e.get_inventory(defines.inventory.chest).is_empty() then
+    if e.name and e.name == "steel-chest" and (not e.get_inventory(defines.inventory.chest).is_empty()) then
         player.print{ "vlayer.steel-chest-empty" }
         return nil
     end
