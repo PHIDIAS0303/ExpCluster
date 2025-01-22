@@ -81,10 +81,16 @@ Selection.on_selection(SelectionConvertArea, function(event)
         return nil
     end
 
-    local entities = event.surface.find_entities_filtered{ area = area, name = "steel-chest", force = player.force }
     local frame = Gui.get_left_element(player, vlayer_container)
     local disp = frame.container["vlayer_st_2"].disp.table
     local target = vlayer_control_type_list[disp[vlayer_gui_control_type.name].selected_index]
+    local entities
+
+    if event.surface and event.surface.platform and target == "energy" then
+        entities = event.surface.find_entities_filtered{ area = area, name = "constant-combinator", force = player.force }
+    else
+        entities = event.surface.find_entities_filtered{ area = area, name = "steel-chest", force = player.force }
+    end
 
     if #entities == 0 then
         player.print{ "vlayer.steel-chest-detect" }
