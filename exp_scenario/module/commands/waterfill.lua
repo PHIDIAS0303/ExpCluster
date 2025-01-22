@@ -43,19 +43,22 @@ Selection.on_selection(SelectionName, function(event)
     end
 
     local item_count_cliff = player.get_item_count("cliff-explosives")
-    local item_count_cliff_craft = math.min(math.floor(player.get_item_count("explosives") / 10), player.get_item_count("barrel"), player.get_item_count("grenade"))
+    local item_count_craft = math.min(math.floor(player.get_item_count("explosives") / 10), player.get_item_count("barrel"), player.get_item_count("grenade"))
     local item_count_type_bool = true
+    local item_count_cliff_ne = false
+    local item_count_craft_ne = false
 
-    if item_count_cliff > 0 and item_count_cliff < area_size then
+    if item_count_cliff < area_size then
+        item_count_cliff_ne = true
+    elseif item_count_craft < area_size then
+        item_count_craft_ne = true
+    end
+
+    if item_count_cliff_ne and item_count_craft_ne then
         player.print({ "exp-commands_waterfill.too-few-explosives", area_size, item_count_cliff }, Commands.print_settings.error)
         return
-    elseif item_count_cliff_craft > 0 then
-        if item_count_cliff_craft < area_size then
-            player.print({ "exp-commands_waterfill.too-few-explosives", area_size, item_count_cliff_craft }, Commands.print_settings.error)
-            return
-        else
-            item_count_type_bool = false
-        end
+    elseif item_count_cliff_ne and (not item_count_craft_ne) then
+        item_count_type_bool = false
     end
 
     local tile_count = 0
