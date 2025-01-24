@@ -340,9 +340,9 @@ function vlayer.create_input_interface(surface, position, circuit, last_user)
     end
 
     if circuit then
-        for k, _ in pairs(circuit) do
-            for _, v in pairs(circuit[k]) do
-                interface.connect_neighbour{ wire = defines.wire_type[k], target_entity = v }
+        for k, _ in pairs({ defines.wire_connector_id.circuit_red, defines.wire_connector_id.circuit_green }) do
+            for _, v in pairs(circuit.get_wire_connector{ wire_connector_id = k, or_create = false }.real_connections) do
+                interface.connect_to{ target = v.target }
             end
         end
     end
@@ -418,9 +418,9 @@ function vlayer.create_output_interface(surface, position, circuit, last_user)
     end
 
     if circuit then
-        for k, _ in pairs(circuit) do
-            for _, v in pairs(circuit[k]) do
-                interface.connect_neighbour{ wire = defines.wire_type[k], target_entity = v }
+        for k, _ in pairs({ defines.wire_connector_id.circuit_red, defines.wire_connector_id.circuit_green }) do
+            for _, v in pairs(circuit.get_wire_connector{ wire_connector_id = k, or_create = false }.real_connections) do
+                interface.connect_to{ target = v.target }
             end
         end
     end
@@ -555,9 +555,9 @@ function vlayer.create_circuit_interface(surface, position, circuit, last_user)
     end
 
     if circuit then
-        for k, _ in pairs(circuit) do
-            for _, v in pairs(circuit[k]) do
-                interface.connect_neighbour{ wire = defines.wire_type[k], target_entity = v }
+        for k, _ in pairs({ defines.wire_connector_id.circuit_red, defines.wire_connector_id.circuit_green }) do
+            for _, v in pairs(circuit.get_wire_connector{ wire_connector_id = k, or_create = false }.real_connections) do
+                interface.connect_to{ target = v.target }
             end
         end
     end
