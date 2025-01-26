@@ -20,7 +20,7 @@ Commands.new("kill", { "exp-commands_kill.description" })
         if other_player == nil then
             -- Can only be nil if the target is the player and they are already dead
             return Commands.status.error{ "exp-commands_kill.already-dead" }
-        elseif (other_player == player) or highest_role(other_player).index < highest_role(player).index then
+        elseif (other_player == player) or (highest_role(other_player).index < highest_role(player).index) then
             -- You can always kill yourself or can kill lower role players
             local pos = other_player.position
             other_player.surface.create_entity{ name = "lightning", position = { pos.x, pos.y - 16 }, target = other_player.character }
