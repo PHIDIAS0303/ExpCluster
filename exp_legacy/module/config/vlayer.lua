@@ -11,7 +11,8 @@ return {
     modded_auto_downgrade = true, --- @setting modded_auto_downgrade When true modded items will be converted into their base game equivalent, original items can not be recovered
     power_on_space = true, --- @setting power_on_space When true allow on spaceship
     power_on_space_research = {
-        ["research-productivity"] = 10
+        name = "research-productivity",
+        level = 10
     },
 
     mimic_surface = "nauvis", --- @setting mimic_surface Surface name/index the vlayer will copy its settings from, use nil to use the settings below
