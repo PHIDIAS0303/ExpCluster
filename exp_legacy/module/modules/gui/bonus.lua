@@ -329,6 +329,7 @@ bonus_container =
         local disp = frame.container["bonus_st_1"].disp.table
         local n = bonus_gui_pts_needed(player)
         disp[bonus_gui_control_pts_n_count.name].caption = n
+        disp[bonus_gui_control_pts_a_count.name].caption = config.pts.base * (Roles.get_player_highest_role(player).index - Roles.get_role_by_name(config.pts.role_name).index)
         local r = tonumber(disp[bonus_gui_control_pts_a_count.name].caption) - n
         disp[bonus_gui_control_pts_r_count.name].caption = r
 
