@@ -9,7 +9,9 @@ local Event = require("modules/exp_legacy/utils/event") --- @dep utils.event
 local config = require("modules.exp_legacy.config.bonus") --- @dep config.bonus
 local vlayer = require("modules.exp_legacy.modules.control.vlayer")
 local format_number = require("util").format_number --- @dep util
+
 local bonus_container
+local bonus_gui_control_pts_a_count
 
 local function bonus_gui_pts_needed(player)
     local frame = Gui.get_left_element(player, bonus_container)
@@ -65,7 +67,7 @@ end
 local function max_bonus_pts_update(player)
     local frame = Gui.get_left_element(player, bonus_container)
     local disp = frame.container["bonus_st_2"].disp.table
-    disp["bonus_control_pts_a_count"].caption = math.floor(config.pts.base * (1 + config.pts.increase_percentage_per_role_level * (Roles.get_player_highest_role(player).index - Roles.get_role_by_name(config.pts.role_name).index)))
+    disp[bonus_gui_control_pts_a_count.name].caption = math.floor(config.pts.base * (1 + config.pts.increase_percentage_per_role_level * (Roles.get_player_highest_role(player).index - Roles.get_role_by_name(config.pts.role_name).index)))
 end
 
 local function apply_periodic_bonus(player)
@@ -115,7 +117,7 @@ local bonus_gui_control_pts_a =
         width = config.gui_display_width["half"],
     }
 
-local bonus_gui_control_pts_a_count =
+bonus_gui_control_pts_a_count =
     Gui.element{
         type = "label",
         name = "bonus_control_pts_a_count",
