@@ -41,12 +41,10 @@ Selection.on_selection(SelectionName, function(event)
         return
     end
 
-    local item_count_cliff = player.get_item_count("cliff-explosives")
-    local item_count_craft = math.min(math.floor(player.get_item_count("explosives") / 10), player.get_item_count("barrel"), player.get_item_count("grenade"))
-    local item_count_total = item_count_cliff + item_count_craft
+    local item_count_total = player.get_item_count("cliff-explosives") + math.min(math.floor(player.get_item_count("explosives") / 10), player.get_item_count("barrel"), player.get_item_count("grenade"))
 
     if item_count_total < area_size then
-        player.print({ "exp-commands_waterfill.too-few-explosives", area_size, item_count_cliff }, Commands.print_settings.error)
+        player.print({ "exp-commands_waterfill.too-few-explosives", area_size, item_count_total }, Commands.print_settings.error)
         return
     end
 
