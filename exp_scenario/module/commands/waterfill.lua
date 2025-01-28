@@ -20,7 +20,7 @@ Commands.new("waterfill", { "exp-commands_waterfill.description" })
             if item_count_total == 0 then
                 return player.print{ "exp-commands_waterfill.requires-explosives" }
             else
-                Selection.start(player, SelectionWaterfillArea)
+                Selection.start(player, SelectionName)
                 return player.print{ "exp-commands_waterfill.enter" }
             end
         end
