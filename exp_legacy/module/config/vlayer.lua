@@ -13,7 +13,7 @@ return {
     power_on_space_research = {
         name = "research-productivity",
         level = 10
-    },
+    }, --- @setting power_on_space_research the research level needed to use power_on_space
 
     mimic_surface = "nauvis", --- @setting mimic_surface Surface name/index the vlayer will copy its settings from, use nil to use the settings below
     surface = { --- @setting surface When mimic_surface is nil these settings will be used instead, see LuaSurface for details
