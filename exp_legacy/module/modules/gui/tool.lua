@@ -83,11 +83,13 @@ local tool_gui_waterfill_b =
         if Selection.is_selecting(player, SelectionWaterfillArea) then
             Selection.stop(player)
             return player.print{ "exp-commands_waterfill.exit" }
-        elseif player.get_item_count("cliff-explosives") == 0 then
-            return player.print{ "exp-commands_waterfill.requires-explosives" }
         else
-            Selection.start(player, SelectionWaterfillArea)
-            return player.print{ "exp-commands_waterfill.enter" }
+            if player.get_item_count("cliff-explosives") == 0 then
+                return player.print{ "exp-commands_waterfill.requires-explosives" }
+            else
+                Selection.start(player, SelectionWaterfillArea)
+                return player.print{ "exp-commands_waterfill.enter" }
+            end
         end
     end)
 
