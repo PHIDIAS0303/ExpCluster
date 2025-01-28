@@ -84,7 +84,10 @@ local tool_gui_waterfill_b =
             Selection.stop(player)
             return player.print{ "exp-commands_waterfill.exit" }
         else
-            if player.get_item_count("cliff-explosives") == 0 then
+            local item_count_cliff = player.get_item_count("cliff-explosives")
+            local item_count_craft = math.min(math.floor(player.get_item_count("explosives") / 10), player.get_item_count("barrel"), player.get_item_count("grenade"))
+            local item_count_total = item_count_cliff + item_count_craft
+            if item_count_total == 0 then
                 return player.print{ "exp-commands_waterfill.requires-explosives" }
             else
                 Selection.start(player, SelectionWaterfillArea)
