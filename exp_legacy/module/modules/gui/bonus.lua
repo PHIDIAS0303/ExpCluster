@@ -62,6 +62,12 @@ local function apply_bonus(player)
     end
 end
 
+local function max_bonus_pts_update(player)
+    local frame = Gui.get_left_element(player, bonus_container)
+    local disp = frame.container["bonus_st_2"].disp.table
+    disp["bonus_control_pts_a_count"].caption = config.pts.base * (Roles.get_player_highest_role(player).index - Roles.get_role_by_name(config.pts.role_name).index)
+end
+
 local function apply_periodic_bonus(player)
     if not Roles.player_allowed(player, "gui/bonus") then
         return
@@ -360,11 +366,15 @@ Event.add(defines.events.on_player_created, function(event)
 end)
 
 Event.add(Roles.events.on_role_assigned, function(event)
-    apply_bonus(game.players[event.player_index])
+    local player = game.players[event.player_index]
+    apply_bonus(player)
+    max_bonus_pts_update(player)
 end)
 
 Event.add(Roles.events.on_role_unassigned, function(event)
-    apply_bonus(game.players[event.player_index])
+    local player = game.players[event.player_index]
+    apply_bonus(player)
+    max_bonus_pts_update(player)
 end)
 
 --- When a player respawns re-apply bonus
