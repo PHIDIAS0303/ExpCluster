@@ -55,4 +55,3 @@ Commands.new("repair", { "exp-commands_repair.description" })
 
         return Commands.status.success(response)
     end)
-
