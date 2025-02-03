@@ -9,7 +9,9 @@ local Roles = require("modules.exp_legacy.expcore.roles") --- @dep expcore.roles
 local config = require("modules.exp_legacy.config.bonus") --- @dep config.bonus
 local vlayer = require("modules.exp_legacy.modules.control.vlayer")
 local format_number = require("util").format_number --- @dep util
+
 local bonus_container
+local bonus_gui_control_pts_a_count
 
 --- @param player LuaPlayer
 --- @param container LuaGuiElement?
@@ -65,6 +67,14 @@ local function apply_bonus(player)
         end
     end
 end
+
+--[[
+local function max_bonus_pts_update(player)
+    local frame = Gui.get_left_element(player, bonus_container)
+    local disp = frame.container["bonus_st_2"].disp.table
+    disp[bonus_gui_control_pts_a_count.name].caption = math.floor(config.pts.base * (1 + config.pts.increase_percentage_per_role_level * (Roles.get_player_highest_role(player).index - Roles.get_role_by_name(config.pts.role_name).index)))
+end
+]]
 
 local function apply_periodic_bonus(player)
     if not Roles.player_allowed(player, "gui/bonus") then
