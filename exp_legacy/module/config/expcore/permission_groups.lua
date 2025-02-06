@@ -81,10 +81,14 @@ Groups.new_group("Guest")
         "set_infinity_pipe_filter",
         "admin_action", -- trusted
         "change_programmable_speaker_alert_parameters", -- standard
+        "change_programmable_speaker_circuit_parameters",
+        "change_programmable_speaker_parameters",
         "drop_item",
         "open_new_platform_button_from_rocket_silo",
         "set_rocket_silo_send_to_orbit_automated_mode",
-        "change_programmable_speaker_parameters",
+        "instantly_create_space_platform",
+        "cancel_delete_space_platform",
+        "rename_space_platform",
         "change_train_stop_station",
         -- "deconstruct",
         "remove_cables",
