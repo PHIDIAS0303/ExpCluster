@@ -20,11 +20,6 @@ Groups.new_group("Mod")
         "map_editor_action",
         "toggle_map_editor",
         "change_multiplayer_config",
-        "set_heat_interface_mode",
-        "set_heat_interface_temperature",
-        "set_infinity_container_filter_item",
-        "set_infinity_container_remove_unfiltered_items",
-        "set_infinity_pipe_filter"
     }
 
 Groups.new_group("Trusted")
@@ -37,12 +32,12 @@ Groups.new_group("Trusted")
         "map_editor_action",
         "toggle_map_editor",
         "change_multiplayer_config",
-        "set_heat_interface_mode",
+        "set_heat_interface_mode", -- trusted
         "set_heat_interface_temperature",
         "set_infinity_container_filter_item",
         "set_infinity_container_remove_unfiltered_items",
         "set_infinity_pipe_filter",
-        "admin_action", -- trusted
+        "admin_action",
     }
 
 Groups.new_group("Standard")
