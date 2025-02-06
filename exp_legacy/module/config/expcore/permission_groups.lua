@@ -61,6 +61,7 @@ Groups.new_group("Standard")
         "set_infinity_container_remove_unfiltered_items",
         "set_infinity_pipe_filter",
         "admin_action", -- trusted
+        "delete_space_platform",
         "change_programmable_speaker_alert_parameters", -- standard
     }
 
@@ -80,6 +81,7 @@ Groups.new_group("Guest")
         "set_infinity_container_remove_unfiltered_items",
         "set_infinity_pipe_filter",
         "admin_action", -- trusted
+        "delete_space_platform",
         "change_programmable_speaker_alert_parameters", -- standard
         "change_programmable_speaker_circuit_parameters", -- guest
         "change_programmable_speaker_parameters",
@@ -88,7 +90,6 @@ Groups.new_group("Guest")
         "open_new_platform_button_from_rocket_silo",
         "instantly_create_space_platform",
         "cancel_delete_space_platform",
-        "delete_space_platform",
         "rename_space_platform",
         -- "launch_rocket",
         "change_train_stop_station",
