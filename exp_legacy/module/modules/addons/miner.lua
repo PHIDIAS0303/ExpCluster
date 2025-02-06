@@ -41,7 +41,7 @@ local function check_entity(entity)
     end
 
     if not entity.minable then
-        -- if it is minable
+        -- if it is not minable
         return true
     end
 
@@ -85,7 +85,7 @@ local function chest_check(entity)
         end
     end
 
-    if check_entity(target) then
+    if not check_entity(target) then
         table.insert(miner_data.queue, { t = game.tick + 10, e = target })
     end
 end
@@ -161,27 +161,27 @@ Event.add(defines.events.on_resource_depleted, function(event)
         return
     end
 
-    local entities = event.entity.surface.find_entities_filtered{ area = { { event.entity.position.x - 1, event.entity.position.y - 1 }, { event.entity.position.x + 1, event.entity.position.y + 1 } }, type = "mining-drill" }
+    local resource = event.entity
+    local drills = resource.surface.find_entities_filtered{ type = "mining-drill" }
 
-    if #entities == 0 then
-        return
-    end
-
-    for _, entity in pairs(entities) do
-        if ((math.abs(entity.position.x - event.entity.position.x) < entity.prototype.mining_drill_radius) and (math.abs(entity.position.y - event.entity.position.y) < entity.prototype.mining_drill_radius)) then
+    for _, entity in pairs(drills) do
+        local radius = entity.prototype.mining_drill_radius
+        local dx = math.abs(entity.position.x - resource.position.x)
+        local dy = math.abs(entity.position.y - resource.position.y)
+        if dx <= radius and dy <= radius then
             miner_check(entity)
         end
     end
 end)
 
 Event.on_nth_tick(10, function(event)
-    for k, q in pairs(miner_data.queue) do
+    for i = #miner_data.queue, 1, -1 do
+        local q = miner_data.queue[i]
         if not q.e or not q.e.valid then
-            table.remove(miner_data.queue, k)
-            break
+            table.remove(miner_data.queue, i)
         elseif event.tick >= q.t then
             q.e.order_deconstruction(q.e.force)
-            table.remove(miner_data.queue, k)
+            table.remove(miner_data.queue, i)
         end
     end
 end)
