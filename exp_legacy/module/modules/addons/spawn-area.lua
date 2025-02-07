@@ -61,7 +61,7 @@ local function spawn_turrets()
 
         -- Makes a new turret if it is not found
         if not turret or not turret.valid then
-            turret = surface.create_entity{ name = "gun-turret", position = pos, force = "spawn" }
+            turret = surface.create_entity{ name = "gun-turret", position = pos, force = "neutral" }
             if not turret then return end
             protect_entity(turret)
         end
