@@ -115,9 +115,7 @@ local function miner_check(entity)
     if config.fluid and entity.fluidbox and #entity.fluidbox > 0 then
         -- if require fluid to mine
         table.insert(pipe_build, { x = 0, y = 0 })
-
-        local half = math.floor(entity.get_radius())
-        local r = 1 + er
+        local r = er + 1
 
         local entities = es.find_entities_filtered{ area = { { ep.x - r, ep.y - r }, { ep.x + r, ep.y + r } }, type = { "mining-drill", "pipe", "pipe-to-ground" } }
         local entities_t = es.find_entities_filtered{ area = { { ep.x - r, ep.y - r }, { ep.x + r, ep.y + r } }, ghost_type = { "pipe", "pipe-to-ground" } }
@@ -126,19 +124,19 @@ local function miner_check(entity)
 
         for _, e in pairs(entities) do
             if (e.position.x > ep.x) and (e.position.y == ep.y) then
-                for h = 1, half do
+                for h = 1, er do
                     table.insert(pipe_build, { x = h, y = 0 })
                 end
             elseif (e.position.x < ep.x) and (e.position.y == ep.y) then
-                for h = 1, half do
+                for h = 1, er do
                     table.insert(pipe_build, { x = -h, y = 0 })
                 end
             elseif (e.position.x == ep.x) and (e.position.y > ep.y) then
-                for h = 1, half do
+                for h = 1, er do
                     table.insert(pipe_build, { x = 0, y = h })
                 end
             elseif (e.position.x == ep.x) and (e.position.y < ep.y) then
-                for h = 1, half do
+                for h = 1, er do
                     table.insert(pipe_build, { x = 0, y = -h })
                 end
             end
