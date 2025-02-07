@@ -91,6 +91,7 @@ Roles.new_role("Trainee Moderator", "Trainee")
     :set_flag("is_admin")
     :set_flag("is_spectator")
     :set_flag("report-immune")
+    :set_flag("instant-respawn")
     :set_flag("deconlog-bypass")
     :set_parent("Board Member")
     :allow{
@@ -147,6 +148,7 @@ Roles.new_role("Supporter", "Sup")
     :set_permission_group("Trusted")
     :set_custom_color{ r = 230, g = 99, b = 34 }
     :set_flag("is_spectator")
+    :set_flag("instant-respawn")
     :set_flag("deconlog-bypass")
     :set_parent("Partner")
     :allow{
@@ -156,6 +158,7 @@ Roles.new_role("Partner", "Part")
     :set_permission_group("Trusted")
     :set_custom_color{ r = 24, g = 172, b = 188 }
     :set_flag("is_spectator")
+    :set_flag("instant-respawn")
     :set_flag("deconlog-bypass")
     :set_parent("Senior Member")
     :allow{
@@ -166,6 +169,7 @@ Roles.new_role("Senior Member", "SMem")
     :set_custom_color{ r = 24, g = 172, b = 188 }
     :set_flag("is_spectator")
     :set_flag("deconlog-bypass")
+    :set_flag("instant-respawn")
     :set_parent("Member")
     :allow{
         "command/set-join-message",
@@ -182,6 +186,7 @@ Roles.new_role("Senior Member", "SMem")
 Roles.new_role("Member", "Mem")
     :set_permission_group("Trusted")
     :set_custom_color{ r = 24, g = 172, b = 188 }
+    :set_flag("instant-respawn")
     :set_flag("deconlog-bypass")
     :set_parent("Veteran")
     :allow{

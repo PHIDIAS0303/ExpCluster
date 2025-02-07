@@ -11,10 +11,7 @@ local vlayer = require("modules.exp_legacy.modules.control.vlayer")
 local format_number = require("util").format_number --- @dep util
 
 local bonus_container
-local bonus_score = {
-    ["current"] = 0,
-    ["limit"] = config.pts.base,
-}
+local bonus_score_limit = config.pts.base
 
 --- @param player LuaPlayer
 --- @param container LuaGuiElement?
@@ -71,14 +68,6 @@ local function apply_bonus(player)
     end
 end
 
---[[
-local function max_bonus_pts_update(player)
-    local frame = Gui.get_left_element(player, bonus_container)
-    local disp = frame.container["bonus_st_2"].disp.table
-    disp[bonus_gui_control_pts_count.name].caption = math.floor(config.pts.base * (1 + config.pts.increase_percentage_per_role_level * (Roles.get_player_highest_role(player).index - Roles.get_role_by_name(config.pts.role_name).index)))
-end
-]]
-
 local function apply_periodic_bonus(player)
     if not Roles.player_allowed(player, "gui/bonus") then
         return
@@ -130,7 +119,7 @@ local bonus_gui_control_pts_count = Gui.element("vlayer_gui_display_item_solar_c
     :draw{
         type = "progressbar",
         name = Gui.property_from_name,
-        caption = bonus_score["current"] .. " / " .. bonus_score["limit"],
+        caption = "0 / " .. bonus_score_limit,
         value = 0,
         style = "electric_satisfaction_statistics_progressbar",
     }:style{
@@ -154,18 +143,13 @@ local bonus_gui_control_reset = Gui.element("bonus_gui_control_reset")
         for k, v in pairs(config.conversion) do
             local s = "bonus_display_" .. k .. "_slider"
             disp[s].slider_value = config.player_bonus[v].value
-
-            if config.player_bonus[v].is_percentage then
-                disp[disp[s].tags.counter].caption = format_number(disp[s].slider_value * 100, false) .. " %"
-            else
-                disp[disp[s].tags.counter].caption = format_number(disp[s].slider_value, false)
-            end
+            disp[disp[s].tags.counter].caption = (config.player_bonus[v].is_percentage and format_number(disp[s].slider_value * 100, false) .. " %") or format_number(disp[s].slider_value, false)
         end
 
         local slider = disp["bonus_display_personal_battery_recharge_slider"]
         slider.slider_value = config.player_special_bonus["personal_battery_recharge"].value
         disp[slider.tags.counter].caption = format_number(slider.slider_value, false)
-        disp[bonus_gui_control_pts_count.name].caption = bonus_gui_pts_needed(player) .. " / " .. bonus_score["limit"]
+        disp[bonus_gui_control_pts_count.name].caption = bonus_gui_pts_needed(player) .. " / " .. bonus_score_limit
     end)
 
 --- A button used for pts apply
@@ -179,11 +163,9 @@ local bonus_gui_control_apply = Gui.element("bonus_gui_control_apply")
         width = config.gui_display_width["half"],
     }:on_click(function(def, player, element)
         local n = bonus_gui_pts_needed(player)
-        element.parent[bonus_gui_control_pts_n_count.name].caption = n
-        local r = tonumber(element.parent[bonus_gui_control_pts_count.name].caption) - n
-        element.parent[bonus_gui_control_pts_r_count.name].caption = r
+        element.parent[bonus_gui_control_pts_count.name].caption = n .. " / " .. bonus_score_limit
 
-        if r >= 0 then
+        if n <= bonus_score_limit then
             apply_bonus(player)
         end
     end)
@@ -215,14 +197,6 @@ local bonus_gui_slider = Gui.element("bonus_gui_slider")
         }
         label.style.width = config.gui_display_width["label"]
 
-        local value = bonus.value
-
-        if bonus.is_percentage then
-            value = format_number(value * 100, false) .. " %"
-        else
-            value = format_number(value, false)
-        end
-
         local slider = parent.add{
             type = "slider",
             name = name .. "_slider",
@@ -242,7 +216,7 @@ local bonus_gui_slider = Gui.element("bonus_gui_slider")
         local count = parent.add{
             type = "label",
             name = name .. "_count",
-            caption = value,
+            caption = (bonus.is_percentage and format_number(bonus.value * 100, false) .. " %") or format_number(bonus.value, false),
             style = "heading_2_label",
         }
         count.style.width = config.gui_display_width["count"]
@@ -250,16 +224,10 @@ local bonus_gui_slider = Gui.element("bonus_gui_slider")
         return slider
     end)
     :on_value_changed(function(def, player, element)
-        if element.tags.is_percentage then
-            element.parent[element.tags.counter].caption = format_number(element.slider_value * 100, false) .. " %"
-        else
-            element.parent[element.tags.counter].caption = format_number(element.slider_value, false)
-        end
-
-        local r = bonus_gui_pts_needed(player)
+        element.parent[element.tags.counter].caption = (element.tags.is_percentage and format_number(element.slider_value * 100, false) .. " %") or format_number(element.slider_value, false)
         local container = Gui.get_left_element(bonus_container, player)
         local disp = container.frame["bonus_st_1"].disp.table
-        disp[bonus_gui_control_pts_count.name].caption = 0 .. " / " .. config.pts.base
+        disp[bonus_gui_control_pts_count.name].caption = bonus_gui_pts_needed(player) .. " / " .. bonus_score_limit
     end)
 
 --- A vertical flow containing all the bonus data
@@ -290,10 +258,8 @@ bonus_container = Gui.element("bonus_container")
         bonus_data_set(container, "bonus_st_2")
 
         local disp = container["bonus_st_1"].disp.table
-        local n = bonus_gui_pts_needed(player, container.parent)
-        disp[bonus_gui_control_pts_n_count.name].caption = n
-        local r = tonumber(disp[bonus_gui_control_pts_count.name].caption) - n
-        disp[bonus_gui_control_pts_r_count.name].caption = r
+        bonus_score_limit = math.floor(config.pts.base * (1 + config.pts.increase_percentage_per_role_level * (Roles.get_player_highest_role(player).index - Roles.get_role_by_name(config.pts.role_name).index)))
+        disp[bonus_gui_control_pts_count.name].caption = bonus_gui_pts_needed(player) .. " / " .. bonus_score_limit
 
         return container.parent
     end)
@@ -325,11 +291,15 @@ Event.add(defines.events.on_player_created, function(event)
 end)
 
 Event.add(Roles.events.on_role_assigned, function(event)
-    apply_bonus(game.players[event.player_index])
+    local player = game.players[event.player_index]
+    bonus_score_limit = math.floor(config.pts.base * (1 + config.pts.increase_percentage_per_role_level * (Roles.get_player_highest_role(player).index - Roles.get_role_by_name(config.pts.role_name).index)))
+    apply_bonus(player)
 end)
 
 Event.add(Roles.events.on_role_unassigned, function(event)
-    apply_bonus(game.players[event.player_index])
+    local player = game.players[event.player_index]
+    bonus_score_limit = math.floor(config.pts.base * (1 + config.pts.increase_percentage_per_role_level * (Roles.get_player_highest_role(player).index - Roles.get_role_by_name(config.pts.role_name).index)))
+    apply_bonus(player)
 end)
 
 --- When a player respawns re-apply bonus
@@ -338,11 +308,9 @@ Event.add(defines.events.on_player_respawned, function(event)
     local container = Gui.get_left_element(bonus_container, player)
     local disp = container.frame["bonus_st_1"].disp.table
     local n = bonus_gui_pts_needed(player)
-    disp[bonus_gui_control_pts_n_count.name].caption = n
-    local r = tonumber(disp[bonus_gui_control_pts_count.name].caption) - n
-    disp[bonus_gui_control_pts_r_count.name].caption = r
+    disp[bonus_gui_control_pts_count.name].caption = n .. " / " .. bonus_score_limit
 
-    if r >= 0 then
+    if n <= bonus_score_limit then
         apply_bonus(player)
     end
 end)
