@@ -279,7 +279,7 @@ Event.add(defines.events.on_research_started, function(event)
 
     for i = #rq, 1, -1 do
         if config.limit_res[rq[i]] and rq[i].level > config.limit_res[rq[i]] then
-            rq[i] = nil
+            event.research.force.research_queue[i] = nil
         end
     end
 end)
