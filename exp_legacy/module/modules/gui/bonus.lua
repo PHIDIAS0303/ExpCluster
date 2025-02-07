@@ -246,9 +246,13 @@ local bonus_data_set = Gui.element("bonus_data_set")
 
         return bonus_set
     end)
+
+local function bonus_score_limit_calc(player)
+    return math.floor(config.pts.base * (1 + config.pts.increase_percentage_per_role_level * (Roles.get_role_by_name(config.pts.role_name).index - Roles.get_player_highest_role(player).index)))
+end
+
 --- The main container for the bonus gui
 -- @element bonus_container
-
 bonus_container = Gui.element("bonus_container")
     :draw(function(def, parent)
         local player = Gui.get_player(parent)
@@ -258,7 +262,7 @@ bonus_container = Gui.element("bonus_container")
         bonus_data_set(container, "bonus_st_2")
 
         local disp = container["bonus_st_1"].disp.table
-        bonus_score_limit = math.floor(config.pts.base * (1 + config.pts.increase_percentage_per_role_level * (Roles.get_role_by_name(config.pts.role_name).index - Roles.get_player_highest_role(player).index)))
+        bonus_score_limit = bonus_score_limit_calc(player)
         disp[bonus_gui_control_pts_count.name].caption = bonus_gui_pts_needed(player, container.parent) .. " / " .. bonus_score_limit
 
         return container.parent
@@ -292,13 +296,13 @@ end)
 
 Event.add(Roles.events.on_role_assigned, function(event)
     local player = game.players[event.player_index]
-    bonus_score_limit = math.floor(config.pts.base * (1 + config.pts.increase_percentage_per_role_level * (Roles.get_role_by_name(config.pts.role_name).index - Roles.get_player_highest_role(player).index)))
+    bonus_score_limit = bonus_score_limit_calc(player)
     apply_bonus(player)
 end)
 
 Event.add(Roles.events.on_role_unassigned, function(event)
     local player = game.players[event.player_index]
-    bonus_score_limit = math.floor(config.pts.base * (1 + config.pts.increase_percentage_per_role_level * (Roles.get_role_by_name(config.pts.role_name).index - Roles.get_player_highest_role(player).index)))
+    bonus_score_limit = bonus_score_limit_calc(player)
     apply_bonus(player)
 end)
 
@@ -309,6 +313,7 @@ Event.add(defines.events.on_player_respawned, function(event)
     local disp = container.frame["bonus_st_1"].disp.table
     local n = bonus_gui_pts_needed(player)
     disp[bonus_gui_control_pts_count.name].caption = n .. " / " .. bonus_score_limit
+    disp[bonus_gui_control_pts_count.name].v
 
     if n <= bonus_score_limit then
         apply_bonus(player)
@@ -318,7 +323,6 @@ end)
 --- When a player dies allow them to have instant respawn
 Event.add(defines.events.on_player_died, function(event)
     local player = game.players[event.player_index]
-
     if Roles.player_has_flag(player, "instant-respawn") then
         player.ticks_to_respawn = 120
     end
