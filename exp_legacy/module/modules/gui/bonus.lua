@@ -149,7 +149,8 @@ local bonus_gui_control_reset = Gui.element("bonus_gui_control_reset")
         local slider = disp["bonus_display_personal_battery_recharge_slider"]
         slider.slider_value = config.player_special_bonus["personal_battery_recharge"].value
         disp[slider.tags.counter].caption = format_number(slider.slider_value, false)
-        disp[bonus_gui_control_pts_count.name].caption = bonus_gui_pts_needed(player) .. " / " .. bonus_score_limit
+
+        element.parent[bonus_gui_control_pts_count.name].caption = bonus_gui_pts_needed(player) .. " / " .. bonus_score_limit
     end)
 
 --- A button used for pts apply
@@ -245,9 +246,9 @@ local bonus_data_set = Gui.element("bonus_data_set")
 
         return bonus_set
     end)
-
 --- The main container for the bonus gui
 -- @element bonus_container
+
 bonus_container = Gui.element("bonus_container")
     :draw(function(def, parent)
         local player = Gui.get_player(parent)
@@ -257,7 +258,7 @@ bonus_container = Gui.element("bonus_container")
         bonus_data_set(container, "bonus_st_2")
 
         local disp = container["bonus_st_1"].disp.table
-        bonus_score_limit = math.floor(config.pts.base * (1 + config.pts.increase_percentage_per_role_level * (Roles.get_player_highest_role(player).index - Roles.get_role_by_name(config.pts.role_name).index)))
+        bonus_score_limit = math.floor(config.pts.base * (1 + config.pts.increase_percentage_per_role_level * (Roles.get_role_by_name(config.pts.role_name).index - Roles.get_player_highest_role(player).index)))
         disp[bonus_gui_control_pts_count.name].caption = bonus_gui_pts_needed(player, container.parent) .. " / " .. bonus_score_limit
 
         return container.parent
