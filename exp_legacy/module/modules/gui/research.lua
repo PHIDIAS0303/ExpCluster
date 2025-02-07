@@ -280,7 +280,7 @@ Event.add(defines.events.on_research_started, function(event)
 
     for i = #rq, 1, -1 do
         if config.limit_res[rq[i] ] and rq[i].level > config.limit_res[rq[i] ] then
-            r.force.cancel_current_research()
+            rq[i] = nil
         end
     end
 end)
