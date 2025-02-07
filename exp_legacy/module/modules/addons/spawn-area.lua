@@ -222,8 +222,6 @@ Event.add(defines.events.on_player_created, function(event)
     local s = player.physical_surface
     game.forces["neutral"].set_cease_fire("player", true)
     game.forces["player"].set_cease_fire("neutral", true)
-    -- force.set_friend("player", true)
-    -- game.forces["player"].set_friend("neutral", true)
     game.forces["neutral"].enable_all_technologies()
     spawn_area(s, p)
     if config.pattern.enabled then spawn_pattern(s, p) end
