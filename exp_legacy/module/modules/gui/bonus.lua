@@ -115,7 +115,7 @@ local bonus_gui_control_pts = Gui.element("bonus_gui_control_pts")
         width = config.gui_display_width["half"],
     }
 
-local bonus_gui_control_pts_count = Gui.element("vlayer_gui_display_item_solar_count")
+local bonus_gui_control_pts_count = Gui.element("bonus_gui_control_pts_count")
     :draw{
         type = "progressbar",
         name = Gui.property_from_name,
@@ -143,7 +143,7 @@ local bonus_gui_control_reset = Gui.element("bonus_gui_control_reset")
         for k, v in pairs(config.conversion) do
             local s = "bonus_display_" .. k .. "_slider"
             disp[s].slider_value = config.player_bonus[v].value
-            disp[disp[s].tags.counter].caption = (config.player_bonus[v].is_percentage and format_number(disp[s].slider_value * 100, false) .. " %") or format_number(disp[s].slider_value, false)
+            disp[disp[s].tags.counter].caption = (config.player_bonus[v].is_percentage and (format_number(disp[s].slider_value * 100, false) .. " %")) or format_number(disp[s].slider_value, false)
         end
 
         local slider = disp["bonus_display_personal_battery_recharge_slider"]
