@@ -211,9 +211,7 @@ local research_data_set = Gui.element("research_data_set")
 
         for i = 1, 8 do
             research_data_group(disp, i)
-
             local research_name_i = "research_" .. i
-
             disp[research_name_i .. "_name"].caption = res_disp[i]["name"]
             disp[research_name_i .. "_target"].caption = res_disp[i]["target"]
             disp[research_name_i .. "_attempt"].caption = res_disp[i]["attempt"]
