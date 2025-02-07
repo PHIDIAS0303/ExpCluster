@@ -14,10 +14,9 @@ local bonus_container
 local bonus_score_limit = config.pts.base
 
 --- @param player LuaPlayer
---- @param container LuaGuiElement?
 --- @return number
 local function bonus_gui_pts_needed(player)
-    container = Gui.get_left_element(bonus_container, player)
+    local container = Gui.get_left_element(bonus_container, player)
     local disp = container.frame["bonus_st_2"].disp.table
     local total = 0
 
