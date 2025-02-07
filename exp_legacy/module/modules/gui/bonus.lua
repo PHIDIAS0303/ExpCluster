@@ -125,7 +125,7 @@ local bonus_gui_control_pts_count = Gui.element("bonus_gui_control_pts_count")
         name = Gui.property_from_name,
         caption = "0 / " .. bonus_score_limit,
         value = 0,
-        style = "progressbar",
+        style = "electric_satisfaction_statistics_progressbar",
     }:style{
         width = config.gui_display_width["half"],
         font = "heading-2",
