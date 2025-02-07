@@ -114,6 +114,11 @@ local function research_notification(event)
             event.research.force[config.bonus_inventory.name] = event.research.level * config.bonus_inventory.rate
         end
     end
+
+    if config.limit_res[event.research.name] and event.research.level > config.limit_res[event.research.name] then
+        event.research.enabled = false
+        event.research.visible_when_disabled = false
+    end
 end
 
 local function research_gui_update()
@@ -269,17 +274,6 @@ Event.add(defines.events.on_research_finished, function(event)
                 disp[research_name_i .. "_difference"].caption = res_disp[i]["difference"]
                 disp[research_name_i .. "_difference"].style.font_color = res_disp[i]["color"]
             end
-        end
-    end
-end)
-
-Event.add(defines.events.on_research_started, function(event)
-    local r = event.research
-    local rq = r.force.research_queue
-
-    for i = #rq, 1, -1 do
-        if config.limit_res[rq[i]] and rq[i].level > config.limit_res[rq[i]] then
-            event.research.force.research_queue[i] = nil
         end
     end
 end)
