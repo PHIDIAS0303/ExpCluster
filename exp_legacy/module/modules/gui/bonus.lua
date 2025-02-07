@@ -165,9 +165,7 @@ local bonus_gui_control_reset = Gui.element("bonus_gui_control_reset")
         local slider = disp["bonus_display_personal_battery_recharge_slider"]
         slider.slider_value = config.player_special_bonus["personal_battery_recharge"].value
         disp[slider.tags.counter].caption = format_number(slider.slider_value, false)
-
-        local r = bonus_gui_pts_needed(player)
-        disp[bonus_gui_control_pts_count.name].caption = 0 .. " / " .. bonus_score["limit"]
+        disp[bonus_gui_control_pts_count.name].caption = bonus_gui_pts_needed(player) .. " / " .. bonus_score["limit"]
     end)
 
 --- A button used for pts apply
