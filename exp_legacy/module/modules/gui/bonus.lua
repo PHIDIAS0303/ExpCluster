@@ -103,6 +103,10 @@ local function apply_periodic_bonus(player)
     end
 end
 
+local function bonus_score_limit_calc(player)
+    return math.floor(config.pts.base * (1 + config.pts.increase_percentage_per_role_level * (Roles.get_player_highest_role(player).index - Roles.get_role_by_name(config.pts.role_name).index)))
+end
+
 --- Control label for the bonus points available
 -- @element bonus_gui_control_pts
 local bonus_gui_control_pts = Gui.element("bonus_gui_control_pts")
@@ -251,10 +255,6 @@ local bonus_data_set = Gui.element("bonus_data_set")
 
         return bonus_set
     end)
-
-local function bonus_score_limit_calc(player)
-    return math.floor(config.pts.base * (1 + config.pts.increase_percentage_per_role_level * (Roles.get_role_by_name(config.pts.role_name).index - Roles.get_player_highest_role(player).index)))
-end
 
 --- The main container for the bonus gui
 -- @element bonus_container
