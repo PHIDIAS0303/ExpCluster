@@ -117,6 +117,7 @@ local function research_notification(event)
 
     if config.limit_res[event.research.name] and event.research.level >= config.limit_res[event.research.name] then
         event.research.enabled = false
+        event.research.visible_when_disabled = true
         local rq = event.research.force.research_queue
 
         for i = #rq, 1, -1 do
