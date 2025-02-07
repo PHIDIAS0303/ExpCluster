@@ -117,14 +117,16 @@ local function research_notification(event)
 
     if config.limit_res[event.research.name] and (event.research.level + 1) >= config.limit_res[event.research.name] then
         event.research.enabled = false
-        event.research.force.cancel_current_research()
-        --[[
-        for i = #event.research.force.research_queue, 1, -1 do
-            if event.research.force.research_queue[i] == event.research.name then
-                table.remove(event.research.force.research_queue, i)
+        local rq = event.research.force.research_queue
+
+        for i = #rq, 1, -1 do
+            if rq[i] == event.research.name then
+                table.remove(rq, i)
             end
         end
-        ]]
+
+        event.research.force.cancel_current_research()
+        event.research.force.research_queue = rq
     end
 end
 
