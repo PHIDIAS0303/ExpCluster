@@ -11,7 +11,6 @@ local vlayer = require("modules.exp_legacy.modules.control.vlayer")
 local format_number = require("util").format_number --- @dep util
 
 local bonus_container
-local bonus_gui_control_pts_a_count
 
 --- @param player LuaPlayer
 --- @param container LuaGuiElement?
