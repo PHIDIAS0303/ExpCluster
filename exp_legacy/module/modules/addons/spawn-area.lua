@@ -20,15 +20,6 @@ for _, turret in ipairs(turrets) do
     turret.position = apply_offset(turret.position, config.turrets.offset)
 end
 
--- Get or create the force used for entities in spawn
-local function get_neutral_force()
-    local force = game.forces["neutral"]
-
-    if force and force.valid then
-        return force
-    end
-end
-
 -- Protects an entity
 -- and sets its force to the spawn force
 local function protect_entity(entity, set_force)
@@ -39,7 +30,7 @@ local function protect_entity(entity, set_force)
         entity.operable = false
 
         if set_force then
-            entity.force = get_neutral_force()
+            entity.force = game.forces["neutral"]
         end
     end
 end
