@@ -292,13 +292,13 @@ end)
 
 Event.add(Roles.events.on_role_assigned, function(event)
     local player = game.players[event.player_index]
-    bonus_score_limit = math.floor(config.pts.base * (1 + config.pts.increase_percentage_per_role_level * (Roles.get_player_highest_role(player).index - Roles.get_role_by_name(config.pts.role_name).index)))
+    bonus_score_limit = math.floor(config.pts.base * (1 + config.pts.increase_percentage_per_role_level * (Roles.get_role_by_name(config.pts.role_name).index - Roles.get_player_highest_role(player).index)))
     apply_bonus(player)
 end)
 
 Event.add(Roles.events.on_role_unassigned, function(event)
     local player = game.players[event.player_index]
-    bonus_score_limit = math.floor(config.pts.base * (1 + config.pts.increase_percentage_per_role_level * (Roles.get_player_highest_role(player).index - Roles.get_role_by_name(config.pts.role_name).index)))
+    bonus_score_limit = math.floor(config.pts.base * (1 + config.pts.increase_percentage_per_role_level * (Roles.get_role_by_name(config.pts.role_name).index - Roles.get_player_highest_role(player).index)))
     apply_bonus(player)
 end)
 
