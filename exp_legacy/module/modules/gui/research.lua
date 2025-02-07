@@ -31,7 +31,7 @@ local research_time_format = ExpUtil.format_time_factory{ format = "clock", hour
 local empty_time = research_time_format(nil)
 
 local font_color = {
-    ["neutral"] = { r = 0, g = 0, b = 0 },
+    ["neutral"] = { r = 1, g = 1, b = 1 },
     ["positive"] = { r = 0.3, g = 1, b = 0.3 },
     ["negative"] = { r = 1, g = 0.3, b = 0.3 },
 }
@@ -207,6 +207,7 @@ local research_data_set = Gui.element("research_data_set")
         disp["research_0_target"].caption = { "research.target" }
         disp["research_0_attempt"].caption = { "research.attempt" }
         disp["research_0_difference"].caption = { "research.difference" }
+        disp["research_0_difference"].style.font_color = font_color["neutral"]
 
         for i = 1, 8 do
             research_data_group(disp, i)
