@@ -104,6 +104,9 @@ local function apply_periodic_bonus(player)
 end
 
 local function bonus_score_limit_calc(player)
+    game.print(Roles.get_player_highest_role(player).index)
+    game.print(Roles.get_role_by_name(config.pts.role_name).index)
+
     return math.floor(config.pts.base * (1 + config.pts.increase_percentage_per_role_level * (Roles.get_player_highest_role(player).index - Roles.get_role_by_name(config.pts.role_name).index)))
 end
 
