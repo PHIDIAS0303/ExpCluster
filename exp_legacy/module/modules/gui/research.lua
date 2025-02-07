@@ -115,7 +115,7 @@ local function research_notification(event)
         end
     end
 
-    if config.limit_res[event.research.name] and (event.research.level + 1) >= config.limit_res[event.research.name] then
+    if config.limit_res[event.research.name] and event.research.level >= config.limit_res[event.research.name] then
         event.research.enabled = false
         local rq = event.research.force.research_queue
 
