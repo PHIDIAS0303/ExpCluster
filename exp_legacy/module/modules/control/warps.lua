@@ -191,7 +191,7 @@ function Warps.make_warp_area(warp_id)
         end
 
         if entity.name == "small-lamp" then
-            warp.always_on = true
+            entity.always_on = true
         end
     end
 end

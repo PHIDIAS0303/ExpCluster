@@ -114,7 +114,13 @@ local function spawn_entities(surface, position)
             protect_entity(entity)
         end
 
-        entity.operable = config.entities.operable
+        if entity then
+            entity.operable = config.entities.operable
+
+            if entity.name == "small-lamp" then
+                entity.always_on = true
+            end
+        end
     end
 end
 
