@@ -14,9 +14,10 @@ local bonus_container
 local bonus_score_limit = config.pts.base
 
 --- @param player LuaPlayer
+--- @param container LuaGuiElement?
 --- @return number
-local function bonus_gui_pts_needed(player)
-    local container = Gui.get_left_element(bonus_container, player)
+local function bonus_gui_pts_needed(player, container)
+    container = container or Gui.get_left_element(bonus_container, player)
     local disp = container.frame["bonus_st_2"].disp.table
     local total = 0
 
@@ -257,7 +258,7 @@ bonus_container = Gui.element("bonus_container")
 
         local disp = container["bonus_st_1"].disp.table
         bonus_score_limit = math.floor(config.pts.base * (1 + config.pts.increase_percentage_per_role_level * (Roles.get_player_highest_role(player).index - Roles.get_role_by_name(config.pts.role_name).index)))
-        disp[bonus_gui_control_pts_count.name].caption = bonus_gui_pts_needed(player) .. " / " .. bonus_score_limit
+        disp[bonus_gui_control_pts_count.name].caption = bonus_gui_pts_needed(player, container.parent) .. " / " .. bonus_score_limit
 
         return container.parent
     end)
