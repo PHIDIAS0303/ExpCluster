@@ -150,7 +150,9 @@ local bonus_gui_control_reset = Gui.element("bonus_gui_control_reset")
         slider.slider_value = config.player_special_bonus["personal_battery_recharge"].value
         disp[slider.tags.counter].caption = format_number(slider.slider_value, false)
 
-        element.parent[bonus_gui_control_pts_count.name].caption = bonus_gui_pts_needed(player) .. " / " .. bonus_score_limit
+        local n = bonus_gui_pts_needed(player)
+        element.parent[bonus_gui_control_pts_count.name].caption = n .. " / " .. bonus_score_limit
+        element.parent[bonus_gui_control_pts_count.name].value = n / bonus_score_limit
     end)
 
 --- A button used for pts apply
@@ -165,6 +167,7 @@ local bonus_gui_control_apply = Gui.element("bonus_gui_control_apply")
     }:on_click(function(def, player, element)
         local n = bonus_gui_pts_needed(player)
         element.parent[bonus_gui_control_pts_count.name].caption = n .. " / " .. bonus_score_limit
+        element.parent[bonus_gui_control_pts_count.name].value = n / bonus_score_limit
 
         if n <= bonus_score_limit then
             apply_bonus(player)
@@ -228,7 +231,9 @@ local bonus_gui_slider = Gui.element("bonus_gui_slider")
         element.parent[element.tags.counter].caption = (element.tags.is_percentage and format_number(element.slider_value * 100, false) .. " %") or format_number(element.slider_value, false)
         local container = Gui.get_left_element(bonus_container, player)
         local disp = container.frame["bonus_st_1"].disp.table
-        disp[bonus_gui_control_pts_count.name].caption = bonus_gui_pts_needed(player) .. " / " .. bonus_score_limit
+        local n = bonus_gui_pts_needed(player)
+        disp[bonus_gui_control_pts_count.name].caption = n .. " / " .. bonus_score_limit
+        disp[bonus_gui_control_pts_count.name].value = n / bonus_score_limit
     end)
 
 --- A vertical flow containing all the bonus data
@@ -262,8 +267,10 @@ bonus_container = Gui.element("bonus_container")
         bonus_data_set(container, "bonus_st_2")
 
         local disp = container["bonus_st_1"].disp.table
+        local n = bonus_gui_pts_needed(player, container.parent)
         bonus_score_limit = bonus_score_limit_calc(player)
-        disp[bonus_gui_control_pts_count.name].caption = bonus_gui_pts_needed(player, container.parent) .. " / " .. bonus_score_limit
+        disp[bonus_gui_control_pts_count.name].caption = n .. " / " .. bonus_score_limit
+        disp[bonus_gui_control_pts_count.name].value = n / bonus_score_limit
 
         return container.parent
     end)
@@ -313,7 +320,7 @@ Event.add(defines.events.on_player_respawned, function(event)
     local disp = container.frame["bonus_st_1"].disp.table
     local n = bonus_gui_pts_needed(player)
     disp[bonus_gui_control_pts_count.name].caption = n .. " / " .. bonus_score_limit
-    disp[bonus_gui_control_pts_count.name].v
+    disp[bonus_gui_control_pts_count.name].value = n / bonus_score_limit
 
     if n <= bonus_score_limit then
         apply_bonus(player)
