@@ -21,20 +21,12 @@ for _, turret in ipairs(turrets) do
 end
 
 -- Get or create the force used for entities in spawn
-local function get_spawn_force()
-    local force = game.forces["spawn"]
+local function get_neutral_force()
+    local force = game.forces["neutral"]
 
     if force and force.valid then
         return force
     end
-
-    force = game.create_force("spawn")
-    force.set_cease_fire("player", true)
-    -- force.set_friend('player', true)
-    game.forces["player"].set_cease_fire("spawn", true)
-    -- game.forces['player'].set_friend('spawn', true)
-
-    return force
 end
 
 -- Protects an entity
@@ -47,7 +39,7 @@ local function protect_entity(entity, set_force)
         entity.operable = false
 
         if set_force then
-            entity.force = get_spawn_force()
+            entity.force = get_neutral_force()
         end
     end
 end
@@ -228,7 +220,11 @@ Event.add(defines.events.on_player_created, function(event)
     local player = game.players[event.player_index]
     local p = { x = 0, y = 0 }
     local s = player.physical_surface
-    get_spawn_force()
+    game.forces["neutral"].set_cease_fire("player", true)
+    game.forces["player"].set_cease_fire("neutral", true)
+    -- force.set_friend("player", true)
+    -- game.forces["player"].set_friend("neutral", true)
+    game.forces["neutral"].enable_all_technologies()
     spawn_area(s, p)
     if config.pattern.enabled then spawn_pattern(s, p) end
     if config.water.enabled then spawn_water(s, p) end
