@@ -29,7 +29,7 @@ local function check_items(player, type)
         items = items,
         surface = game.planets.nauvis.surface,
         allow_creation = true,
-        name = "iron-chest",
+        name = "steel-chest",
     }
 end
 
