@@ -219,9 +219,9 @@ Event.add(defines.events.on_player_created, function(event)
     local s = player.physical_surface
     game.forces["neutral"].set_cease_fire("player", true)
     game.forces["player"].set_cease_fire("neutral", true)
-    game.forces["neutral"].set_ammo_damage_modifier("bullet", 2)
-    game.forces["neutral"].set_gun_speed_modifier("bullet", 2)
-    game.forces["neutral"].set_turret_attack_modifier("gun-turret", 2)
+    game.forces["neutral"].set_ammo_damage_modifier("bullet", 1)
+    game.forces["neutral"].set_gun_speed_modifier("bullet", 1)
+    game.forces["neutral"].set_turret_attack_modifier("gun-turret", 1)
     spawn_area(s, p)
     if config.pattern.enabled then spawn_pattern(s, p) end
     if config.water.enabled then spawn_water(s, p) end
