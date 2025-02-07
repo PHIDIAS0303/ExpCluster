@@ -216,7 +216,7 @@ local research_data_set = Gui.element("research_data_set")
             disp[research_name_i .. "_target"].caption = res_disp[i]["target"]
             disp[research_name_i .. "_attempt"].caption = res_disp[i]["attempt"]
             disp[research_name_i .. "_difference"].caption = res_disp[i]["difference"]
-            disp[research_name_i .. "_difference"].style.font_color = res_disp[i]["difference_color"]
+            disp[research_name_i .. "_difference"].style.font_color = res_disp[i]["color"]
         end
 
         return research_set
@@ -267,7 +267,7 @@ Event.add(defines.events.on_research_finished, function(event)
                 disp[research_name_i .. "_target"].caption = res_disp[i]["target"]
                 disp[research_name_i .. "_attempt"].caption = res_disp[i]["attempt"]
                 disp[research_name_i .. "_difference"].caption = res_disp[i]["difference"]
-                disp[research_name_i .. "_difference"].style.font_color = res_disp[i]["difference_color"]
+                disp[research_name_i .. "_difference"].style.font_color = res_disp[i]["color"]
             end
         end
     end
