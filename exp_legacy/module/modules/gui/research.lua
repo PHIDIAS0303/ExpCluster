@@ -130,6 +130,7 @@ local function research_gui_update()
         }
 
         if entry.raw_name then
+            assert(prototypes.technology[entry.raw_name], "Invalid Research: " .. tostring(entry.raw_name))
             data.name = { "research.res-name", entry.raw_name, prototypes.technology[entry.raw_name].localised_name }
             data.target = entry.target_disp
 
