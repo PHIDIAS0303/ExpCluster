@@ -80,9 +80,7 @@ local function research_res_n()
         end
     end
 
-    local max_start = math.max(1, #res.disp - 7)
-    local start = math.clamp(current - 3, 1, max_start)
-    return math.min(start, max_start)
+    return math.clamp(current - 3, 1, math.max(1, #res.disp - 7))
 end
 
 local function research_notification(event)
