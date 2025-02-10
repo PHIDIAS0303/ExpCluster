@@ -189,6 +189,10 @@ function Warps.make_warp_area(warp_id)
         if entity.type == "electric-pole" then
             warp.electric_pole = entity
         end
+
+        if entity.name == "small-lamp" then
+            entity.always_on = true
+        end
     end
 end
 

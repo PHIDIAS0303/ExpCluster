@@ -33,10 +33,12 @@ Selection.on_selection(SelectionName, function(event)
     local player = game.players[event.player_index]
     local surface = event.surface
 
+    --[[
     if surface.planet and surface.planet ~= game.planets.nauvis then
         player.print({ "exp-commands_waterfill.nauvis-only" }, Commands.print_settings.error)
         return
     end
+    ]]
 
     local area_size = (area.right_bottom.x - area.left_top.x) * (area.right_bottom.y - area.left_top.y)
     if area_size > 1000 then

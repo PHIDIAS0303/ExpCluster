@@ -20,23 +20,6 @@ for _, turret in ipairs(turrets) do
     turret.position = apply_offset(turret.position, config.turrets.offset)
 end
 
--- Get or create the force used for entities in spawn
-local function get_spawn_force()
-    local force = game.forces["spawn"]
-
-    if force and force.valid then
-        return force
-    end
-
-    force = game.create_force("spawn")
-    force.set_cease_fire("player", true)
-    -- force.set_friend('player', true)
-    game.forces["player"].set_cease_fire("spawn", true)
-    -- game.forces['player'].set_friend('spawn', true)
-
-    return force
-end
-
 -- Protects an entity
 -- and sets its force to the spawn force
 local function protect_entity(entity, set_force)
@@ -47,7 +30,7 @@ local function protect_entity(entity, set_force)
         entity.operable = false
 
         if set_force then
-            entity.force = get_spawn_force()
+            entity.force = game.forces["neutral"]
         end
     end
 end
@@ -61,7 +44,7 @@ local function spawn_turrets()
 
         -- Makes a new turret if it is not found
         if not turret or not turret.valid then
-            turret = surface.create_entity{ name = "gun-turret", position = pos, force = "spawn" }
+            turret = surface.create_entity{ name = "gun-turret", position = pos, force = "neutral" }
             if not turret then return end
             protect_entity(turret)
         end
@@ -131,7 +114,13 @@ local function spawn_entities(surface, position)
             protect_entity(entity)
         end
 
-        entity.operable = config.entities.operable
+        if entity then
+            entity.operable = config.entities.operable
+
+            if entity.name == "small-lamp" then
+                entity.always_on = true
+            end
+        end
     end
 end
 
@@ -228,7 +217,11 @@ Event.add(defines.events.on_player_created, function(event)
     local player = game.players[event.player_index]
     local p = { x = 0, y = 0 }
     local s = player.physical_surface
-    get_spawn_force()
+    game.forces["neutral"].set_cease_fire("player", true)
+    game.forces["player"].set_cease_fire("neutral", true)
+    game.forces["neutral"].set_ammo_damage_modifier("bullet", 1)
+    game.forces["neutral"].set_gun_speed_modifier("bullet", 1)
+    game.forces["neutral"].set_turret_attack_modifier("gun-turret", 1)
     spawn_area(s, p)
     if config.pattern.enabled then spawn_pattern(s, p) end
     if config.water.enabled then spawn_water(s, p) end
