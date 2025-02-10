@@ -296,6 +296,9 @@ Gui.toolbar.create_button{
 }
 
 Event.add(defines.events.on_player_created, function(event)
+    local player = game.players[event.player_index]
+    bonus_data.score_limit[player] = bonus_score_limit_calc(player)
+
     if event.player_index ~= 1 then
         return
     end
