@@ -123,21 +123,17 @@ local function miner_check(entity)
         table.insert_array(entities, entities_t)
 
         for _, e in pairs(entities) do
-            if (e.position.x > ep.x) and (e.position.y == ep.y) then
-                for h = 1, er do
-                    table.insert(pipe_build, { x = h, y = 0 })
-                end
-            elseif (e.position.x < ep.x) and (e.position.y == ep.y) then
-                for h = 1, er do
-                    table.insert(pipe_build, { x = -h, y = 0 })
-                end
-            elseif (e.position.x == ep.x) and (e.position.y > ep.y) then
-                for h = 1, er do
-                    table.insert(pipe_build, { x = 0, y = h })
-                end
-            elseif (e.position.x == ep.x) and (e.position.y < ep.y) then
-                for h = 1, er do
-                    table.insert(pipe_build, { x = 0, y = -h })
+            for i, _ in pairs(e.fluidbox) do
+                local pc = e.fluidbox.get_pipe_connections(i)
+
+                for _, p in pairs(pc) do
+                    if p.flow_direction == "input" or p.flow_direction == "input-output" then
+                        for x = 1, p.position.x do
+                            for y = 1, p.position.y do
+                                table.insert(pipe_build, { x = x, y = y })
+                            end
+                        end
+                    end
                 end
             end
         end
