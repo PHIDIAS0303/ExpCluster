@@ -56,35 +56,17 @@ local production_data_group = Gui.element("production_data_group")
             item.style.width = 32
         end
 
-        local data_1 = parent.add{
-            type = "label",
-            name = "production_" .. i .. "_1",
-            caption = "0.0",
-            style = "heading_2_label",
-        }
-        data_1.style.width = 90
-        data_1.style.horizontal_align = "right"
-        data_1.style.font_color = font_color["positive"]
-
-        local data_2 = parent.add{
-            type = "label",
-            name = "production_" .. i .. "_2",
-            caption = "0.0",
-            style = "heading_2_label",
-        }
-        data_2.style.width = 90
-        data_2.style.horizontal_align = "right"
-        data_2.style.font_color = font_color["negative"]
-
-        local data_3 = parent.add{
-            type = "label",
-            name = "production_" .. i .. "_3",
-            caption = "0.0",
-            style = "heading_2_label",
-        }
-        data_3.style.width = 90
-        data_3.style.horizontal_align = "right"
-        data_3.style.font_color = font_color["positive"]
+        for j = 1, 3 do
+            local data_1 = parent.add{
+                type = "label",
+                name = "production_" .. i .. "_" .. j,
+                caption = "0.0",
+                style = "heading_2_label",
+            }
+            data_1.style.width = 90
+            data_1.style.horizontal_align = "right"
+            data_1.style.font_color = font_color["positive"]
+        end
 
         return item
     end)
@@ -145,16 +127,10 @@ Event.on_nth_tick(60, function()
                 local add = math.floor(stat.get_flow_count{ name = item, category = "input", precision_index = precision_value, count = false } / 6) / 10
                 local minus = math.floor(stat.get_flow_count{ name = item, category = "output", precision_index = precision_value, count = false } / 6) / 10
                 local sum = add - minus
-
                 table[production_prefix .. "_1"].caption = format_n(add)
                 table[production_prefix .. "_2"].caption = format_n(minus)
                 table[production_prefix .. "_3"].caption = format_n(sum)
-
-                if sum < 0 then
-                    table[production_prefix .. "_3"].style.font_color = font_color["negative"]
-                else
-                    table[production_prefix .. "_3"].style.font_color = font_color["positive"]
-                end
+                table[production_prefix .. "_3"].style.font_color = (sum < 0 and font_color["negative"]) or font_color["positive"]
             else
                 table[production_prefix .. "_1"].caption = "0.0"
                 table[production_prefix .. "_2"].caption = "0.0"
