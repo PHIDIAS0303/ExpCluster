@@ -109,13 +109,29 @@ local function miner_check(entity)
     local pipe_build = {}
 
     if config.fluid and entity.fluidbox and #entity.fluidbox > 0 then
-        table.insert(pipe_build, { x = 0, y = 0 })
+        local connections = {}
 
+        -- Collect all unique pipe connection directions
         for i = 1, #entity.fluidbox do
-            for _, p in pairs(entity.fluidbox[i].get_pipe_connections(i)) do
-                for x = 1, p.position.x do
-                    for y = 1, p.position.y do
-                        table.insert(pipe_build, { x = x, y = y })
+            local box_connections = entity.fluidbox.get_pipe_connections(i)
+
+            for _, connection in pairs(box_connections) do
+                -- Get relative connection position vector
+                local vec = connection.target_position
+                -- Normalize to cardinal direction
+                local direction = {
+                    x = vec.x > 0.5 and 1 or vec.x < -0.5 and -1 or 0,
+                    y = vec.y > 0.5 and 1 or vec.y < -0.5 and -1 or 0
+                }
+
+                -- Convert to string key to prevent duplicates
+                local key = direction.x .. "," .. direction.y
+                if not connections[key] then
+                    connections[key] = true
+
+                    -- Calculate pipe positions in this direction
+                    for d = 1, entity.prototype.mining_drill_radius or 1 do
+                        table.insert(pipe_build, { x = direction.x * d, y = direction.y * d })
                     end
                 end
             end
