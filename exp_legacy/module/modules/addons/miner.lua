@@ -115,19 +115,13 @@ local function miner_check(entity)
     if config.fluid and entity.fluidbox and #entity.fluidbox > 0 then
         -- if require fluid to mine
         table.insert(pipe_build, { x = 0, y = 0 })
-        local r = er + 1
-        local entities = es.find_entities_filtered{ area = { { ep.x - r, ep.y - r }, { ep.x + r, ep.y + r } }, type = { "mining-drill", "pipe", "pipe-to-ground" } }
-        local entities_t = es.find_entities_filtered{ area = { { ep.x - r, ep.y - r }, { ep.x + r, ep.y + r } }, ghost_type = { "pipe", "pipe-to-ground" } }
-        table.insert_array(entities, entities_t)
 
-        for _, e in pairs(entities) do
-            for i = 1, #e.fluidbox do
-                for _, p in pairs(e.fluidbox.get_pipe_connections(i)) do
-                    if p.flow_direction == "input" or p.flow_direction == "input-output" then
-                        for x = 1, p.position.x do
-                            for y = 1, p.position.y do
-                                table.insert(pipe_build, { x = x, y = y })
-                            end
+        for i = 1, #entity.fluidbox do
+            for _, p in pairs(entity.fluidbox.get_pipe_connections(i)) do
+                if p.flow_direction == "input" or p.flow_direction == "input-output" then
+                    for x = 1, p.position.x do
+                        for y = 1, p.position.y do
+                            table.insert(pipe_build, { x = x, y = y })
                         end
                     end
                 end
