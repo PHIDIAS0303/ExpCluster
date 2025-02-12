@@ -116,10 +116,8 @@ local function miner_check(entity)
         -- if require fluid to mine
         table.insert(pipe_build, { x = 0, y = 0 })
         local r = er + 1
-
         local entities = es.find_entities_filtered{ area = { { ep.x - r, ep.y - r }, { ep.x + r, ep.y + r } }, type = { "mining-drill", "pipe", "pipe-to-ground" } }
         local entities_t = es.find_entities_filtered{ area = { { ep.x - r, ep.y - r }, { ep.x + r, ep.y + r } }, ghost_type = { "pipe", "pipe-to-ground" } }
-
         table.insert_array(entities, entities_t)
 
         for _, e in pairs(entities) do
