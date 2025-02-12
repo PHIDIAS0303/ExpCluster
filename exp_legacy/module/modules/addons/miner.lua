@@ -96,8 +96,10 @@ local function miner_check(entity)
     local ef = entity.force
     local er = entity.prototype.mining_drill_radius
 
-    if entity.status ~= defines.entity_status.no_minable_resources then
-        return
+    for _, r in pairs(entity.surface.find_entities_filtered{ area = { { x = ep.x - er, y = ep.y - er }, { x = ep.x + er, y = ep.y + er } }, type = "resource" }) do
+        if r.amount > 0 then
+            return
+        end
     end
 
     if check_entity(entity) then
