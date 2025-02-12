@@ -100,14 +100,6 @@ local function miner_check(entity)
         return
     end
 
-    --[[
-    for _, r in pairs(entity.surface.find_entities_filtered{ area = { { x = ep.x - er, y = ep.y - er }, { x = ep.x + er, y = ep.y + er } }, type = "resource" }) do
-        if r.amount > 0 then
-            return
-        end
-    end
-    ]]
-
     if check_entity(entity) then
         return
     end
@@ -115,15 +107,30 @@ local function miner_check(entity)
     local pipe_build = {}
 
     if config.fluid and entity.fluidbox and #entity.fluidbox > 0 then
-        -- if require fluid to mine
         table.insert(pipe_build, { x = 0, y = 0 })
+        local r = er + 1
 
-        for i = 1, #entity.fluidbox do
-            for _, p in pairs(entity.fluidbox.get_pipe_connections(i)) do
-                for x = 1, p.position.x do
-                    for y = 1, p.position.y do
-                        table.insert(pipe_build, { x = x, y = y })
-                    end
+        local entities = es.find_entities_filtered{ area = { { ep.x - r, ep.y - r }, { ep.x + r, ep.y + r } }, type = { "mining-drill", "pipe", "pipe-to-ground" } }
+        local entities_t = es.find_entities_filtered{ area = { { ep.x - r, ep.y - r }, { ep.x + r, ep.y + r } }, ghost_type = { "pipe", "pipe-to-ground" } }
+
+        table.insert_array(entities, entities_t)
+
+        for _, e in pairs(entities) do
+            if (e.position.x > ep.x) and (e.position.y == ep.y) then
+                for h = 1, er do
+                    table.insert(pipe_build, { x = h, y = 0 })
+                end
+            elseif (e.position.x < ep.x) and (e.position.y == ep.y) then
+                for h = 1, er do
+                    table.insert(pipe_build, { x = -h, y = 0 })
+                end
+            elseif (e.position.x == ep.x) and (e.position.y > ep.y) then
+                for h = 1, er do
+                    table.insert(pipe_build, { x = 0, y = h })
+                end
+            elseif (e.position.x == ep.x) and (e.position.y < ep.y) then
+                for h = 1, er do
+                    table.insert(pipe_build, { x = 0, y = -h })
                 end
             end
         end
@@ -136,7 +143,7 @@ local function miner_check(entity)
     table.insert(miner_data.queue, { t = game.tick + 5, e = entity })
 
     for _, pos in ipairs(pipe_build) do
-        es.create_entity{ name = "entity-ghost", position = { x = ep.x + pos.x, y = ep.y + pos.y }, force = ef, inner_name = "pipe", raise_built = true }
+        es.create_entity{ name = "entity-ghost", position = { x = ep.x + pos.x, y = ep.y + pos.y }, force = ef, inner_name = "pipe" }
     end
 end
 
