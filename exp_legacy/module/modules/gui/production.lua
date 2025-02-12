@@ -57,15 +57,15 @@ local production_data_group = Gui.element("production_data_group")
         end
 
         for j = 1, 3 do
-            local data_1 = parent.add{
+            local data = parent.add{
                 type = "label",
                 name = "production_" .. i .. "_" .. j,
                 caption = "0.0",
                 style = "heading_2_label",
             }
-            data_1.style.width = 90
-            data_1.style.horizontal_align = "right"
-            data_1.style.font_color = font_color["positive"]
+            data.style.width = 90
+            data.style.horizontal_align = "right"
+            data.style.font_color = font_color["positive"]
         end
 
         return item
