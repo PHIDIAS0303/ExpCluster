@@ -48,12 +48,8 @@ local function format_n(amount)
     integer_part = integer_part:reverse():gsub("(%d%d%d)", "%1,"):reverse()
     integer_part = integer_part:gsub("^,", ""):gsub("-,", "-")
     -- Handle numbers below 1000 without suffix
-    if scale == 1 then
-        return string.format("%s.%s", integer_part, fractional_part)
-    end
     -- Combine parts and add suffix
-    -- Clean up trailing zeros
-    return string.format("%s.%s %s", integer_part, fractional_part, suffix):gsub("%.?0+ %k$", " " .. suffix)
+    return string.format("%s.%s%s", integer_part, fractional_part, (suffix == "" and "") or (" " .. suffix)):gsub("%.?0+ %k$", " " .. suffix)
 end
 
 --- Display group
