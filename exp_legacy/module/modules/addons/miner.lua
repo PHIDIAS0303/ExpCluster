@@ -109,27 +109,31 @@ local function miner_check(entity)
     local pipe_build = {}
 
     if config.fluid and entity.fluidbox and #entity.fluidbox > 0 then
-        local connections = {}
+        table.insert(pipe_build, { x = 0, y = 0 })
+        local rh = math.ceil(er / 2) - 1
+        local r = er + 1
 
-        -- Collect all unique pipe connection directions
-        for i = 1, #entity.fluidbox do
-            local box_connections = entity.fluidbox.get_pipe_connections(i)
+        local entities = es.find_entities_filtered{ area = { { ep.x - r, ep.y - r }, { ep.x + r, ep.y + r } }, type = { "mining-drill", "pipe", "pipe-to-ground" } }
+        local entities_t = es.find_entities_filtered{ area = { { ep.x - r, ep.y - r }, { ep.x + r, ep.y + r } }, ghost_type = { "pipe", "pipe-to-ground" } }
 
-            for _, connection in pairs(box_connections) do
-                -- Get relative connection position vector
-                local vec = connection.target_position
-                -- Normalize to cardinal direction
-                local direction = { x = (((vec.x > 0.5 and 1) or (vec.x < -0.5 and -1)) or 0), y = (((vec.y > 0.5 and 1) or (vec.y < -0.5 and -1)) or 0) }
+        table.insert_array(entities, entities_t)
 
-                -- Convert to string key to prevent duplicates
-                local key = direction.x .. "," .. direction.y
-                if not connections[key] then
-                    connections[key] = true
-
-                    -- Calculate pipe positions in this direction
-                    for d = 1, er do
-                        table.insert(pipe_build, { x = direction.x * d, y = direction.y * d })
-                    end
+        for _, e in pairs(entities) do
+            if (e.position.x > ep.x) and (e.position.y == ep.y) then
+                for h = 1, rh do
+                    table.insert(pipe_build, { x = h, y = 0 })
+                end
+            elseif (e.position.x < ep.x) and (e.position.y == ep.y) then
+                for h = 1, rh do
+                    table.insert(pipe_build, { x = -h, y = 0 })
+                end
+            elseif (e.position.x == ep.x) and (e.position.y > ep.y) then
+                for h = 1, rh do
+                    table.insert(pipe_build, { x = 0, y = h })
+                end
+            elseif (e.position.x == ep.x) and (e.position.y < ep.y) then
+                for h = 1, rh do
+                    table.insert(pipe_build, { x = 0, y = -h })
                 end
             end
         end
