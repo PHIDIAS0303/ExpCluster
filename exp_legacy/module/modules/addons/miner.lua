@@ -115,7 +115,6 @@ local function miner_check(entity)
 
         local entities = es.find_entities_filtered{ area = { { ep.x - r, ep.y - r }, { ep.x + r, ep.y + r } }, type = { "mining-drill", "pipe", "pipe-to-ground" } }
         local entities_t = es.find_entities_filtered{ area = { { ep.x - r, ep.y - r }, { ep.x + r, ep.y + r } }, ghost_type = { "pipe", "pipe-to-ground" } }
-
         table.insert_array(entities, entities_t)
 
         for _, e in pairs(entities) do
