@@ -26,7 +26,6 @@ local function format_n(amount)
     end
     local suffix = ""
     local suffix_list = {
-        ["T"] = 1e12,
         ["G"] = 1e9,
         ["M"] = 1e6,
         ["k"] = 1e3
