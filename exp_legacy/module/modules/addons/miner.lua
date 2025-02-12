@@ -118,11 +118,9 @@ local function miner_check(entity)
 
         for i = 1, #entity.fluidbox do
             for _, p in pairs(entity.fluidbox.get_pipe_connections(i)) do
-                if p.flow_direction == "input" or p.flow_direction == "input-output" then
-                    for x = 1, p.position.x do
-                        for y = 1, p.position.y do
-                            table.insert(pipe_build, { x = x, y = y })
-                        end
+                for x = 1, p.position.x do
+                    for y = 1, p.position.y do
+                        table.insert(pipe_build, { x = x, y = y })
                     end
                 end
             end
