@@ -39,8 +39,7 @@ local function format_n(amount)
             break
         end
     end
-    local scaled_value = amount / scale
-    local formatted = string.format("%.2f", scaled_value)
+    local formatted = string.format("%.2f", amount / scale)
     -- Split into integer and fractional parts
     local integer_part, fractional_part = formatted:match("^(%-?%d+)%.(%d+)$")
     integer_part = integer_part or formatted
@@ -50,10 +49,6 @@ local function format_n(amount)
     integer_part = integer_part:gsub("^,", ""):gsub("-,", "-")
     -- Handle numbers below 1000 without suffix
     if scale == 1 then
-        -- Remove trailing .00 for whole numbers
-        if fractional_part == "00" then
-            return integer_part
-        end
         return string.format("%s.%s", integer_part, fractional_part)
     end
     -- Combine parts and add suffix
