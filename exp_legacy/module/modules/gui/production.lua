@@ -35,7 +35,7 @@ local function format_n(n)
 
     for letter, limit in pairs(suffix_list) do
         if math.abs(n) >= limit then
-            n = string.format("%.1f", n / limit)
+            n = string.format("%.2f", n / limit)
             suffix = letter
             break
         end
