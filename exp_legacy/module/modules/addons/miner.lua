@@ -119,10 +119,7 @@ local function miner_check(entity)
                 -- Get relative connection position vector
                 local vec = connection.target_position
                 -- Normalize to cardinal direction
-                local direction = {
-                    x = (((vec.x > 0.5 and 1) or (vec.x < -0.5 and -1)) or 0),
-                    y = (((vec.y > 0.5 and 1) or (vec.y < -0.5 and -1)) or 0)
-                }
+                local direction = { x = (((vec.x > 0.5 and 1) or (vec.x < -0.5 and -1)) or 0), y = (((vec.y > 0.5 and 1) or (vec.y < -0.5 and -1)) or 0) }
 
                 -- Convert to string key to prevent duplicates
                 local key = direction.x .. "," .. direction.y
