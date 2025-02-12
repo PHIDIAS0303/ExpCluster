@@ -120,8 +120,8 @@ local function miner_check(entity)
                 local vec = connection.target_position
                 -- Normalize to cardinal direction
                 local direction = {
-                    x = vec.x > 0.5 and 1 or vec.x < -0.5 and -1 or 0,
-                    y = vec.y > 0.5 and 1 or vec.y < -0.5 and -1 or 0
+                    x = (((vec.x > 0.5 and 1) or (vec.x < -0.5 and -1)) or 0),
+                    y = (((vec.y > 0.5 and 1) or (vec.y < -0.5 and -1)) or 0)
                 }
 
                 -- Convert to string key to prevent duplicates
@@ -130,7 +130,7 @@ local function miner_check(entity)
                     connections[key] = true
 
                     -- Calculate pipe positions in this direction
-                    for d = 1, entity.prototype.mining_drill_radius or 1 do
+                    for d = 1, er do
                         table.insert(pipe_build, { x = direction.x * d, y = direction.y * d })
                     end
                 end
