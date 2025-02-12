@@ -16,10 +16,8 @@ local precision = {
 }
 
 local font_color = {
-    -- positive
-    [1] = { r = 0.3, g = 1, b = 0.3 },
-    -- negative
-    [2] = { r = 1, g = 0.3, b = 0.3 },
+    ["positive"] = { r = 0.3, g = 1, b = 0.3 },
+    ["negative"] = { r = 1, g = 0.3, b = 0.3 },
 }
 
 local function format_n(n)
@@ -66,7 +64,7 @@ local production_data_group = Gui.element("production_data_group")
         }
         data_1.style.width = 90
         data_1.style.horizontal_align = "right"
-        data_1.style.font_color = font_color[1]
+        data_1.style.font_color = font_color["positive"]
 
         local data_2 = parent.add{
             type = "label",
@@ -76,7 +74,7 @@ local production_data_group = Gui.element("production_data_group")
         }
         data_2.style.width = 90
         data_2.style.horizontal_align = "right"
-        data_2.style.font_color = font_color[2]
+        data_2.style.font_color = font_color["negative"]
 
         local data_3 = parent.add{
             type = "label",
@@ -86,7 +84,7 @@ local production_data_group = Gui.element("production_data_group")
         }
         data_3.style.width = 90
         data_3.style.horizontal_align = "right"
-        data_3.style.font_color = font_color[1]
+        data_3.style.font_color = font_color["positive"]
 
         return item
     end)
@@ -153,15 +151,15 @@ Event.on_nth_tick(60, function()
                 table[production_prefix .. "_3"].caption = format_n(sum)
 
                 if sum < 0 then
-                    table[production_prefix .. "_3"].style.font_color = font_color[2]
+                    table[production_prefix .. "_3"].style.font_color = font_color["negative"]
                 else
-                    table[production_prefix .. "_3"].style.font_color = font_color[1]
+                    table[production_prefix .. "_3"].style.font_color = font_color["positive"]
                 end
             else
                 table[production_prefix .. "_1"].caption = "0.0"
                 table[production_prefix .. "_2"].caption = "0.0"
                 table[production_prefix .. "_3"].caption = "0.0"
-                table[production_prefix .. "_3"].style.font_color = font_color[1]
+                table[production_prefix .. "_3"].style.font_color = font_color["positive"]
             end
         end
     end
