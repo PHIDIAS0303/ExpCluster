@@ -117,7 +117,7 @@ local function miner_check(entity)
         table.insert(pipe_build, { x = 0, y = 0 })
 
         for i = 1, #entity.fluidbox do
-            for _, p in pairs(entity.fluidbox.get_pipe_connections(i)) do
+            for _, p in pairs(entity.fluidbox.pipe_connections) do
                 for x = 1, p.position.x do
                     for y = 1, p.position.y do
                         table.insert(pipe_build, { x = x, y = y })
