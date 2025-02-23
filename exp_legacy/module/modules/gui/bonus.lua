@@ -11,7 +11,6 @@ local vlayer = require("modules.exp_legacy.modules.control.vlayer")
 local format_number = require("util").format_number --- @dep util
 
 local bonus_container
-
 local bonus_data_score_limit = {}
 
 --- @param player LuaPlayer
