@@ -4,7 +4,6 @@
 ]]
 
 local Gui = require("modules/exp_gui")
-local Storage = require("modules/exp_util/storage")
 local Event = require("modules/exp_legacy/utils/event") --- @dep utils.event
 local Roles = require("modules.exp_legacy.expcore.roles") --- @dep expcore.roles
 local config = require("modules.exp_legacy.config.bonus") --- @dep config.bonus
@@ -16,10 +15,6 @@ local bonus_container
 local bonus_data = {
     score_limit = {}
 }
-
-Storage.register(bonus_data, function(tbl)
-    bonus_data = tbl
-end)
 
 --- @param player LuaPlayer
 --- @param container LuaGuiElement?
