@@ -42,7 +42,7 @@ local function format_n(amount)
     -- Split into integer and fractional parts
     local integer_part, fractional_part = formatted:match("^(%-?%d+)%.(%d+)(.*)$")
     -- Add commas to integer part
-    return string.format("%s.%s%s", (integer_part or formatted):reverse():gsub("(%d%d%d)", "%1,"):reverse():gsub("^,", ""):gsub("-,", "-"), (fractional_part or "00"), suffix):gsub("%.00([ ]?[GMk])$", "%1")
+    return string.format("%s.%s%s", (integer_part or formatted):reverse():gsub("(%d%d%d)", "%1,"):reverse():gsub("^,", ""):gsub("-,", "-"), fractional_part or "00", suffix)
 end
 
 --- Display group
