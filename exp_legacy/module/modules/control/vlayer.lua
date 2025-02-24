@@ -590,8 +590,36 @@ end
 
 --- Calculate the current power load to provide a better view for the user
 local function handle_circuit_power_load()
-    for index, interface in pairs(vlayer_data.entity_interfaces.circuit) do
+    local processed = {}
+    local pi = 0
+    local po = 0
+
+    for _, v in pairs(spawn_pole) do
+        local e = game.surfaces[1].find_entity(v[1], { x = v[2], y = v[3] })
+
+        if e and e.valid and e.is_connected_to_electric_network() and e.electric_network_id and not processed[e.electric_network_id] then
+            local ens = e.electric_network_statistics
+            local ensi = 0
+            local enso = 0
+
+            for _, c in pairs(ens.input_counts) do
+                ensi = ensi + c
+            end
+
+            for _, c in pairs(ens.output_counts) do
+                enso = enso + c
+            end
+
+            processed[e.electric_network_id] = { i = ensi, o = enso }
+        end
     end
+
+    for _, v in pairs(processed) do
+        pi = pi + v.i
+        po = po + v.o
+    end
+
+    vlayer_data.storage.load = pi * 10000 / po
 end
 
 --- Handle all circuit interfaces, updating their signals to match the vlayer statistics
