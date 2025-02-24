@@ -535,7 +535,7 @@ local function handle_circuit_power_load()
         po = po + v.o
     end
 
-    return pi * 10000 / po
+    return (pi * 10000 / po) or 0
 end
 
 --- Get the statistics for the vlayer
