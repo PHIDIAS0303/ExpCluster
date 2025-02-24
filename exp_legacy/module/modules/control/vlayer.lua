@@ -522,7 +522,7 @@ local function handle_circuit_power_load()
             processed[e.electric_network_id] = true
         end
     end
-    return (pi * 10000 / po) or 0
+    return pi * 10000 / math.max(po, 1)
 end
 
 --- Get the statistics for the vlayer
