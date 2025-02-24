@@ -41,7 +41,7 @@ local spawn_pole = {}
 
 for _, v in pairs(config_spawn.entities.locations) do
     if v[1] == "small-electric-pole" or v[1] == "medium-electric-pole" then
-        table.insert(spawn_pole, v)
+        table.insert(spawn_pole, { n = v[1], p = { x = v[2], y = v[3] } })
     end
 end
 
@@ -511,7 +511,7 @@ local function handle_circuit_power_load()
     local po = 0
 
     for _, v in pairs(spawn_pole) do
-        local e = game.surfaces[1].find_entity(v[1], { x = v[2], y = v[3] })
+        local e = game.surfaces[1].find_entity(v.n, v.p)
 
         if e and e.valid and e.is_connected_to_electric_network() and e.electric_network_id and not processed[e.electric_network_id] then
             local ens = e.electric_network_statistics
