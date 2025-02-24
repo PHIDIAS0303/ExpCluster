@@ -512,29 +512,23 @@ local function handle_circuit_power_load()
 
     for _, v in pairs(spawn_pole) do
         local e = game.surfaces[1].find_entity(v.n, v.p)
-
         if e and e.valid and e.is_connected_to_electric_network() and e.electric_network_id and not processed[e.electric_network_id] then
             local ens = e.electric_network_statistics
             local ensi = 0
             local enso = 0
-
             for _, c in pairs(ens.input_counts) do
                 ensi = ensi + c
             end
-
             for _, c in pairs(ens.output_counts) do
                 enso = enso + c
             end
-
             processed[e.electric_network_id] = { i = ensi, o = enso }
         end
     end
-
     for _, v in pairs(processed) do
         pi = pi + v.i
         po = po + v.o
     end
-
     return (pi * 10000 / po) or 0
 end
 
