@@ -8,7 +8,6 @@ local ExpUtil = require("modules/exp_util")
 local Storage = require("modules/exp_util/storage")
 local Event = require("modules/exp_legacy/utils/event") --- @dep utils.event
 local config = require("modules.exp_legacy.config.vlayer") --- @dep config.vlayer
-local config_spawn = require("modules.exp_legacy.config.spawn_area") --- @dep config.spawn_area
 
 local mega = 1000000
 
@@ -36,14 +35,6 @@ local vlayer_data = {
     },
     surface = table.deep_copy(config.surface),
 }
-
-local spawn_pole = {}
-
-for _, v in pairs(config_spawn.entities.locations) do
-    if v[1] == "small-electric-pole" or v[1] == "medium-electric-pole" then
-        table.insert(spawn_pole, { n = v[1], p = { x = v[2], y = v[3] } })
-    end
-end
 
 Storage.register(vlayer_data, function(tbl)
     vlayer_data = tbl
@@ -504,39 +495,12 @@ local function handle_unallocated()
     end
 end
 
---- Calculate the current power load to provide a better view for the user
-local function handle_circuit_power_load()
-    local processed = {}
-    local pi = 0
-    local po = 0
-
-    for _, v in pairs(spawn_pole) do
-        local e = game.surfaces[1].find_entity(v.n, v.p)
-        if e and e.valid and e.is_connected_to_electric_network() and e.electric_network_id and (not processed[e.electric_network_id]) then
-            local ens = e.electric_network_statistics
-
-            for _, c in pairs(ens.input_counts) do
-                pi = pi + c
-            end
-
-            for _, c in pairs(ens.output_counts) do
-                po = po + c
-            end
-
-            processed[e.electric_network_id] = true
-        end
-    end
-
-    return pi * 10000 / math.max(po, 1)
-end
-
 --- Get the statistics for the vlayer
 function vlayer.get_statistics()
     local vdp = vlayer_data.properties.production * mega
     local gdm = get_production_multiplier()
     local gsm = get_sustained_multiplier()
     local gald = get_actual_land_defecit()
-    local cl = handle_circuit_power_load()
 
     return {
         total_surface_area = vlayer_data.properties.total_surface_area,
@@ -544,7 +508,6 @@ function vlayer.get_statistics()
         remaining_surface_area = gald,
         surface_area = vlayer_data.properties.total_surface_area - gald,
         production_multiplier = gdm,
-        current_load = cl,
         energy_max = vdp,
         energy_production = vdp * gdm,
         energy_total_production = vlayer_data.properties.total_production * gsm * mega,
@@ -569,7 +532,6 @@ function vlayer.get_circuits()
         used_surface_area = "signal-U",
         remaining_surface_area = "signal-R",
         production_multiplier = "signal-M",
-        current_load = "signal-O",
         energy_production = "signal-P",
         energy_sustained = "signal-S",
         energy_capacity = "signal-C",
