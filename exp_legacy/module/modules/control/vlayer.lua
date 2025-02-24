@@ -617,7 +617,7 @@ local function handle_circuit_interfaces()
                 circuit_oc.clear_slot(clear_index)
             end
 
-            circuit_oc.combinator_description = vlayer_circuits_string
+            interface.combinator_description = vlayer_circuits_string
         end
     end
 end
