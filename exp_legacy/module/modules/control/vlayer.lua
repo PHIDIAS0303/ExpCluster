@@ -40,7 +40,7 @@ local vlayer_data = {
 
 local spawn_pole = {}
 
-for _, v in pairs(config_spawn.entities.location) do
+for _, v in pairs(config_spawn.entities.locations) do
     if v[1] == "small-electric-pole" or v[1] == "medium-electric-pole" then
         table.insert(spawn_pole, v)
     end
