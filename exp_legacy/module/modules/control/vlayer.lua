@@ -8,6 +8,7 @@ local ExpUtil = require("modules/exp_util")
 local Storage = require("modules/exp_util/storage")
 local Event = require("modules/exp_legacy/utils/event") --- @dep utils.event
 local config = require("modules.exp_legacy.config.vlayer") --- @dep config.vlayer
+local config_spawn = require("modules.exp_legacy.config.spawn_area") --- @dep config.spawn_area
 
 local mega = 1000000
 
@@ -36,6 +37,14 @@ local vlayer_data = {
     },
     surface = table.deep_copy(config.surface),
 }
+
+local spawn_pole = {}
+
+for _, v in pairs(config_spawn.entities.location) do
+    if v[1] == "small-electric-pole" or v[1] == "medium-electric-pole" then
+        table.insert(spawn_pole, v)
+    end
+end
 
 Storage.register(vlayer_data, function(tbl)
     vlayer_data = tbl
@@ -579,6 +588,12 @@ function vlayer.create_circuit_interface(surface, position, circuit, last_user)
     return interface
 end
 
+--- Calculate the current power load to provide a better view for the user
+local function handle_circuit_power_load()
+    for index, interface in pairs(vlayer_data.entity_interfaces.circuit) do
+    end
+end
+
 --- Handle all circuit interfaces, updating their signals to match the vlayer statistics
 local function handle_circuit_interfaces()
     local stats = vlayer.get_statistics()
@@ -787,6 +802,7 @@ Event.on_nth_tick(config.update_tick_storage, function(_)
     handle_input_interfaces()
     handle_output_interfaces()
     handle_unallocated()
+    handle_circuit_power_load()
 end)
 
 --- Handle all energy and circuit updates
