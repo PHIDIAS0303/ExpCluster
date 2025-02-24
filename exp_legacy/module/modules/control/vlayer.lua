@@ -32,7 +32,6 @@ local vlayer_data = {
         items = {},
         power_items = {},
         energy = 0,
-        load = 0,
         unallocated = {},
     },
     surface = table.deep_copy(config.surface),
@@ -505,12 +504,47 @@ local function handle_unallocated()
     end
 end
 
+--- Calculate the current power load to provide a better view for the user
+local function handle_circuit_power_load()
+    local processed = {}
+    local pi = 0
+    local po = 0
+
+    for _, v in pairs(spawn_pole) do
+        local e = game.surfaces[1].find_entity(v[1], { x = v[2], y = v[3] })
+
+        if e and e.valid and e.is_connected_to_electric_network() and e.electric_network_id and not processed[e.electric_network_id] then
+            local ens = e.electric_network_statistics
+            local ensi = 0
+            local enso = 0
+
+            for _, c in pairs(ens.input_counts) do
+                ensi = ensi + c
+            end
+
+            for _, c in pairs(ens.output_counts) do
+                enso = enso + c
+            end
+
+            processed[e.electric_network_id] = { i = ensi, o = enso }
+        end
+    end
+
+    for _, v in pairs(processed) do
+        pi = pi + v.i
+        po = po + v.o
+    end
+
+    return pi * 10000 / po
+end
+
 --- Get the statistics for the vlayer
 function vlayer.get_statistics()
     local vdp = vlayer_data.properties.production * mega
     local gdm = get_production_multiplier()
     local gsm = get_sustained_multiplier()
     local gald = get_actual_land_defecit()
+    local cl = handle_circuit_power_load()
 
     return {
         total_surface_area = vlayer_data.properties.total_surface_area,
@@ -518,7 +552,7 @@ function vlayer.get_statistics()
         remaining_surface_area = gald,
         surface_area = vlayer_data.properties.total_surface_area - gald,
         production_multiplier = gdm,
-        current_load = vlayer_data.storage.load,
+        current_load = cl,
         energy_max = vdp,
         energy_production = vdp * gdm,
         energy_total_production = vlayer_data.properties.total_production * gsm * mega,
@@ -586,40 +620,6 @@ function vlayer.create_circuit_interface(surface, position, circuit, last_user)
     interface.operable = true
 
     return interface
-end
-
---- Calculate the current power load to provide a better view for the user
-local function handle_circuit_power_load()
-    local processed = {}
-    local pi = 0
-    local po = 0
-
-    for _, v in pairs(spawn_pole) do
-        local e = game.surfaces[1].find_entity(v[1], { x = v[2], y = v[3] })
-
-        if e and e.valid and e.is_connected_to_electric_network() and e.electric_network_id and not processed[e.electric_network_id] then
-            local ens = e.electric_network_statistics
-            local ensi = 0
-            local enso = 0
-
-            for _, c in pairs(ens.input_counts) do
-                ensi = ensi + c
-            end
-
-            for _, c in pairs(ens.output_counts) do
-                enso = enso + c
-            end
-
-            processed[e.electric_network_id] = { i = ensi, o = enso }
-        end
-    end
-
-    for _, v in pairs(processed) do
-        pi = pi + v.i
-        po = po + v.o
-    end
-
-    vlayer_data.storage.load = pi * 10000 / po
 end
 
 --- Handle all circuit interfaces, updating their signals to match the vlayer statistics
@@ -830,7 +830,6 @@ Event.on_nth_tick(config.update_tick_storage, function(_)
     handle_input_interfaces()
     handle_output_interfaces()
     handle_unallocated()
-    handle_circuit_power_load()
 end)
 
 --- Handle all energy and circuit updates
