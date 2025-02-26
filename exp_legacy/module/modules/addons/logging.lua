@@ -14,27 +14,32 @@ local function add_log(data)
 end
 
 Event.add(defines.events.on_cargo_pod_finished_ascending, function(event)
-    if event and event.launched_by_rocket then
-        local force = event.cargo_pod.force
-        if force.rockets_launched >= config.rocket_launch_display_rate and force.rockets_launched % config.rocket_launch_display_rate == 0 then
-            add_log("[ROCKET] " .. force.rockets_launched .. " rockets launched")
-        elseif config.rocket_launch_display[force.rockets_launched] then
-            add_log("[ROCKET] " .. force.rockets_launched .. " rockets launched")
-        end
+    if not event or not event.launched_by_rocket then
+        return
+    end
+
+    local force = event.cargo_pod.force
+
+    if force.rockets_launched >= config.rocket_launch_display_rate and force.rockets_launched % config.rocket_launch_display_rate == 0 then
+        add_log("[ROCKET] " .. force.rockets_launched .. " rockets launched")
+    elseif config.rocket_launch_display[force.rockets_launched] then
+        add_log("[ROCKET] " .. force.rockets_launched .. " rockets launched")
     end
 end)
 
 Event.add(defines.events.on_pre_player_died, function(event)
-    if event and event.player_index then
-        if event.cause then
-            if event.cause.type and event.cause.type == "character" and event.cause.player and event.cause.player.index then
-                add_log("[DEATH] " .. game.players[event.player_index].name .. " died because of " .. (game.players[event.cause.player.index].name or "unknown reason"))
-            else
-                add_log("[DEATH] " .. game.players[event.player_index].name .. " died because of " .. (event.cause.name or "unknown reason"))
-            end
+    if not event or not event.player_index then
+        return
+    end
+
+    if event.cause then
+        if event.cause.type and event.cause.type == "character" and event.cause.player and event.cause.player.index then
+            add_log("[DEATH] " .. game.players[event.player_index].name .. " died because of " .. (game.players[event.cause.player.index].name or "unknown reason"))
         else
-            add_log("[DEATH] " .. game.players[event.player_index].name .. " died because of unknown reason")
+            add_log("[DEATH] " .. game.players[event.player_index].name .. " died because of " .. (event.cause.name or "unknown reason"))
         end
+    else
+        add_log("[DEATH] " .. game.players[event.player_index].name .. " died because of unknown reason")
     end
 end)
 
