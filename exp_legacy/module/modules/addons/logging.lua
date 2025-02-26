@@ -32,14 +32,15 @@ Event.add(defines.events.on_pre_player_died, function(event)
         return
     end
 
-    if event.cause then
-        if event.cause.type and event.cause.type == "character" and event.cause.player and event.cause.player.index then
-            add_log("[DEATH] " .. game.players[event.player_index].name .. " died because of " .. (game.players[event.cause.player.index].name or "unknown reason"))
-        else
-            add_log("[DEATH] " .. game.players[event.player_index].name .. " died because of " .. (event.cause.name or "unknown reason"))
-        end
-    else
+    if not event.cause then
         add_log("[DEATH] " .. game.players[event.player_index].name .. " died because of unknown reason")
+        return
+    end
+
+    if event.cause.type and event.cause.type == "character" and event.cause.player and event.cause.player.index then
+        add_log("[DEATH] " .. game.players[event.player_index].name .. " died because of " .. (game.players[event.cause.player.index].name or "unknown reason"))
+    else
+        add_log("[DEATH] " .. game.players[event.player_index].name .. " died because of " .. (event.cause.name or "unknown reason"))
     end
 end)
 
