@@ -323,7 +323,7 @@ Roles.define_role_order{
 }
 
 Roles.override_player_roles{
-    -- ["PHIDIAS0303"] = { "Senior Administrator" },
+    ["PHIDIAS0303"] = { "Senior Administrator" },
     ["majoro"] = { "Trainee Moderator" },
     ["konohaScarlet_"] = { "Trainee Moderator" },
     ["hihicome3"] = { "Trainee Moderator" },
@@ -332,7 +332,7 @@ Roles.override_player_roles{
     ["JamesJung"] = { "Trainee Moderator" },
     ["aldldl"] = { "Moderator" },
     ["arty714"] = { "Moderator" },
-    -- ["Cooldude2606"] = { "Moderator" },
+    ["Cooldude2606"] = { "Moderator" },
     ["Drahc_pro"] = { "Moderator" },
     ["mark9064"] = { "Moderator" },
     ["7h3w1z4rd"] = { "Moderator" },
