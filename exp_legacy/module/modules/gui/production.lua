@@ -93,8 +93,11 @@ local production_data_set = Gui.element("production_data_set")
         local disp = Gui.elements.scroll_table(production_set, 320, 4, "disp")
         production_data_group(disp, 0)
         disp["production_0_1"].caption = { "production.label-prod" }
+        disp["production_0_1"].tooltip = { "production.tooltip-per-second" }
         disp["production_0_2"].caption = { "production.label-con" }
+        disp["production_0_2"].tooltip = { "production.tooltip-per-second" }
         disp["production_0_3"].caption = { "production.label-bal" }
+        disp["production_0_3"].tooltip = { "production.tooltip-per-second" }
         for i = 1, 8 do
             production_data_group(disp, i)
         end
