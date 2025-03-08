@@ -77,8 +77,6 @@ local production_data_group = Gui.element("production_data_group")
                 caption = "0.00",
                 style = "heading_2_label",
             }
-            data.style.width = 80
-            data.style.horizontal_align = "right"
             data.style.font_color = font_color["positive"]
         end
 
@@ -91,6 +89,9 @@ local production_data_set = Gui.element("production_data_set")
     :draw(function(_, parent, name)
         local production_set = parent.add{ type = "flow", direction = "vertical", name = name }
         local disp = Gui.elements.scroll_table(production_set, 320, 4, "disp")
+        for i = 2, 4 do
+            disp.style.column_alignments[i] = "right"
+        end
         production_data_group(disp, 0)
         disp["production_0_1"].caption = { "production.label-prod" }
         disp["production_0_1"].tooltip = { "production.tooltip-per-second" }
