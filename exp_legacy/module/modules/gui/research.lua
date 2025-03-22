@@ -27,6 +27,11 @@ for _, mod_name in ipairs(config.mod_set_lookup) do
     end
 end
 
+if settings.startup["PHI-VP"] and settings.startup["PHI-VP-MAIN"] then
+    config.mod_set = "base"
+end
+
+
 local research_time_format = ExpUtil.format_time_factory{ format = "clock", hours = true, minutes = true, seconds = true }
 local empty_time = research_time_format(nil)
 
