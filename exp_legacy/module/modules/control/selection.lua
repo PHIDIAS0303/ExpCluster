@@ -79,7 +79,6 @@ function Selection.start(player, selection_name, single_use, ...)
     if player.character then
         player.character_inventory_slots_bonus = player.character_inventory_slots_bonus + 1
     end
-
     local inventory = player.get_main_inventory()
     if inventory then
         player.hand_location = { inventory = inventory.index, slot = #inventory }
