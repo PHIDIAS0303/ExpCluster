@@ -38,7 +38,7 @@ function module.res_queue(force, silent)
 
     if #res_q < config.queue_amount then
         for i = #res_q, config.queue_amount - 1 do
-            -- force.add_research(res)
+            force.add_research(res)
 
             if not silent then
                 game.print{ "exp-commands_research.queue", res.name, res.level + i }
