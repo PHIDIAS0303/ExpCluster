@@ -19,6 +19,13 @@ Storage.register(research, function(tbl)
     research = tbl
 end)
 
+if script.active_mods["PHI-CL"] and settings.startup["PHI-VP"] and settings.startup["PHI-VP-MAIN"] then
+    config.bonus_inventory.res[config.mod_set] = {
+        name = "mining-productivity-4",
+        level = 4,
+    }
+end
+
 --- @param force LuaForce
 --- @param silent boolean True when no message should be printed
 function module.res_queue(force, silent)
