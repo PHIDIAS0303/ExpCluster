@@ -23,7 +23,7 @@ end)
 --- @param silent boolean True when no message should be printed
 function module.res_queue(force, silent)
     local res_q = force.research_queue
-    game.print(config.mod_set)
+    rcon.print(config.mod_set)
     local res = force.technologies[config.bonus_inventory.res[config.mod_set].name]
 
     if #res_q < config.queue_amount then
