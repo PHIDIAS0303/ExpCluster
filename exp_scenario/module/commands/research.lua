@@ -26,7 +26,7 @@ for _, mod_name in ipairs(config.mod_set_lookup) do
     end
 end
 
-if script.active_mods["PHI-CL"] and settings.startup["PHI-VP"] and settings.startup["PHI-VP-MAIN"] then
+if script.active_mods["space-age"] and script.active_mods["PHI-CL"] and settings.startup["PHI-VP"] and settings.startup["PHI-VP-MAIN"] then
     config.mod_set = "space-age"
 end
 
@@ -34,11 +34,12 @@ end
 --- @param silent boolean True when no message should be printed
 function module.res_queue(force, silent)
     local res_q = force.research_queue
+    game.print(config.bonus_inventory.res[config.mod_set].name)
     local res = force.technologies[config.bonus_inventory.res[config.mod_set].name]
 
     if #res_q < config.queue_amount then
         for i = #res_q, config.queue_amount - 1 do
-            force.add_research(res)
+            -- force.add_research(res)
 
             if not silent then
                 game.print{ "exp-commands_research.queue", res.name, res.level + i }
