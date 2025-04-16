@@ -19,24 +19,15 @@ Storage.register(research, function(tbl)
     research = tbl
 end)
 
-for _, mod_name in ipairs(config.mod_set_lookup) do
-    if script.active_mods[mod_name] then
-        config.mod_set = mod_name
-        break
-    end
-end
-
-if script.active_mods["PHI-CL"] and settings.startup["PHI-VP"] and settings.startup["PHI-VP-MAIN"] then
-    config.mod_set = "base"
-end
-
 --- @param force LuaForce
 --- @param silent boolean True when no message should be printed
 function module.res_queue(force, silent)
     local res_q = force.research_queue
     local res = force.technologies[config.bonus_inventory.res[config.mod_set].name]
+    game.print(config.mod_set)
+    game.print(config.bonus_inventory.res[config.mod_set].name)
     game.print(force.technologies[config.bonus_inventory.res[config.mod_set].name].name)
-
+    
     if #res_q < config.queue_amount then
         for i = #res_q, config.queue_amount - 1 do
             -- force.add_research(res)
