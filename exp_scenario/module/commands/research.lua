@@ -20,10 +20,7 @@ Storage.register(research, function(tbl)
 end)
 
 if script.active_mods["PHI-CL"] and settings.startup["PHI-VP"] and settings.startup["PHI-VP-MAIN"] then
-    config.bonus_inventory.res[config.mod_set] = {
-        name = "mining-productivity-4",
-        level = 4,
-    }
+    config.mod_set = "base"
 end
 
 --- @param force LuaForce
