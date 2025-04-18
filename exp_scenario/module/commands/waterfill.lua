@@ -95,7 +95,7 @@ Selection.on_selection(SelectionName, function(event)
 
     surface.set_tiles(tiles_to_make, true, "abort_on_collision", true, false, player, 0)
     local remaining_tiles = surface.count_tiles_filtered{ area = area, name = tile_to_apply }
-    local t_diff = tile_count - remaining_tiles
+    local t_diff = math.max(tile_count - remaining_tiles, 0)
 
     if item_count_cliff >= t_diff then
         player.remove_item{ name = "cliff-explosives", count = t_diff }
