@@ -73,10 +73,7 @@ Selection.on_selection(SelectionName, function(event)
         for _, v in pairs(chest) do
             if v.get_inventory(defines.inventory.chest).is_empty() then
                 tile_count = tile_count + 1
-                tiles_to_make[tile_count] = {
-                    name = tile_to_apply,
-                    position = { math.floor(v.position.x), math.floor(v.position.y) },
-                }
+                tiles_to_make[tile_count] = { name = tile_to_apply, position = { v.position.x, v.position.y } }
                 v.destroy()
             end
         end
@@ -85,10 +82,7 @@ Selection.on_selection(SelectionName, function(event)
         for x = area.left_top.x, area.right_bottom.x do
             for y = area.left_top.y, area.right_bottom.y do
                 tile_count = tile_count + 1
-                tiles_to_make[tile_count] = {
-                    name = tile_to_apply,
-                    position = { x, y },
-                }
+                tiles_to_make[tile_count] = { name = tile_to_apply, position = { x, y } }
             end
         end
     end
