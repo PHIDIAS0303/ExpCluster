@@ -89,7 +89,7 @@ Selection.on_selection(SelectionName, function(event)
             end
         end
 
-        local remaining_tiles = surface.count_tiles_filtered{ area = area, name = tile_to_apply }
+        remaining_tiles = surface.count_tiles_filtered{ area = area, name = tile_to_apply }
     end
 
     surface.set_tiles(tiles_to_make, true, "abort_on_collision", true, false, player, 0)
