@@ -90,8 +90,7 @@ Selection.on_selection(SelectionName, function(event)
     surface.set_tiles(tiles_to_make, true, "abort_on_collision", true, false, player, 0)
     local remaining_tiles = surface.count_tiles_filtered{ area = area, name = tile_to_apply }
     local t_diff = tile_count - remaining_tiles
-    game.print(tile_count)
-    game.print(remaining_tiles)
+    game.print("T " .. tile_count .. " R " .. remaining_tiles)
 
     --[[
     if item_count_cliff >= t_diff then
