@@ -78,15 +78,15 @@ return {
         ["space-age"] = {
             ["logistic-science-pack"] = 3600,
             ["military-science-pack"] = 3600,
-            ["chemical-science-pack"] = 4500,
-            ["utility-science-pack"] = 5400,
-            ["production-science-pack"] = 5400,
-            ["space-science-pack"] = 5400,
-            ["metallurgic-science-pack"] = 6300,
-            ["electromagnetic-science-pack"] = 6300,
-            ["agricultural-science-pack"] = 6300,
-            ["cryogenic-science-pack"] = 6300,
-            ["promethium-science-pack"] = 7200
+            ["chemical-science-pack"] = 5400,
+            ["utility-science-pack"] = 7200,
+            ["production-science-pack"] = 7200,
+            ["space-science-pack"] = 7200,
+            ["metallurgic-science-pack"] = 12600,
+            ["electromagnetic-science-pack"] = 12600,
+            ["agricultural-science-pack"] = 12600,
+            ["cryogenic-science-pack"] = 12600,
+            ["promethium-science-pack"] = 14400
         }
     },
     inf_res = {
