@@ -27,10 +27,6 @@ for _, mod_name in ipairs(config.mod_set_lookup) do
     end
 end
 
-if script.active_mods["PHI-CL"] and settings.startup["PHI-VP"] and settings.startup["PHI-VP-MAIN"] then
-    config.mod_set = "base"
-end
-
 local research_time_format = ExpUtil.format_time_factory{ format = "clock", hours = true, minutes = true, seconds = true }
 local empty_time = research_time_format(nil)
 
@@ -89,15 +85,9 @@ end
 
 local function research_notification(event)
     if config.inf_res[config.mod_set][event.research.name] then
-        if event.research.name == config.bonus_inventory.log[config.mod_set].name then
-            if event.research.level == config.bonus_inventory.log[config.mod_set].level + 1 then
-                -- Add run result to log
-                research_add_log()
-            end
-
-            if config.pollution_ageing_by_research then
-                game.map_settings.pollution.ageing = math.min(10, event.research.level / 5)
-            end
+        if event.research.name == config.bonus_inventory.log[config.mod_set].name and event.research.level == config.bonus_inventory.log[config.mod_set].level + 1 then
+            -- Add run result to log
+            research_add_log()
         end
 
         if not (event.by_script) then
@@ -109,6 +99,10 @@ local function research_notification(event)
 
     if config.bonus_inventory.enabled and config.bonus_inventory.res[event.research.name] then
         event.research.force[config.bonus_inventory.name] = math.min((event.research.level - 1) * config.bonus_inventory.rate, config.bonus_inventory.limit)
+    end
+
+    if config.pollution_ageing_by_research and config.bonus_inventory.res[event.research.name] then
+        game.map_settings.pollution.ageing = math.min(10, event.research.level / 5)
     end
 end
 
