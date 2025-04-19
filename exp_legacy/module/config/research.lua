@@ -163,7 +163,7 @@ return {
             ["rocket-part-productivity"] = 1,
             -- Follower Robot Count
             ["follower-robot-count-5"] = 5,
-        }
+        },
     },
     -- prevent research up to a certain level
     limit_res = {
