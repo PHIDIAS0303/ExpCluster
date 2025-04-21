@@ -10,7 +10,7 @@ Storage.register(turrets, function(tbl)
     turrets = tbl
 end)
 
-do
+local function spawn_force()
     local force = game.forces["spawn"]
 
     if force and force.valid then
@@ -49,6 +49,8 @@ end
 
 -- Will spawn all infinite ammo turrets and keep them refilled
 local function spawn_turrets()
+    spawn_force()
+
     for _, turret_pos in pairs(turrets) do
         local surface = game.surfaces[turret_pos.surface]
         local pos = turret_pos.position
