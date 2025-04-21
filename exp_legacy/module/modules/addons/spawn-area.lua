@@ -10,18 +10,6 @@ Storage.register(turrets, function(tbl)
     turrets = tbl
 end)
 
-local function spawn_force()
-    local force = game.forces["spawn"]
-
-    if force and force.valid then
-        return force
-    end
-
-    force = game.create_force("spawn")
-    force.set_cease_fire("player", true)
-    game.forces["player"].set_cease_fire("spawn", true)
-end
-
 -- Apply an offset to a LuaPosition
 local function apply_offset(position, offset)
     return { x = position.x + (offset.x or offset[1]), y = position.y + (offset.y or offset[2]) }
@@ -49,8 +37,6 @@ end
 
 -- Will spawn all infinite ammo turrets and keep them refilled
 local function spawn_turrets()
-    spawn_force()
-
     for _, turret_pos in pairs(turrets) do
         local surface = game.surfaces[turret_pos.surface]
         local pos = turret_pos.position
@@ -231,6 +217,15 @@ Event.add(defines.events.on_player_created, function(event)
     local player = game.players[event.player_index]
     local p = { x = 0, y = 0 }
     local s = player.physical_surface
+
+    local force = game.forces["spawn"]
+
+    if not (force or force.valid) then
+        force = game.create_force("spawn")
+        force.set_cease_fire("player", true)
+        game.forces["player"].set_cease_fire("spawn", true)
+    end
+
     game.forces["spawn"].set_ammo_damage_modifier("bullet", 1)
     game.forces["spawn"].set_gun_speed_modifier("bullet", 1)
     game.forces["spawn"].set_turret_attack_modifier("gun-turret", 1)
