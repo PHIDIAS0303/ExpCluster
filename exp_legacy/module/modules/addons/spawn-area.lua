@@ -218,14 +218,12 @@ Event.add(defines.events.on_player_created, function(event)
     local p = { x = 0, y = 0 }
     local s = player.physical_surface
 
-    local force = game.forces["spawn"]
-
-    if not (force or force.valid) then
-        force = game.create_force("spawn")
-        force.set_cease_fire("player", true)
-        game.forces["player"].set_cease_fire("spawn", true)
+    if not game.forces["spawn"] or game.forces["spawn"].valid then
+        game.create_force("spawn")
     end
 
+    game.forces["spawn"].set_cease_fire("player", true)
+    game.forces["player"].set_cease_fire("spawn", true)
     game.forces["spawn"].set_ammo_damage_modifier("bullet", 1)
     game.forces["spawn"].set_gun_speed_modifier("bullet", 1)
     game.forces["spawn"].set_turret_attack_modifier("gun-turret", 1)
