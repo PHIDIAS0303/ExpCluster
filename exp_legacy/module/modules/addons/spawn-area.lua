@@ -10,6 +10,18 @@ Storage.register(turrets, function(tbl)
     turrets = tbl
 end)
 
+do
+    local force = game.forces["spawn"]
+
+    if force and force.valid then
+        return force
+    end
+
+    force = game.create_force("spawn")
+    force.set_cease_fire("player", true)
+    game.forces["player"].set_cease_fire("spawn", true)
+end
+
 -- Apply an offset to a LuaPosition
 local function apply_offset(position, offset)
     return { x = position.x + (offset.x or offset[1]), y = position.y + (offset.y or offset[2]) }
@@ -44,15 +56,15 @@ local function spawn_turrets()
 
         -- Makes a new turret if it is not found
         if not turret or not turret.valid then
-            turret = surface.create_entity{ name = "gun-turret", position = pos, force = "neutral" }
+            turret = surface.create_entity{ name = "gun-turret", position = pos, force = "spawn" }
             if not turret then return end
             protect_entity(turret)
         end
 
         -- Adds ammo to the turret
         local inv = turret.get_inventory(defines.inventory.turret_ammo)
-        if inv and inv.can_insert{ name = config.turrets.ammo_type, count = 10 } then
-            inv.insert{ name = config.turrets.ammo_type, count = 10 }
+        if inv and inv.can_insert{ name = config.turrets.ammo_type, count = 20 } then
+            inv.insert{ name = config.turrets.ammo_type, count = 20 }
         end
     end
 end
@@ -217,12 +229,9 @@ Event.add(defines.events.on_player_created, function(event)
     local player = game.players[event.player_index]
     local p = { x = 0, y = 0 }
     local s = player.physical_surface
-    game.forces["neutral"].set_cease_fire("player", true)
-    game.forces["player"].set_cease_fire("neutral", true)
-    game.forces["neutral"].set_cease_fire("enemy", false)
-    game.forces["neutral"].set_ammo_damage_modifier("bullet", 1)
-    game.forces["neutral"].set_gun_speed_modifier("bullet", 1)
-    game.forces["neutral"].set_turret_attack_modifier("gun-turret", 1)
+    game.forces["spawn"].set_ammo_damage_modifier("bullet", 1)
+    game.forces["spawn"].set_gun_speed_modifier("bullet", 1)
+    game.forces["spawn"].set_turret_attack_modifier("gun-turret", 1)
     spawn_area(s, p)
     if config.pattern.enabled then spawn_pattern(s, p) end
     if config.water.enabled then spawn_water(s, p) end
