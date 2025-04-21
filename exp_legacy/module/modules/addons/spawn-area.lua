@@ -219,6 +219,7 @@ Event.add(defines.events.on_player_created, function(event)
     local s = player.physical_surface
     game.forces["neutral"].set_cease_fire("player", true)
     game.forces["player"].set_cease_fire("neutral", true)
+    game.forces["neutral"].set_cease_fire("enemy", false)
     game.forces["neutral"].set_ammo_damage_modifier("bullet", 1)
     game.forces["neutral"].set_gun_speed_modifier("bullet", 1)
     game.forces["neutral"].set_turret_attack_modifier("gun-turret", 1)
