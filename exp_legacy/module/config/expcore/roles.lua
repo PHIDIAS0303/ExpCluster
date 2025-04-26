@@ -324,6 +324,7 @@ Roles.define_role_order{
 
 Roles.override_player_roles{
     ["PHIDIAS0303"] = { "Senior Administrator" },
+    ["MadKatz"] = { "Moderator" },
     ["majoro"] = { "Trainee Moderator" },
     ["konohaScarlet_"] = { "Trainee Moderator" },
     ["hihicome3"] = { "Trainee Moderator" },
