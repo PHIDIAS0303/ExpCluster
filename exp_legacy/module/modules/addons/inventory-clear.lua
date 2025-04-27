@@ -11,7 +11,7 @@ local function clear_items(event)
     ExpUtil.transfer_inventory_to_surface{
         inventory = inventory,
         surface = game.surfaces[1],
-        name = "iron-chest",
+        name = "steel-chest",
         allow_creation = true,
     }
 end

@@ -492,7 +492,7 @@ local function role_update_event(event)
     local disp = container.frame["vlayer_st_2"].disp.table
     disp[vlayer_gui_control_build.name].visible = visible
     disp[vlayer_gui_control_remove.name].visible = visible
-end    
+end
 
 Event.add(Roles.events.on_role_assigned, role_update_event)
 Event.add(Roles.events.on_role_unassigned, role_update_event)
