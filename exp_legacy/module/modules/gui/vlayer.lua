@@ -378,7 +378,7 @@ local vlayer_gui_control_see = Gui.element("vlayer_gui_control_see")
     }:on_click(function(def, player, element, event)
         local target = element.parent[vlayer_gui_control_type.name].selected_index
         local n = element.parent[vlayer_gui_control_list.name].selected_index
-        
+
         if target and vlayer_control_type_list[target] and n > 0 then
             local i = vlayer.get_interfaces()
             local entity = i[vlayer_control_type_list[target]][n]
