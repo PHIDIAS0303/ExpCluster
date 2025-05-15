@@ -172,14 +172,6 @@ Roles.new_role("Senior Member", "SMem")
     :set_flag("instant-respawn")
     :set_parent("Member")
     :allow{
-        "command/set-join-message",
-        "command/remove-join-message",
-        "command/goto",
-        "command/jail",
-        "command/unjail",
-        "command/spectate",
-        "command/follow",
-        "command/repair"
     }
 
 --- Standard User Roles
@@ -190,6 +182,8 @@ Roles.new_role("Member", "Mem")
     :set_flag("deconlog-bypass")
     :set_parent("Veteran")
     :allow{
+        "command/set-join-message",
+        "command/remove-join-message",
         "gui/vlayer-edit",
         "gui/rocket-info/toggle-active",
         "gui/rocket-info/remote_launch",
@@ -203,6 +197,12 @@ Roles.new_role("Member", "Mem")
         "command/set-home",
         "command/get-home",
         "command/return",
+        "command/goto",
+        "command/jail",
+        "command/unjail",
+        "command/spectate",
+        "command/follow",
+        "command/repair",
         "fast-tree-decon"
     }
 
@@ -354,7 +354,6 @@ Roles.override_player_roles{
     ["ookl"] = { "Moderator" },
     ["Phoenix27833"] = { "Moderator" },
     ["porelos"] = { "Moderator" },
-    ["rongli"] = { "Trainee Moderator" },
     ["Ruuyji"] = { "Moderator" },
     ["samy115"] = { "Moderator" },
     ["SilentLog"] = { "Moderator" },
@@ -373,4 +372,5 @@ Roles.override_player_roles{
     ["JamesJung"] = { "Trainee Moderator" },
     ["konohaScarlet_"] = { "Trainee Moderator" },
     ["majoro"] = { "Trainee Moderator" },
+    ["rongli"] = { "Trainee Moderator" },
 }
