@@ -83,7 +83,7 @@ return {
     skip_victory = true, --- @setting skip_victory will skip the victory screen when a rocket is launched
     friendly_fire = false, --- @setting friendly_fire weather players will be able to attack each other on the same force
     enemy_expansion = false, --- @setting enemy_expansion a catch all for in case the map settings file fails to load
-    chart_radius = 10 * 32, --- @setting chart_radius the number of tiles that will be charted when the map starts
+    chart_radius = 20 * 32, --- @setting chart_radius the number of tiles that will be charted when the map starts
     items = { --- @setting items items and there condition for being given
         ["iron-ore"] = cutoff_time(20 * minutes, 80, 0),
         ["stone"] = cutoff_time(20 * minutes, 20, 0),
