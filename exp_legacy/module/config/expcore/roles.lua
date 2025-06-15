@@ -26,6 +26,7 @@ Roles.new_role("System", "SYS")
     :set_flag("is_spectator")
     :set_flag("report-immune")
     :set_flag("instant-respawn")
+    :set_flag("deconlog-bypass")
     :set_allow_all()
 
 Roles.new_role("Senior Administrator", "SAdmin")
@@ -36,13 +37,9 @@ Roles.new_role("Senior Administrator", "SAdmin")
     :set_flag("is_spectator")
     :set_flag("report-immune")
     :set_flag("instant-respawn")
+    :set_flag("deconlog-bypass")
     :set_parent("Administrator")
-    :allow{
-        "command/_rcon",
-        "command/debug",
-        "command/set-cheat-mode",
-        "command/research-all",
-    }
+    :set_allow_all()
 
 Roles.new_role("Administrator", "Admin")
     :set_permission_group("Admin")
@@ -51,63 +48,57 @@ Roles.new_role("Administrator", "Admin")
     :set_flag("is_spectator")
     :set_flag("report-immune")
     :set_flag("instant-respawn")
+    :set_flag("deconlog-bypass")
+    :set_parent("Senior Moderator")
+    :allow{
+        "command/_rcon",
+        "command/debug",
+        "command/set-cheat-mode",
+        "command/research-all"
+    }
+
+Roles.new_role("Senior Moderator", "SMod")
+    :set_permission_group("Mod")
+    :set_custom_color{ r = 0, g = 170, b = 0 }
+    :set_flag("is_admin")
+    :set_flag("is_system")
+    :set_flag("is_spectator")
+    :set_flag("report-immune")
+    :set_flag("instant-respawn")
+    :set_flag("deconlog-bypass")
     :set_parent("Moderator")
     :allow{
         "gui/warp-list/bypass-proximity",
         "gui/warp-list/bypass-cooldown",
-        "command/connect-all",
+        "command/connect-all"
     }
 
 Roles.new_role("Moderator", "Mod")
-    :set_permission_group("Admin")
+    :set_permission_group("Mod")
     :set_custom_color{ r = 0, g = 170, b = 0 }
     :set_flag("is_admin")
     :set_flag("is_spectator")
     :set_flag("report-immune")
     :set_flag("instant-respawn")
-    :set_parent("Trainee")
+    :set_flag("deconlog-bypass")
+    :set_parent("Trainee Moderator")
     :allow{
-        "command/assign-role",
-        "command/unassign-role",
-        "command/repair",
-        "command/kill/always",
-        "command/clear-tag/always",
-        "command/spawn/always",
-        "command/clear-reports",
-        "command/clear-warnings",
-        "command/clear-script-warnings",
-        "command/clear-last-warnings",
-        "command/clear-inventory",
-        "command/kill-enemies",
-        "command/remove-enemies",
-        --'command/bonus',
-        "command/home",
-        "command/set-home",
-        "command/get-home",
-        "command/return",
-        "command/connect-player",
-        "command/set-bot-queue",
-        "command/set-game-speed",
-        "command/set-friendly-fire",
-        "command/set-always-day",
-        "command/set-pollution-enabled",
-        "command/clear-pollution",
-        "gui/rocket-info/toggle-active",
-        "gui/rocket-info/remote_launch",
-        "gui/bonus",
-        "fast-tree-decon",
     }
 
-Roles.new_role("Trainee", "TrMod")
-    :set_permission_group("Admin")
+Roles.new_role("Trainee Moderator", "Trainee")
+    :set_permission_group("Mod")
     :set_custom_color{ r = 0, g = 170, b = 0 }
     :set_flag("is_admin")
     :set_flag("is_spectator")
     :set_flag("report-immune")
-    :set_parent("Veteran")
+    :set_flag("instant-respawn")
+    :set_flag("deconlog-bypass")
+    :set_parent("Board Member")
     :allow{
+        "command/assign-role",
+        "command/unassign-role",
         "command/admin-chat",
-        "command/goto",
+        "command/protect-tag",
         "command/teleport",
         "command/bring",
         "command/create-warning",
@@ -115,19 +106,30 @@ Roles.new_role("Trainee", "TrMod")
         "command/get-reports",
         "command/protect-entity",
         "command/protect-area",
-        "command/protect-tag",
-        "command/jail",
-        "command/unjail",
         "command/kick",
         "command/ban",
-        "command/spectate",
-        "command/follow",
         "command/search",
         "command/search-online",
         "command/search-amount",
         "command/search-recent",
-        "command/clear-blueprints",
-        "gui/playerdata",
+        "command/clear-pollution",
+        "command/set-pollution-enabled",
+        "command/set-bot-queue",
+        "command/set-game-speed",
+        "command/kill-enemies",
+        "command/remove-enemies",
+        "command/set-friendly-fire",
+        "command/set-always-day",
+        "command/clear-reports",
+        "command/clear-warnings",
+        "command/clear-script-warnings",
+        "command/clear-last-warnings",
+        "command/clear-inventory",
+        "command/connect-player",
+        "command/kill/always",
+        -- "command/clear-tag/always",
+        "command/spawn/always",
+        "gui/playerdata"
     }
 
 --- Trusted Roles
@@ -137,81 +139,94 @@ Roles.new_role("Board Member", "Board")
     :set_flag("is_spectator")
     :set_flag("report-immune")
     :set_flag("instant-respawn")
-    :set_parent("Sponsor")
-    :allow{
-        "command/goto",
-        "command/repair",
-        "command/spectate",
-        "command/follow",
-        "gui/playerdata",
-    }
-
-Roles.new_role("Senior Backer", "Backer")
-    :set_permission_group("Trusted")
-    :set_custom_color{ r = 238, g = 172, b = 44 }
-    :set_flag("is_spectator")
-    :set_flag("report-immune")
-    :set_flag("instant-respawn")
-    :set_parent("Sponsor")
-    :allow{
-    }
-
-Roles.new_role("Sponsor", "Spon")
-    :set_permission_group("Trusted")
-    :set_custom_color{ r = 238, g = 172, b = 44 }
-    :set_flag("is_spectator")
-    :set_flag("report-immune")
-    :set_flag("instant-respawn")
+    :set_flag("deconlog-bypass")
     :set_parent("Supporter")
     :allow{
-        "gui/rocket-info/toggle-active",
-        "gui/rocket-info/remote_launch",
-        "gui/bonus",
-        --"command/bonus",
-        "command/home",
-        "command/set-home",
-        "command/get-home",
-        "command/return",
-        "fast-tree-decon",
     }
 
 Roles.new_role("Supporter", "Sup")
     :set_permission_group("Trusted")
     :set_custom_color{ r = 230, g = 99, b = 34 }
     :set_flag("is_spectator")
-    :set_parent("Veteran")
+    :set_flag("instant-respawn")
+    :set_flag("deconlog-bypass")
+    :set_parent("Partner")
     :allow{
-        "command/tag-color",
-        "command/jail",
-        "command/unjail",
-        "command/set-join-message",
-        "command/remove-join-message",
     }
 
 Roles.new_role("Partner", "Part")
     :set_permission_group("Trusted")
-    :set_custom_color{ r = 140, g = 120, b = 200 }
+    :set_custom_color{ r = 24, g = 172, b = 188 }
     :set_flag("is_spectator")
-    :set_parent("Veteran")
+    :set_flag("instant-respawn")
+    :set_flag("deconlog-bypass")
+    :set_parent("Senior Member")
     :allow{
-        "command/jail",
-        "command/unjail",
     }
 
-local hours10, hours250 = 10 * 216000, 250 * 60
+Roles.new_role("Senior Member", "SMem")
+    :set_permission_group("Trusted")
+    :set_custom_color{ r = 24, g = 172, b = 188 }
+    :set_flag("is_spectator")
+    :set_flag("deconlog-bypass")
+    :set_flag("instant-respawn")
+    :set_parent("Member")
+    :allow{
+    }
+
+--- Standard User Roles
+Roles.new_role("Member", "Mem")
+    :set_permission_group("Trusted")
+    :set_custom_color{ r = 24, g = 172, b = 188 }
+    :set_flag("instant-respawn")
+    :set_flag("deconlog-bypass")
+    :set_parent("Veteran")
+    :allow{
+        "command/set-join-message",
+        "command/remove-join-message",
+        "gui/vlayer-edit",
+        "gui/rocket-info/toggle-active",
+        "gui/rocket-info/remote_launch",
+        "gui/tool",
+        -- "command/tag-color",
+        "command/clear-blueprints",
+        --"command/bonus",
+        "gui/bonus",
+        "command/personal-logistic",
+        "command/home",
+        "command/set-home",
+        "command/get-home",
+        "command/return",
+        "command/goto",
+        "command/jail",
+        "command/unjail",
+        "command/spectate",
+        "command/follow",
+        "command/repair",
+        "fast-tree-decon"
+    }
+
+local hours6, hours250 = 6 * 216000, 250 * 60
 Roles.new_role("Veteran", "Vet")
     :set_permission_group("Trusted")
     :set_custom_color{ r = 140, g = 120, b = 200 }
-    :set_parent("Member")
+    :set_flag("deconlog-bypass")
+    :set_parent("Regular")
     :allow{
+        "gui/surveillance",
+        "gui/warp-list/add",
+        "gui/warp-list/edit",
         "command/chat-bot",
         "command/clear-ground-items",
         "command/clear-blueprints-radius",
         "command/set-trains-to-automatic",
         "command/set-auto-research",
+        "command/lawnmower",
+        "command/waterfill",
+        "command/artillery"
     }
     :set_auto_assign_condition(function(player)
-        if player.online_time >= hours10 then
+        if player.online_time >= hours6 then
             return true
         else
             local stats = Statistics:get(player, {})
@@ -220,44 +235,25 @@ Roles.new_role("Veteran", "Vet")
         end
     end)
 
---- Standard User Roles
-Roles.new_role("Member", "Mem")
-    :set_permission_group("Standard")
-    :set_custom_color{ r = 24, g = 172, b = 188 }
-    :set_flag("deconlog-bypass")
-    :set_parent("Regular")
-    :allow{
-        "gui/task-list/add",
-        "gui/task-list/edit",
-        "gui/warp-list/add",
-        "gui/warp-list/edit",
-        "gui/surveillance",
-        "gui/vlayer-edit",
-        "gui/tool",
-        "command/save-quickbar",
-        "command/vlayer-info",
-        "command/personal-logistic",
-        "command/lawnmower",
-        "command/waterfill",
-        "command/artillery",
-    }
-
-local hours3, hours15 = 3 * 216000, 15 * 60
+local hours1, hours15 = 1 * 216000, 15 * 60
 Roles.new_role("Regular", "Reg")
     :set_permission_group("Standard")
     :set_custom_color{ r = 79, g = 155, b = 163 }
     :set_parent("Guest")
     :allow{
+        "gui/task-list/add",
+        "gui/task-list/edit",
         "command/kill",
         "command/rainbow",
         "command/spawn",
         "command/me",
+        "command/vlayer-info",
         "standard-decon",
         "bypass-entity-protection",
-        "bypass-nukeprotect",
+        "bypass-nukeprotect"
     }
     :set_auto_assign_condition(function(player)
-        if player.online_time >= hours3 then
+        if player.online_time >= hours1 then
             return true
         else
             local stats = Statistics:get(player, {})
@@ -271,8 +267,8 @@ local default = Roles.new_role("Guest", "")
     :set_permission_group("Guest")
     :set_custom_color{ r = 185, g = 187, b = 160 }
     :allow{
-        "command/tag",
-        "command/tag-clear",
+        -- "command/tag",
+        -- "command/tag-clear",
         "command/commands",
         "command/get-roles",
         "command/locate",
@@ -280,6 +276,7 @@ local default = Roles.new_role("Guest", "")
         "command/ratio",
         "command/server-ups",
         "command/save-data",
+        "command/save-quickbar",
         "command/data-preference",
         "command/connect",
         "gui/player-list",
@@ -292,7 +289,6 @@ local default = Roles.new_role("Guest", "")
         "gui/research",
         "gui/autofill",
         "gui/module",
-        "gui/landfill",
         "gui/production",
     }
 
@@ -312,57 +308,69 @@ Roles.define_role_order{
     "System", -- Best to keep root at top
     "Senior Administrator",
     "Administrator",
+    "Senior Moderator",
     "Moderator",
-    "Trainee",
+    "Trainee Moderator",
     "Board Member",
-    "Senior Backer",
-    "Sponsor",
     "Supporter",
     "Partner",
-    "Veteran",
+    "Senior Member",
     "Member",
+    "Veteran",
     "Regular",
     "Jail",
-    "Guest", -- Default must be last if you want to apply restrictions to other roles
+    "Guest" -- Default must be last if you want to apply restrictions to other roles
 }
 
 Roles.override_player_roles{
-    ["PHIDIAS0303"] = { "Moderator", "Board Member", "Member" },
-    ["aldldl"] = { "Administrator", "Moderator", "Member" },
-    ["arty714"] = { "Senior Administrator", "Moderator", "Member" },
-    ["Cooldude2606"] = { "Senior Administrator", "Moderator", "Member" },
-    ["Drahc_pro"] = { "Administrator", "Moderator", "Member" },
-    ["mark9064"] = { "Administrator", "Moderator", "Member" },
-    ["7h3w1z4rd"] = { "Moderator", "Member" },
-    ["FlipHalfling90"] = { "Moderator", "Member" },
-    ["hamsterbryan"] = { "Moderator", "Member" },
-    ["HunterOfGames"] = { "Moderator", "Member" },
-    ["NextIdea"] = { "Moderator", "Member" },
-    ["TheKernel32"] = { "Moderator", "Member" },
-    ["TheKernel64"] = { "Moderator", "Member" },
-    ["tovernaar123"] = { "Moderator", "Member" },
-    ["UUBlueFire"] = { "Moderator", "Member" },
-    ["AssemblyStorm"] = { "Moderator", "Member" },
-    ["banakeg"] = { "Moderator", "Member" },
-    ["connormkii"] = { "Moderator", "Member" },
-    ["cydes"] = { "Moderator", "Member" },
-    ["darklich14"] = { "Moderator", "Member" },
-    ["facere"] = { "Moderator", "Member" },
-    ["freek18"] = { "Moderator", "Member" },
-    ["Gizan"] = { "Moderator", "Member" },
-    ["LoicB"] = { "Moderator", "Member" },
-    ["M74132"] = { "Moderator", "Member" },
-    ["mafisch3"] = { "Moderator", "Member" },
-    ["maplesyrup01"] = { "Moderator", "Member" },
-    ["ookl"] = { "Moderator", "Member" },
-    ["Phoenix27833"] = { "Moderator", "Member" },
-    ["porelos"] = { "Moderator", "Member" },
-    ["Ruuyji"] = { "Moderator", "Member" },
-    ["samy115"] = { "Moderator", "Member" },
-    ["SilentLog"] = { "Moderator", "Member" },
-    ["Tcheko"] = { "Moderator", "Member" },
-    ["thadius856"] = { "Moderator", "Member" },
-    ["whoami32"] = { "Moderator", "Member" },
-    ["Windbomb"] = { "Moderator", "Member" },
-    ["XenoCyber"] = { "Moderator", "Member" },
+    ["PHIDIAS0303"] = { "Senior Administrator" },
+    ["7h3w1z4rd"] = { "Moderator" },
+    ["aldldl"] = { "Moderator" },
+    ["arty714"] = { "Moderator" },
+    ["AssemblyStorm"] = { "Moderator" },
+    ["banakeg"] = { "Moderator" },
+    ["connormkii"] = { "Moderator" },
+    ["cydes"] = { "Moderator" },
+    ["Cooldude2606"] = { "Moderator" },
+    ["darklich14"] = { "Moderator" },
+    ["Drahc_pro"] = { "Moderator" },
+    ["facere"] = { "Moderator" },
+    ["freek18"] = { "Moderator" },
+    ["FlipHalfling90"] = { "Moderator" },
+    ["Gizan"] = { "Moderator" },
+    ["hamsterbryan"] = { "Moderator" },
+    ["hidden_relic"] = { "Moderator" },
+    ["Hova"] = { "Moderator" },
+    ["HunterOfGames"] = { "Moderator" },
+    ["LoicB"] = { "Moderator" },
+    ["M74132"] = { "Moderator" },
+    ["MadKatz"] = { "Moderator" },
+    ["mafisch3"] = { "Moderator" },
+    ["maplesyrup01"] = { "Moderator" },
+    ["mark9064"] = { "Moderator" },
+    ["nallaj"] = { "Moderator" },
+    ["NextIdea"] = { "Moderator" },
+    ["oof2win2"] = { "Moderator" },
+    ["ookl"] = { "Moderator" },
+    ["Phoenix27833"] = { "Moderator" },
+    ["porelos"] = { "Moderator" },
+    ["Ruuyji"] = { "Moderator" },
+    ["samy115"] = { "Moderator" },
+    ["SilentLog"] = { "Moderator" },
+    ["Tcheko"] = { "Moderator" },
+    ["thadius856"] = { "Moderator" },
+    ["TheKernel32"] = { "Moderator" },
+    ["TheKernel64"] = { "Moderator" },
+    ["tovernaar123"] = { "Moderator" },
+    ["UUBlueFire"] = { "Moderator" },
+    ["whoami32"] = { "Moderator" },
+    ["Windbomb"] = { "Moderator" },
+    ["Windsinger"] = { "Moderator" },
+    ["XenoCyber"] = { "Moderator" },
+    ["Athenaa"] = { "Trainee Moderator" },
+    ["hihicome3"] = { "Trainee Moderator" },
+    ["JamesJung"] = { "Trainee Moderator" },
+    ["konohaScarlet_"] = { "Trainee Moderator" },
+    ["majoro"] = { "Trainee Moderator" },
+    ["rongli"] = { "Trainee Moderator" },
 }

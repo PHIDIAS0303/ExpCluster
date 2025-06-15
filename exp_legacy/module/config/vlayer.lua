@@ -8,8 +8,8 @@ return {
 
     unlimited_capacity = false, --- @setting unlimited_capacity When true the vlayer has an unlimited energy capacity, accumulators are not required
     unlimited_surface_area = false, --- @setting unlimited_surface_area When true the vlayer has an unlimited surface area, landfill is not required
-    modded_auto_downgrade = false, --- @setting modded_auto_downgrade When true modded items will be converted into their base game equivalent, original items can not be recovered
-    power_on_space = false, --- @setting power_on_space When true allow on spaceship
+    modded_auto_downgrade = true, --- @setting modded_auto_downgrade When true modded items will be converted into their base game equivalent, original items can not be recovered
+    power_on_space = true, --- @setting power_on_space When true allow on spaceship
     power_on_space_research = { --- @setting power_on_space_research the research level needed to use power_on_space
         name = "research-productivity",
         level = 10
@@ -29,10 +29,10 @@ return {
     },
 
     interface_limit = { --- @setting interface_limit Sets the limit for the number of vlayer interfaces that can be created
-        energy = 1, -- >1 allows for disconnected power networks to receive power
-        circuit = 20, -- No caveats
-        storage_input = 20, -- No caveats
-        storage_output = 1, -- >0 allows for item teleportation (allowed_items only)
+        energy = 100, -- >1 allows for disconnected power networks to receive power
+        circuit = 100, -- No caveats
+        storage_input = 100, -- No caveats
+        storage_output = 100, -- >0 allows for item teleportation (allowed_items only)
     },
 
     allowed_items = { --- @setting allowed_items List of all items allowed in vlayer storage and their properties
@@ -73,22 +73,22 @@ return {
             required_area = 0,
             surface_area = 0,
             fuel_value = 4, -- MJ
-            power = false, -- turn all coal to power to reduce trash
+            power = true, -- turn all coal to power to reduce trash
         },
         ["solid-fuel"] = {
             starting_value = 0,
             required_area = 0,
             surface_area = 0,
             fuel_value = 12, -- MJ
-            power = false, -- turn all solid fuel to power to reduce trash
+            power = true, -- turn all solid fuel to power to reduce trash
         },
         ["rocket-fuel"] = {
             starting_value = 0,
             required_area = 0,
             surface_area = 0,
             fuel_value = 100, -- MJ
-            power = false, -- turn all rocket fuel to power to reduce trash
-        }
+            power = true, -- turn all rocket fuel to power to reduce trash
+        },
     },
 
     modded_items = { --- @setting modded_items List of all modded items allowed in vlayer storage and their base game equivalent
