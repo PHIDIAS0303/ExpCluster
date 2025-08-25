@@ -194,6 +194,9 @@ end
 if config.turrets.enabled then
     Event.on_nth_tick(config.turrets.refill_time, function()
         if game.tick < 10 then return end
+        if game.tick < (config.turrets.refill_time + 10) and (not game.forces["spawn"] or game.forces["spawn"].valid) then
+            game.create_force("spawn")
+        end
         spawn_turrets()
     end)
 end
