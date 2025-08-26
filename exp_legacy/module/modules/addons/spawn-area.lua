@@ -20,6 +20,23 @@ for _, turret in ipairs(turrets) do
     turret.position = apply_offset(turret.position, config.turrets.offset)
 end
 
+-- Get or create the force used for entities in spawn
+local function get_spawn_force()
+    local force = game.forces["spawn"]
+
+    if force and force.valid then
+        return force
+    end
+
+    force = game.create_force("spawn")
+    force.set_cease_fire("player", true)
+    -- force.set_friend('player', true)
+    game.forces["player"].set_cease_fire("spawn", true)
+    -- game.forces['player'].set_friend('spawn', true)
+
+    return force
+end
+
 -- Protects an entity
 -- and sets its force to the spawn force
 local function protect_entity(entity, set_force)
@@ -30,7 +47,7 @@ local function protect_entity(entity, set_force)
         entity.operable = false
 
         if set_force then
-            entity.force = game.forces["neutral"]
+            entity.force = get_spawn_force()
         end
     end
 end
@@ -194,8 +211,8 @@ end
 if config.turrets.enabled then
     Event.on_nth_tick(config.turrets.refill_time, function()
         if game.tick < 10 then return end
-        if game.tick < (config.turrets.refill_time + 10) and (not game.forces["spawn"] or game.forces["spawn"].valid) then
-            game.create_force("spawn")
+        if game.tick < (config.turrets.refill_time + 10) then
+            get_spawn_force()
         end
         spawn_turrets()
     end)
@@ -220,16 +237,7 @@ Event.add(defines.events.on_player_created, function(event)
     local player = game.players[event.player_index]
     local p = { x = 0, y = 0 }
     local s = player.physical_surface
-
-    if not game.forces["spawn"] or game.forces["spawn"].valid then
-        game.create_force("spawn")
-    end
-
-    game.forces["spawn"].set_cease_fire("player", true)
-    game.forces["player"].set_cease_fire("spawn", true)
-    game.forces["spawn"].set_ammo_damage_modifier("bullet", 1)
-    game.forces["spawn"].set_gun_speed_modifier("bullet", 1)
-    game.forces["spawn"].set_turret_attack_modifier("gun-turret", 1)
+    get_spawn_force()
     spawn_area(s, p)
     if config.pattern.enabled then spawn_pattern(s, p) end
     if config.water.enabled then spawn_water(s, p) end
