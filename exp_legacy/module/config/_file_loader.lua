@@ -13,9 +13,9 @@ return {
     "modules.addons.advanced-start",
     "modules.addons.spawn-area",
     "modules.addons.compilatron",
-    "modules.addons.scorched-earth",
-    "modules.addons.pollution-grading",
-    "modules.addons.station-auto-name",
+    --"modules.addons.scorched-earth",
+    --"modules.addons.pollution-grading",
+    --"modules.addons.station-auto-name",
     "modules.addons.discord-alerts",
     "modules.addons.chat-reply",
     "modules.addons.tree-decon",
@@ -45,8 +45,8 @@ return {
 
     --- GUI
     "modules.gui.readme",
-    "modules.gui.rocket-info",
-    "modules.gui.science-info",
+    -- "modules.gui.rocket-info",
+    -- "modules.gui.science-info",
     "modules.gui.autofill",
     "modules.gui.task-list",
     "modules.gui.warp-list",
@@ -55,14 +55,13 @@ return {
     "modules.gui.vlayer",
     "modules.gui.research",
     "modules.gui.module",
-    "modules.gui.landfill",
     "modules.gui.tool",
     "modules.gui.production",
     "modules.gui.playerdata",
     "modules.gui.surveillance",
     "modules.gui._role_updates",
 
-    "modules.graftorio.require", -- graftorio
+    -- "modules.graftorio.require", -- graftorio
     --- Config Files
     "config.expcore.permission_groups", -- loads some predefined permission groups
     "config.expcore.roles", -- loads some predefined roles
