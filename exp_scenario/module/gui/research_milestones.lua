@@ -57,7 +57,6 @@ do --- Calculate the research targets
             }
 
             research_index = research_index + 1
-
         end
     end
     research_targets.length = research_index - 1
