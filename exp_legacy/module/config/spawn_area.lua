@@ -15,11 +15,11 @@ return {
         refill_time = 60 * 60 * 5, --- @setting refill_time The time in ticks between each refill of the turrets, only change if having lag issues
         offset = { x = 0, y = 0 }, --- @setting offset The position offset to apply to turrets
         locations = { --- @setting locations The locations of all turrets, this list can change during runtime
-            { surface = 1, position = { x = 2, y = 2 } },
-            { surface = 1, position = { x = 2, y = -2 } },
-            { surface = 1, position = { x = -2, y = 2 } },
-            { surface = 1, position = { x = -2, y = -2 } },
-        }
+            { -2, -2 },
+            { 2, -2 },
+            { -2, 2 },
+            { 2, 2 },
+        },
     },
     afk_belts = { --- @setting afk_belts Settings relating to adding afk belts to spawn
         enabled = true, --- @setting enabled Whether afk belts will be added to spawn
@@ -142,6 +142,7 @@ return {
     resource_refill_nearby = {
         enabled = false,
         range = 128,
+        refill_time = 36000,
         resources_name = {
             "iron-ore",
             "copper-ore",
