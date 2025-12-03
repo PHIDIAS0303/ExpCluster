@@ -401,6 +401,9 @@ end
 --- @param player LuaPlayer
 function Elements.container.clear_player_bonus(player)
     Elements.container.data[player] = {}
+    if not player.character then
+        return
+    end
     for _, bonus_data in pairs(config.player_bonus) do
         if not bonus_data.is_special then
             player[bonus_data.name] = 0
@@ -460,7 +463,7 @@ Gui.toolbar.create_button{
 
 --- Recalculate and apply the bonus for a player
 local function recalculate_bonus(event)
-    local player = assert(game.get_player(event.player_index))
+    local player = Gui.get_player(event)
     if event.name == Roles.events.on_role_assigned or event.name == Roles.events.on_role_unassigned then
         -- If the player's roles changed then we will need to recalculate their limit
         Elements.bonus_used._clear_points_limit_cache(player)

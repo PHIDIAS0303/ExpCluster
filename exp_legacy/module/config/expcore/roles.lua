@@ -217,6 +217,7 @@ Roles.new_role("Veteran", "Vet")
         "gui/warp-list/add",
         "gui/warp-list/edit",
         "command/chat-bot",
+        "command/chat-commands",
         "command/clear-ground-items",
         "command/clear-blueprints-radius",
         "command/set-trains-to-automatic",

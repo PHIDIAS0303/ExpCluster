@@ -46,16 +46,18 @@ do --- Calculate the research targets
     local research_index = 1
     local total_time = 0
     for name, time in pairs(config.milestone[config.mod_set]) do
-        research_targets.index_lookup[name] = research_index
-        total_time = total_time + time * 60
+        if prototypes.technology[name] and (not prototypes.technology[name].hidden) then
+            research_targets.index_lookup[name] = research_index
+            total_time = total_time + time * 60
 
-        research_targets.target_times[research_index] = {
-            name = name,
-            target = total_time,
-            label = research_time_format(total_time),
-        }
+            research_targets.target_times[research_index] = {
+                name = name,
+                target = total_time,
+                label = research_time_format(total_time),
+            }
 
-        research_index = research_index + 1
+            research_index = research_index + 1
+        end
     end
     research_targets.length = research_index - 1
     research_targets.max_start_index = math.max(1, research_index - display_size)
@@ -267,6 +269,9 @@ Elements.container = Gui.define("research_milestones/container")
         local milestone_table = Elements.milestone_table(container)
         Elements.clock_label(header)
 
+        local force = Gui.get_player(parent).force
+        def.data[force] = def.data[force] or {} -- used by start index and row data
+
         local force = Gui.get_player(parent).force --[[ @as LuaForce ]]
         local start_index = Elements.container.calculate_starting_research_index(force)
         for research_index = start_index, start_index + display_size - 1 do
@@ -276,7 +281,6 @@ Elements.container = Gui.define("research_milestones/container")
 
         return Gui.elements.container.get_root_element(container)
     end)
-    :force_data{} --[[ @as any ]]
 
 --- Set the achieved time for a force
 --- @param force LuaForce
@@ -299,8 +303,9 @@ end
 --- @param force LuaForce
 --- @return number
 function Elements.container.calculate_starting_research_index(force)
-    local force_data = Elements.container.data[force]
+    local force_data = Elements.container.data[force] or {}
     local research_index = research_targets.length
+    Elements.container.data[force] = force_data -- needed because of @clusterio/research_sync
 
     -- # does not work here because it returned the array alloc size
     for i = 1, research_targets.length do
