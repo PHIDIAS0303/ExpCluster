@@ -113,7 +113,7 @@ local welcome_time_format = ExpUtil.format_time_factory_locale{ format = "long",
 --- Content area for the welcome tab
 define_tab({ "readme.welcome-tab" }, { "readme.welcome-tooltip" }, Gui.define("readme_welcome")
     :draw(function(_, parent)
-        local server_details = { name = "ExpGaming S0 - Local", welcome = "Failed to load description: disconnected from external api.", reset_time = "Non Set", branch = "Unknown" }
+        local server_details = { name = "APERX S0 - Local", welcome = "Failed to load description: disconnected from external api.", reset_time = "Non Set", branch = "Unknown" }
         if External.valid() then server_details = External.get_current_server() end
         local container = parent.add{ type = "flow", direction = "vertical" }
         local player = Gui.get_player(parent)
@@ -223,7 +223,7 @@ define_tab({ "readme.servers-tab" }, { "readme.servers-tooltip" }, Gui.define("r
             end
         else
             local factorio_servers = title_table(scroll_pane, 225, { "readme.servers-factorio" }, 2)
-            for i = 1, 8 do
+            for _, i in pairs{ 1, 2, 3, 5, 6, 8 } do
                 Gui.elements.centered_label(factorio_servers, 110, { "readme.servers-" .. i })
                 Gui.elements.centered_label(factorio_servers, 460, { "readme.servers-d" .. i })
             end
@@ -231,7 +231,7 @@ define_tab({ "readme.servers-tab" }, { "readme.servers-tooltip" }, Gui.define("r
 
         -- Add the external links
         local external_links = title_table(scroll_pane, 235, { "readme.servers-external" }, 2)
-        for _, key in ipairs{ "discord", "website", "patreon", "status", "github" } do
+        for _, key in ipairs{ "website", "github" } do
             local upper_key = key:gsub("^%l", string.upper)
             Gui.elements.centered_label(external_links, 110, upper_key)
             Gui.elements.centered_label(external_links, 460, { "links." .. key }, { "readme.servers-open-in-browser" })
@@ -255,10 +255,10 @@ define_tab({ "readme.backers-tab" }, { "readme.backers-tooltip" }, Gui.define("r
         local done = {}
         local groups = {
             { _roles = { "Senior Administrator", "Administrator" }, _title = { "readme.backers-management" }, _width = 230 },
-            { _roles = { "Board Member", "Senior Backer" }, _title = { "readme.backers-board" }, _width = 145 }, -- change role to board
-            { _roles = { "Sponsor", "Supporter" }, _title = { "readme.backers-backers" }, _width = 196 }, -- change to backer
-            { _roles = { "Moderator", "Trainee" }, _title = { "readme.backers-staff" }, _width = 235 },
-            { _roles = {}, _time = 3 * 3600 * 60, _title = { "readme.backers-active" }, _width = 235 },
+            { _roles = { "Senior Moderator", "Moderator", "Trainee Moderator" }, _title = { "readme.backers-staff" }, _width = 230 },
+            { _roles = { "Board Member", "Supporter", "Partner" }, _title = { "readme.backers-backers" }, _width = 230 }, -- change role to board
+            { _roles = { "Veteran" }, _title = { "readme.backers-active" }, _width = 230 },
+            -- _time = 3 * 3600 * 60
         }
 
         -- Fill by player roles
