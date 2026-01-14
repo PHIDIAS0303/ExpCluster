@@ -49,24 +49,12 @@ Roles.new_role("Administrator", "Admin")
     :set_flag("report-immune")
     :set_flag("instant-respawn")
     :set_flag("deconlog-bypass")
-    :set_parent("Developer")
+    :set_parent("Senior Moderator")
     :allow{
         "command/_rcon",
         "command/debug",
         "command/set-cheat-mode",
         "command/research-all"
-    }
-
-Roles.new_role("Developer", "Dev")
-    :set_permission_group("Mod")
-    :set_custom_color{ r = 0, g = 170, b = 0 }
-    :set_flag("is_admin")
-    :set_flag("is_spectator")
-    :set_flag("report-immune")
-    :set_flag("instant-respawn")
-    :set_flag("deconlog-bypass")
-    :set_parent("Senior Moderator")
-    :allow{
     }
 
 Roles.new_role("Senior Moderator", "SMod")
