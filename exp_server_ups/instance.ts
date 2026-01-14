@@ -20,7 +20,7 @@ export class InstancePlugin extends BaseInstancePlugin {
 			this.clearInterval();
 			this.setInterval();
 		} else if (field === "exp_server_ups.average_interval") {
-			this.gameTimes.splice(curr as number);
+			this.gameTimes = [];
 		}
 	}
 
