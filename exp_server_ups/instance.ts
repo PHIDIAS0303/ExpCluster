@@ -34,7 +34,13 @@ export class InstancePlugin extends BaseInstancePlugin {
 
 	setInterval() {
 		if (!this.updateInterval) {
-			this.updateInterval = setInterval(this.updateUps.bind(this), this.instance.config.get<number>("exp_server_ups.update_interval"));
+			const interval = this.instance.config.get("exp_server_ups.update_interval");
+
+            if (typeof interval === "number") {
+                this.updateInterval = setInterval(this.updateUps.bind(this), interval);
+            } else {
+                this.logger.error(`Invalid update interval type: ${typeof interval}`);
+            }
 		}
 	}
 
@@ -51,8 +57,11 @@ export class InstancePlugin extends BaseInstancePlugin {
 		if (collected > 0) {
 			const minTick = this.gameTimes[0];
 			const maxTick = this.gameTimes[collected];
-			const interval = this.instance.config.get<number>("exp_server_ups.update_interval") / 1000;
-			ups = (maxTick - minTick) / (collected * interval);
+			const interval = this.instance.config.get("exp_server_ups.update_interval");
+
+			if (typeof interval === "number") {
+                ups = (maxTick - minTick) / (collected * (interval / 1000));
+            }
 		}
 
 		try {
@@ -62,8 +71,10 @@ export class InstancePlugin extends BaseInstancePlugin {
 			this.logger.error(`Failed to receive new game time: ${error}`);
 		}
 
-		if (collected > this.instance.config.get<number>("exp_server_ups.average_interval")) {
-			this.gameTimes.shift();
-		}
+		const averageInterval = this.instance.config.get("exp_server_ups.average_interval");
+
+		if (typeof averageInterval === "number" && collected > averageInterval) {
+            this.gameTimes.shift();
+        }
 	}
 }
