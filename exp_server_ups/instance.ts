@@ -34,7 +34,7 @@ export class InstancePlugin extends BaseInstancePlugin {
 
 	setInterval() {
 		if (!this.updateInterval) {
-			const interval = this.instance.config.get("exp_server_ups.update_interval");
+			const interval = this.instance.config.get("exp_server_ups.update_interval") as any;
 
             if (typeof interval === "number") {
                 this.updateInterval = setInterval(this.updateUps.bind(this), interval);
@@ -57,7 +57,7 @@ export class InstancePlugin extends BaseInstancePlugin {
 		if (collected > 0) {
 			const minTick = this.gameTimes[0];
 			const maxTick = this.gameTimes[collected];
-			const interval = this.instance.config.get("exp_server_ups.update_interval");
+			const interval = this.instance.config.get("exp_server_ups.update_interval") as any;
 
 			if (typeof interval === "number") {
                 ups = (maxTick - minTick) / (collected * (interval / 1000));
@@ -71,7 +71,7 @@ export class InstancePlugin extends BaseInstancePlugin {
 			this.logger.error(`Failed to receive new game time: ${error}`);
 		}
 
-		const averageInterval = this.instance.config.get("exp_server_ups.average_interval");
+		const averageInterval = this.instance.config.get("exp_server_ups.average_interval") as any;
 
 		if (typeof averageInterval === "number" && collected > averageInterval) {
             this.gameTimes.shift();
