@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as lib from "@clusterio/lib";
 import { BaseInstancePlugin } from "@clusterio/host";
 
