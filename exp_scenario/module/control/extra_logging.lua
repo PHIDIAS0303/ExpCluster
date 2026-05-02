@@ -37,8 +37,11 @@ local function on_pre_player_died(event)
     local player = assert(game.get_player(event.player_index))
     local cause = event.cause
     if cause then
-        local by_player = event.cause.player
-        add_log_line("[DEATH] ", player.name, " died because of ", by_player and by_player.name or event.cause.name)
+        if cause.type == "character" then
+            add_log_line("[DEATH] ", player.name, " died because of ", (cause.player and cause.player.name) or cause.name)
+        else
+            add_log_line("[DEATH] ", player.name, " died because of ", cause.name)
+        end
     else
         add_log_line("[DEATH] ", player.name, " died because of unknown reason")
     end
