@@ -22,7 +22,6 @@ return {
     --"modules.data.toolbar",
 
     --- GUI
-    "modules.gui.readme",
     "modules.gui.warp-list",
     "modules.gui.player-list",
     "modules.gui.vlayer",
