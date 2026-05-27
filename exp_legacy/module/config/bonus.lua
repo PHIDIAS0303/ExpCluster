@@ -52,8 +52,8 @@ return {
         },
         {
             name = "character_inventory_slots_bonus",
-            cost = 2,
             scale = 10,
+            cost = 2,
             max_value = 200,
             initial_value = 100,
             value_step = 10,
@@ -68,8 +68,8 @@ return {
         },
         {
             name = "character_reach_distance_bonus",
-            cost = 1,
             scale = 1,
+            cost = 1,
             max_value = 24,
             initial_value = 12,
             value_step = 2,
@@ -80,11 +80,11 @@ return {
         },
         {
             name = "personal_battery_recharge",
-            initial_value = 6,
-            max_value = 12,
-            value_step = 1,
             scale = 4,
             cost = 40,
+            max_value = 12,
+            initial_value = 6,
+            value_step = 1,
             is_special = true,
         },
         --[[
