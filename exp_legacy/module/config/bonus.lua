@@ -10,14 +10,14 @@ return {
     Base point is equal to the amount of standard value in each parameter.
 
             CMMS    CRS     CCS     CISB    CHB     CRDB    PBR
-    STD     30      90      32      20      16      12      60
-    =       260
+    STD     20      60      24      10      12      8      40
+    =       174
 
-    MAX     60      180     64      40      32      24      120
-    =       480
+    MAX     40      120     48      20      24      16      80
+    =       348
     ]]
     points = {
-        base = 260,
+        base = 174,
         increase_percentage_per_role_level = 0.03,
         role_name = "Member",
     },
@@ -27,8 +27,8 @@ return {
             name = "character_mining_speed_modifier",
             scale = 1,
             cost = 10,
-            max_value = 6,
-            initial_value = 3,
+            max_value = 4,
+            initial_value = 2,
             value_step = 0.5,
             is_percentage = true,
         },
@@ -36,8 +36,8 @@ return {
             name = "character_running_speed_modifier",
             scale = 1,
             cost = 60,
-            max_value = 3,
-            initial_value = 1.5,
+            max_value = 2,
+            initial_value = 1,
             value_step = 0.25,
             is_percentage = true,
         },
@@ -45,33 +45,33 @@ return {
             name = "character_crafting_speed_modifier",
             scale = 1,
             cost = 4,
-            max_value = 16,
-            initial_value = 8,
+            max_value = 12,
+            initial_value = 6,
             value_step = 1,
             is_percentage = true,
         },
         {
             name = "character_inventory_slots_bonus",
-            cost = 2,
             scale = 10,
-            max_value = 200,
-            initial_value = 100,
+            cost = 2,
+            max_value = 100,
+            initial_value = 50,
             value_step = 10,
         },
         {
             name = "character_health_bonus",
             scale = 50,
             cost = 4,
-            max_value = 400,
-            initial_value = 200,
+            max_value = 300,
+            initial_value = 150,
             value_step = 50,
         },
         {
             name = "character_reach_distance_bonus",
-            cost = 1,
             scale = 1,
-            max_value = 24,
-            initial_value = 12,
+            cost = 1,
+            max_value = 16,
+            initial_value = 8,
             value_step = 2,
             combined_bonus = {
                 "character_resource_reach_distance_bonus",
@@ -80,11 +80,11 @@ return {
         },
         {
             name = "personal_battery_recharge",
-            initial_value = 6,
-            max_value = 12,
-            value_step = 1,
             scale = 4,
             cost = 40,
+            max_value = 8,
+            initial_value = 4,
+            value_step = 1,
             is_special = true,
         },
         --[[
