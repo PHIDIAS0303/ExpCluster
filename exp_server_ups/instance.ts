@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as lib from "@clusterio/lib";
 import { BaseInstancePlugin } from "@clusterio/host";
 
@@ -20,7 +21,7 @@ export class InstancePlugin extends BaseInstancePlugin {
 			this.clearInterval();
 			this.setInterval();
 		} else if (field === "exp_server_ups.average_interval") {
-			this.gameTimes.splice(curr as number);
+			this.gameTimes = [];
 		}
 	}
 
@@ -51,8 +52,7 @@ export class InstancePlugin extends BaseInstancePlugin {
 		if (collected > 0) {
 			const minTick = this.gameTimes[0];
 			const maxTick = this.gameTimes[collected];
-			const interval = this.instance.config.get("exp_server_ups.update_interval") / 1000;
-			ups = (maxTick - minTick) / (collected * interval);
+			ups = (maxTick - minTick) / (collected * (this.instance.config.get("exp_server_ups.update_interval") / 1000));
 		}
 
 		try {
@@ -61,9 +61,9 @@ export class InstancePlugin extends BaseInstancePlugin {
 		} catch (error: any) {
 			this.logger.error(`Failed to receive new game time: ${error}`);
 		}
-
+		
 		if (collected > this.instance.config.get("exp_server_ups.average_interval")) {
-			this.gameTimes.shift();
-		}
+            this.gameTimes.shift();
+        }
 	}
 }

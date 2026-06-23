@@ -1,3 +1,8 @@
 dist/
 node_modules/
 .vscode
+exp_util/node-compile-cache/
+exp_commands/node-compile-cache/
+exp_groups/node-compile-cache/
+exp_legacy/node-compile-cache/
+exp_scenario/node-compile-cache/

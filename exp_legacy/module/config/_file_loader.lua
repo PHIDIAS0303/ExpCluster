@@ -27,7 +27,7 @@ return {
     "modules.gui.vlayer",
     "modules.gui._role_updates",
 
-    "modules.graftorio.require", -- graftorio
+    -- "modules.graftorio.require", -- graftorio
     --- Config Files
     "config.expcore.permission_groups", -- loads some predefined permission groups
     "config.expcore.roles", -- loads some predefined roles

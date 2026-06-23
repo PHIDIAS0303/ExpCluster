@@ -26,12 +26,9 @@ local afk_time_units = {
 return {
     messages = { --- @setting messages will trigger when ever the word is said
         ["discord"] = { "info.discord" },
-        ["expgaming"] = { "info.website" },
+        ["aperx"] = { "info.website" },
         ["website"] = { "info.website" },
-        ["status"] = { "info.status" },
         ["github"] = { "info.github" },
-        ["patreon"] = { "info.patreon" },
-        ["donate"] = { "info.patreon" },
         ["command"] = { "info.custom-commands" },
         ["commands"] = { "info.custom-commands" },
         ["softmod"] = { "info.softmod" },

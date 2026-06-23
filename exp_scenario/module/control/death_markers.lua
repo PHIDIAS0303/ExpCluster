@@ -127,7 +127,7 @@ local function on_character_corpse_expired(event)
     ExpUtil.transfer_inventory_to_surface{
         inventory = inventory,
         surface = corpse.surface,
-        name = "iron-chest",
+        name = "steel-chest",
         allow_creation = true,
     }
 end

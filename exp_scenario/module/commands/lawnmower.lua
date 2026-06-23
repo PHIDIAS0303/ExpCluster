@@ -10,7 +10,7 @@ Commands.new("lawnmower", { "exp-commands_lawnmower.description" })
     :register(function(player, range)
         --- @cast range number
         local surface = player.surface
-        
+
         -- Intentionally left as player.position to allow use in remote view
         local entities = surface.find_entities_filtered{ position = player.position, radius = range, type = "corpse" }
         for _, entity in pairs(entities) do
@@ -18,7 +18,7 @@ Commands.new("lawnmower", { "exp-commands_lawnmower.description" })
                 entity.destroy()
             end
         end
-        
+
         local replace_tiles = {}
         local tiles = surface.find_tiles_filtered{ position = player.position, radius = range, name = { "nuclear-ground" } }
         for i, tile in pairs(tiles) do
