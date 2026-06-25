@@ -117,6 +117,9 @@ local function try_deconstruct_miner(entity)
         try_deconstruct_output_chest(entity)
     end
 
+    --[[
+        TODO Fluidbox is changed to fluidbox_neighbours
+
     -- Skip pipe build if not required
     if not config.fluid or #entity.fluidbox == 0 then
         return
@@ -183,6 +186,7 @@ local function try_deconstruct_miner(entity)
             create_entity(create_entity_param)
         end
     end
+    ]]
 end
 
 --- Get the max mining radius
