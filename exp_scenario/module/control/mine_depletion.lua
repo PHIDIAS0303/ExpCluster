@@ -219,6 +219,7 @@ local function try_deconstruct_miner(entity)
             create_entity(create_entity_param)
         end
     end
+    ]]
 end
 
 local max_quality = ""
