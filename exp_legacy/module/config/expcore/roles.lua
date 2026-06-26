@@ -133,6 +133,9 @@ Roles.new_role("Board Member", "Board")
         "command/search-online",
         "command/search-amount",
         "command/search-recent",
+        "command/spectate",
+        "command/follow",
+        "command/clear-blueprints-surface",
     }
 
 Roles.new_role("Supporter", "Sup")
@@ -167,7 +170,6 @@ Roles.new_role("Member", "Mem")
     :allow{
         "fast-tree-decon",
         "gui/bonus",
-        --"command/bonus",
         --"command/tag-color",
         "command/set-join-message",
         "command/remove-join-message",
@@ -199,7 +201,6 @@ Roles.new_role("Veteran", "Vet")
         "command/chat-commands",
         "command/clear-ground-items",
         "command/clear-blueprints",
-        "command/clear-blueprints-radius",
         "command/set-trains-to-automatic",
         "command/lawnmower",
         "command/waterfill",
