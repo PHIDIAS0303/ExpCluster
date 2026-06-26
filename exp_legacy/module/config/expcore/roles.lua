@@ -201,7 +201,6 @@ Roles.new_role("Veteran", "Vet")
         "command/clear-blueprints",
         "command/clear-blueprints-radius",
         "command/set-trains-to-automatic",
-        "command/set-auto-research",
         "command/lawnmower",
         "command/waterfill",
         "command/artillery",
