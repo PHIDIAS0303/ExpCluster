@@ -5,7 +5,7 @@
 	"author": "Cooldude2606 <https://github.com/Cooldude2606>",
 	"license": "MIT",
 	"repository": "explosivegaming/ExpCluster",
-	"main": "dist/node/index.js",
+	"main": "dist/node/index.ts",
 	"scripts": {
 		"prepare": "tsc --build && webpack-cli --env production"
 	},
