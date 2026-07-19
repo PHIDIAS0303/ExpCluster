@@ -349,7 +349,7 @@ function vlayer.create_input_interface(surface, position, circuit, last_user)
     end
 
     interface.destructible = false
-    interface.minable = false
+    interface.minable_flag = false
     interface.operable = true
 
     return interface
@@ -427,7 +427,7 @@ function vlayer.create_output_interface(surface, position, circuit, last_user)
     end
 
     interface.destructible = false
-    interface.minable = false
+    interface.minable_flag = false
     interface.operable = true
 
     return interface
@@ -514,9 +514,6 @@ function vlayer.get_statistics()
         energy_sustained = vdp * gsm,
         energy_capacity = vlayer_data.properties.capacity * mega,
         energy_storage = vlayer_data.storage.energy,
-        day_time = math.floor(vlayer_data.surface.daytime * vlayer_data.surface.ticks_per_day),
-        day_length = vlayer_data.surface.ticks_per_day,
-        tick = game.tick,
     }
 end
 
@@ -540,9 +537,6 @@ function vlayer.get_circuits()
         energy_sustained = "signal-S",
         energy_capacity = "signal-C",
         energy_storage = "signal-E",
-        day_time = "signal-D",
-        day_length = "signal-L",
-        tick = "signal-T",
     }
 end
 
@@ -574,7 +568,7 @@ function vlayer.create_circuit_interface(surface, position, circuit, last_user)
     end
 
     interface.destructible = false
-    interface.minable = false
+    interface.minable_flag = false
     interface.operable = true
 
     return interface
@@ -653,7 +647,7 @@ function vlayer.create_energy_interface(surface, position, last_user)
     end
 
     interface.destructible = false
-    interface.minable = false
+    interface.minable_flag = false
     interface.operable = false
     interface.electric_buffer_size = 0
     interface.power_production = 0

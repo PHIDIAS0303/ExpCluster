@@ -16,14 +16,11 @@ return {
     "modules.data.quickbar",
     "modules.data.alt-view",
     "modules.data.tag",
-    -- 'modules.data.bonus',
-    "modules.data.personal-logistic",
     "modules.data.language",
     --"modules.data.toolbar",
 
     --- GUI
     "modules.gui.warp-list",
-    "modules.gui.player-list",
     "modules.gui.vlayer",
     "modules.gui._role_updates",
 

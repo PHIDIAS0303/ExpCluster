@@ -14,7 +14,7 @@ Roles.define_flag_trigger("is_spectator", function(player, state)
 end)
 Roles.define_flag_trigger("is_jail", function(player, state)
     if player.character then
-        player.character.active = not state
+        player.character.disabled_by_script = not state
     end
 end)
 
@@ -133,6 +133,9 @@ Roles.new_role("Board Member", "Board")
         "command/search-online",
         "command/search-amount",
         "command/search-recent",
+        "command/spectate",
+        "command/follow",
+        "command/clear-blueprints-surface",
     }
 
 Roles.new_role("Supporter", "Sup")
@@ -167,7 +170,6 @@ Roles.new_role("Member", "Mem")
     :allow{
         "fast-tree-decon",
         "gui/bonus",
-        --"command/bonus",
         --"command/tag-color",
         "command/set-join-message",
         "command/remove-join-message",
@@ -199,9 +201,7 @@ Roles.new_role("Veteran", "Vet")
         "command/chat-commands",
         "command/clear-ground-items",
         "command/clear-blueprints",
-        "command/clear-blueprints-radius",
         "command/set-trains-to-automatic",
-        "command/set-auto-research",
         "command/lawnmower",
         "command/waterfill",
         "command/artillery",
@@ -261,7 +261,6 @@ local default = Roles.new_role("Guest", "")
         "gui/research",
         "gui/autofill",
         "gui/module",
-        "gui/landfill",
         "gui/production",
         -- "command/tag",
         -- "command/tag-clear",

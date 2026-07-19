@@ -1,6 +1,6 @@
 {
 	"name": "@expcluster/permission-groups",
-	"version": "0.1.0",
+	"version": "6.5.0",
 	"description": "Clusterio plugin providing syncing of permission groups",
 	"author": "Cooldude2606 <https://github.com/Cooldude2606>",
 	"license": "MIT",

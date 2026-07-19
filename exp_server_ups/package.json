@@ -1,6 +1,6 @@
 {
 	"name": "@expcluster/server-ups",
-	"version": "0.1.0",
+	"version": "6.5.0",
 	"description": "Clusterio plugin providing in game server ups counter",
 	"author": "Cooldude2606 <https://github.com/Cooldude2606>",
 	"license": "MIT",
@@ -25,9 +25,9 @@
 	},
 	"dependencies": {
 		"@sinclair/typebox": "catalog:",
+		"@expcluster/lib_commands": "workspace:^",
 		"@expcluster/lib_util": "workspace:^",
-		"@expcluster/lib_gui": "workspace:^",
-		"@expcluster/lib_commands": "workspace:^"
+		"@expcluster/lib_gui": "workspace:^"
 	},
 	"publishConfig": {
 		"access": "public"
