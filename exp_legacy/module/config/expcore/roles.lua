@@ -301,6 +301,7 @@ Roles.define_role_order{
     "Member",
     "Veteran",
     "Regular",
+    "Jail",
     "Guest", -- Default must be last if you want to apply restrictions to other roles
 }
 
