@@ -76,8 +76,6 @@ Roles.new_role("Moderator", "Mod")
     :set_flag("report-immune")
     :set_flag("instant-respawn")
     :set_parent("Trainee Moderator")
-    :allow{
-    }
 
 Roles.new_role("Trainee Moderator", "TrMod")
     :set_permission_group("Mod")
@@ -143,24 +141,18 @@ Roles.new_role("Supporter", "Sup")
     :set_custom_color{ r = 230, g = 99, b = 34 }
     :set_flag("is_spectator")
     :set_parent("Partner")
-    :allow{
-    }
 
 Roles.new_role("Partner", "Part")
     :set_permission_group("Trusted")
     :set_custom_color{ r = 140, g = 120, b = 200 }
     :set_flag("is_spectator")
     :set_parent("Senior Member")
-    :allow{
-    }
 
 Roles.new_role("Senior Member", "SMem")
     :set_permission_group("Trusted")
     :set_custom_color{ r = 140, g = 120, b = 200 }
     :set_flag("is_spectator")
     :set_parent("Member")
-    :allow{
-    }
 
 Roles.new_role("Member", "Mem")
     :set_permission_group("Trusted")

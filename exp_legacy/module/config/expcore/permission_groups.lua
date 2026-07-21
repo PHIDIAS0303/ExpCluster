@@ -9,7 +9,6 @@ local Groups = require("modules.exp_legacy.expcore.permission_groups") --- @dep 
 
 Groups.new_group("Admin")
     :allow_all()
-    :disallow{}
 
 Groups.new_group("Mod")
     :allow_all()
