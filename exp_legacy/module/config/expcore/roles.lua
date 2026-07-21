@@ -189,7 +189,7 @@ local hours6, hours250 = 6 * 216000, 250 * 60
 Roles.new_role("Veteran", "Vet")
     :set_permission_group("Trusted")
     :set_custom_color{ r = 140, g = 120, b = 200 }
-    :set_parent("Member")
+    :set_parent("Regular")
     :allow{
         "gui/surveillance",
         "gui/warp-list/add",
