@@ -348,8 +348,10 @@ function PermissionsGroups._prototype:print(message)
 end
 
 -- when the game starts it will make the permission groups
+--[[
 Event.on_init(function()
     PermissionsGroups.reload_permissions()
 end)
+]]
 
 return PermissionsGroups
