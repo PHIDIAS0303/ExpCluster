@@ -17,7 +17,6 @@ local Async = require("modules/exp_util/async")
 
 --- @class ExpRoles
 local ExpRoles = {
-    _prototype = {},
     config = {
         --- Role names in order, a lower index is a more privileged role
         order = {}, --- @type string[]
@@ -25,8 +24,8 @@ local ExpRoles = {
         roles = {}, --- @type table<string, ExpRoles.Role>
         --- Role names held by each player, includes local assignments
         players = {}, --- @type table<string, string[]>
-        --- Callbacks run when a flag is gained or lost
-        flags = {}, --- @type table<string, fun(player: LuaPlayer, state: boolean)>
+        --- Async handles run when a flag is gained or lost
+        flags = {}, --- @type table<string, Async.AsyncFunction>
     },
     events = {
         on_role_assigned = script.generate_event_name(),
@@ -34,7 +33,13 @@ local ExpRoles = {
     },
 }
 
---- @class ExpRoles.Role
+--- Methods shared by every role, kept apart from the fields so that defining
+--- them does not count as injecting fields into the role itself
+--- @class ExpRoles.RolePrototype
+local Role = {}
+ExpRoles._prototype = Role
+
+--- @class ExpRoles.Role : ExpRoles.RolePrototype
 --- @field id number Clusterio role id
 --- @field name string
 --- @field short_hand string
@@ -150,6 +155,7 @@ local function decode_role(record)
         if flag then flags[flag] = true end
     end
 
+    --- @type ExpRoles.Role
     return setmetatable({
         id = record.id,
         name = record.name,
@@ -228,8 +234,9 @@ end
 --- @return ExpRoles.Role?
 function ExpRoles.get_role_from_any(any)
     local t_any = type(any)
-    if t_any == "number" or tonumber(any) then
-        return ExpRoles.get_role_by_order(tonumber(any))
+    local as_number = tonumber(any)
+    if as_number then
+        return ExpRoles.get_role_by_order(as_number)
     elseif t_any == "string" then
         return ExpRoles.get_role_by_name(any)
     elseif t_any == "table" then
@@ -381,24 +388,27 @@ end
 ]]
 
 --- Check if this role allows an action
+--- @param self ExpRoles.Role
 --- @param action string
 --- @return boolean
-function ExpRoles._prototype:is_allowed(action)
+function Role:is_allowed(action)
     local allowed = self.allowed_actions
     return allowed["core.admin"] or allowed[permission_from_action(action)] or false
 end
 
 --- Check if this role sets a flag
+--- @param self ExpRoles.Role
 --- @param name string
 --- @return boolean
-function ExpRoles._prototype:has_flag(name)
+function Role:has_flag(name)
     return self.allowed_actions[permission_from_flag(name)] or false
 end
 
 --- Get the players who hold this role
+--- @param self ExpRoles.Role
 --- @param online boolean? When given, filter by connected state
 --- @return LuaPlayer[]
-function ExpRoles._prototype:get_players(online)
+function Role:get_players(online)
     local players = {}
     for player_name, role_names in pairs(ExpRoles.config.players) do
         for _, role_name in pairs(role_names) do
@@ -416,9 +426,10 @@ function ExpRoles._prototype:get_players(online)
 end
 
 --- Print a message to every online player who holds this role
+--- @param self ExpRoles.Role
 --- @param message LocalisedString
 --- @return number # Number of players the message was sent to
-function ExpRoles._prototype:print(message)
+function Role:print(message)
     local players = self:get_players(true)
     for _, player in pairs(players) do
         player.print(message)
@@ -436,8 +447,8 @@ end
 --- @param message LocalisedString
 function ExpRoles.print_to_roles(roles, message)
     for _, role in pairs(roles) do
-        role = ExpRoles.get_role_from_any(role)
-        if role then role:print(message) end
+        local resolved = ExpRoles.get_role_from_any(role)
+        if resolved then resolved:print(message) end
     end
 end
 
@@ -445,12 +456,12 @@ end
 --- @param role string | number | ExpRoles.Role
 --- @param message LocalisedString
 function ExpRoles.print_to_roles_higher(role, message)
-    role = ExpRoles.get_role_from_any(role)
-    if not role then return end
+    local resolved = ExpRoles.get_role_from_any(role)
+    if not resolved then return end
 
     local roles = {}
     for index, role_name in ipairs(ExpRoles.config.order) do
-        if index <= role.index and role_name ~= ExpRoles.get_default_role_name() then
+        if index <= resolved.index and role_name ~= ExpRoles.get_default_role_name() then
             roles[#roles + 1] = role_name
         end
     end
@@ -462,12 +473,12 @@ end
 --- @param role string | number | ExpRoles.Role
 --- @param message LocalisedString
 function ExpRoles.print_to_roles_lower(role, message)
-    role = ExpRoles.get_role_from_any(role)
-    if not role then return end
+    local resolved = ExpRoles.get_role_from_any(role)
+    if not resolved then return end
 
     local roles = {}
     for index, role_name in ipairs(ExpRoles.config.order) do
-        if index >= role.index and role_name ~= ExpRoles.get_default_role_name() then
+        if index >= resolved.index and role_name ~= ExpRoles.get_default_role_name() then
             roles[#roles + 1] = role_name
         end
     end
@@ -521,7 +532,10 @@ local function emit_player_roles_updated(player, change_type, roles, by_player_n
     end
 
     if not silent then
-        game.print({ "exp-roles.game-message-" .. change_type, player.name, table.concat(role_names, ", "), by_player_name })
+        local joined = table.concat(role_names, ", ")
+        game.print(change_type == "assign"
+            and { "exp-roles.game-message-assign", player.name, joined, by_player_name }
+            or { "exp-roles.game-message-unassign", player.name, joined, by_player_name })
     end
 
     if change_type == "assign" then
@@ -591,6 +605,7 @@ end
 --- @param roles ExpRoles.Role[]
 --- @param change_type "assign" | "unassign"
 --- @param sync boolean
+--- @return ExpRoles.Role[] # The roles which actually changed
 local function apply_local_change(player_name, roles, change_type, sync)
     local local_roles = script_data.local_players[player_name] or {}
     local pending = script_data.pending[player_name] or {}
@@ -860,7 +875,6 @@ end
 ]]
 
 --- Create persistent script data if this is the first startup
---- @package
 function ExpRoles.on_server_startup()
     if compat.script_data["exp_roles"] == nil then
         --- @type ExpRoles.ScriptData
@@ -878,7 +892,6 @@ function ExpRoles.on_server_startup()
 end
 
 --- Apply the flag triggers for a player who just joined
---- @package
 --- @param event EventData.on_player_joined_game
 function ExpRoles.on_player_joined_game(event)
     local player = game.get_player(event.player_index)
