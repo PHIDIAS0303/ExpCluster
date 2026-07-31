@@ -1,0 +1,13 @@
+{
+	"name": "exp_roles",
+	"load": [
+		"events.lua"
+	],
+	"require": [
+		"globals.lua"
+	],
+	"dependencies": {
+		"clusterio": "*",
+		"exp_util": "*"
+	}
+}
