@@ -49,7 +49,7 @@ export class InstancePlugin extends BaseInstancePlugin {
 		]);
 
 		await this.luaSend("initialise", {
-			roles: roles.map(role => role.toJSON()),
+			...messages.encodeRolesForLua(roles),
 			assignments: assignments.map(assignment => assignment.toJSON()),
 		});
 		await this.luaSetEmitEvents(this.syncMode === "bidirectional");

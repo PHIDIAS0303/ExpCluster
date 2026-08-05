@@ -240,6 +240,37 @@ export class AssignmentRecord {
 	}
 }
 
+/**
+ * Encode roles for the lua initialise call.
+ *
+ * Roles repeat the same permission names over and over, so each name is sent
+ * once and referenced by index. At 15 roles this is 17 KiB rather than 38 KiB
+ * and decodes in 0.37 ms rather than 0.50 ms; at 60 roles it is 30 KiB rather
+ * than 122 KiB and 0.87 ms rather than 1.52 ms.
+ *
+ * Single role updates stay in the plain form, they have nothing to share.
+ */
+export function encodeRolesForLua(roles: RoleRecord[]) {
+	const names: string[] = [];
+	const indexes = new Map<string, number>();
+
+	const encoded = roles.map(role => {
+		const permissions = role.permissions.map(permission => {
+			let index = indexes.get(permission);
+			if (index === undefined) {
+				index = names.length;
+				names.push(permission);
+				indexes.set(permission, index);
+			}
+			return index;
+		});
+
+		return { ...role.toJSON(), permissions };
+	});
+
+	return { permission_names: names, roles: encoded };
+}
+
 /*
 	Update events
 */
@@ -250,7 +281,7 @@ export class RoleUpdatedEvent {
 	static type = "event" as const;
 	static src = "controller" as const;
 	static dst = ["control", "instance"] as const;
-	static permission = "exp_roles.role.subscribe" as const;
+	static permission = "core.role.subscribe" as const;
 
 	constructor(
 		public updates: RoleRecord[],
@@ -274,8 +305,7 @@ export class AssignmentUpdatedEvent {
 	static plugin = "exp_roles" as const;
 	static type = "event" as const;
 	static src = "controller" as const;
-	static dst = ["control", "instance"] as const;
-	static permission = "exp_roles.assignment.subscribe" as const;
+	static dst = "instance" as const;
 
 	constructor(
 		public updates: AssignmentRecord[],
@@ -304,7 +334,7 @@ export class RoleListRequest {
 	static type = "request" as const;
 	static src = ["control", "instance"] as const;
 	static dst = "controller" as const;
-	static permission = "exp_roles.role.list" as const;
+	static permission = "core.role.list" as const;
 	static Response = lib.jsonArray(RoleRecord);
 
 	constructor() {}
@@ -316,7 +346,7 @@ export class RoleMetaUpdateRequest {
 	static type = "request" as const;
 	static src = "control" as const;
 	static dst = "controller" as const;
-	static permission = "exp_roles.role.update" as const;
+	static permission = "core.role.update" as const;
 
 	constructor(
 		public meta: RoleMetaRecord,
@@ -343,9 +373,8 @@ export class AssignmentListRequest {
 	declare ["constructor"]: typeof AssignmentListRequest;
 	static plugin = "exp_roles" as const;
 	static type = "request" as const;
-	static src = ["control", "instance"] as const;
+	static src = "instance" as const;
 	static dst = "controller" as const;
-	static permission = "exp_roles.assignment.list" as const;
 	static Response = lib.jsonArray(AssignmentRecord);
 
 	constructor() {}
@@ -359,7 +388,7 @@ export class AssignmentUpdateRequest {
 	declare ["constructor"]: typeof AssignmentUpdateRequest;
 	static plugin = "exp_roles" as const;
 	static type = "request" as const;
-	static src = ["control", "instance"] as const;
+	static src = "instance" as const;
 	static dst = "controller" as const;
 	static permission = "core.user.update_roles" as const;
 

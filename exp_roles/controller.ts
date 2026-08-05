@@ -16,8 +16,12 @@ export class ControllerPlugin extends BaseControllerPlugin {
 			).bootstrap()
 		);
 
-		// Roles created before this plugin was installed have no properties yet
+		// The datastore can be out of step with the roles, either because the
+		// plugin was installed after they were created or because it was
+		// uninstalled while they were deleted
 		this.ensureRoleMeta();
+		this.sweepRoleMeta();
+		this.applyAutoAssign();
 
 		this.controller.subscriptions.handle(messages.RoleUpdatedEvent, this.handleRoleSubscription.bind(this));
 		this.controller.subscriptions.handle(
@@ -65,6 +69,28 @@ export class ControllerPlugin extends BaseControllerPlugin {
 		return created;
 	}
 
+	/**
+	 * Delete properties left behind by roles which no longer exist.
+	 *
+	 * Without this they would be picked up by whichever role is next given the
+	 * same id, which happens when a role is deleted while the plugin is not
+	 * running.
+	 */
+	sweepRoleMeta() {
+		const orphaned = [];
+		for (const meta of this.roleMeta.valuesMutable()) {
+			if (!this.controller.roles.has(meta.id)) {
+				orphaned.push(meta);
+			}
+		}
+
+		if (orphaned.length) {
+			this.roleMeta.deleteMany(orphaned);
+		}
+
+		return orphaned;
+	}
+
 	/** Combine a clusterio role with its in game properties. */
 	buildRoleRecord(role: Readonly<lib.Role>) {
 		const meta = this.roleMeta.get(role.id) ?? new messages.RoleMetaRecord(role.id, role.id);
@@ -80,9 +106,11 @@ export class ControllerPlugin extends BaseControllerPlugin {
 	}
 
 	async onControllerConfigFieldChanged(field: string, curr: unknown, prev: unknown) {
-		// Which role is the default is carried on the role records themselves
-		if (field === "controller.default_role_id") {
-			this.controller.subscriptions.broadcast(new messages.RoleUpdatedEvent(this.listRoleRecords()));
+		switch (field) {
+			// Which role is the default is carried on the role records themselves
+			case "controller.default_role_id":
+				this.controller.subscriptions.broadcast(new messages.RoleUpdatedEvent(this.listRoleRecords()));
+				break;
 		}
 	}
 
@@ -107,21 +135,7 @@ export class ControllerPlugin extends BaseControllerPlugin {
 	/** A clusterio role was created, changed or deleted. */
 	rolesUpdated(roles: lib.Role[]) {
 		const created = this.ensureRoleMeta();
-
-		// Deleting a role leaves its properties behind, which would be reused by
-		// the next role to be given the same id
-		const orphaned = [];
-		for (const role of roles) {
-			if (role.isDeleted) {
-				const meta = this.roleMeta.getMutable(role.id);
-				if (meta) {
-					orphaned.push(meta);
-				}
-			}
-		}
-		if (orphaned.length) {
-			this.roleMeta.deleteMany(orphaned);
-		}
+		this.sweepRoleMeta();
 
 		// Newly created properties broadcast on their own through roleMetaUpdated
 		const createdIds = new Set(created.map(meta => meta.id));

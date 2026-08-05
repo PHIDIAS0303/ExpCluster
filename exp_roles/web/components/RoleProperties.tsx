@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Button, ColorPicker, Form, Input, InputNumber, Space, Switch, Tooltip } from "antd";
+import { Button, Col, ColorPicker, Form, Input, InputNumber, Row, Switch, Tooltip } from "antd";
 
 import * as lib from "@clusterio/lib";
 import { ControlContext, SectionHeader, useAccount, notifyErrorHandler } from "@clusterio/web_ui";
@@ -34,7 +34,7 @@ export default function RoleProperties(props: { plugin: WebPlugin, role?: lib.Ro
 	const [roles] = props.plugin.useRoles();
 	const record = props.role ? roles.get(props.role.id) : undefined;
 	const meta = record?.meta;
-	const canUpdate = account.hasPermission("exp_roles.role.update");
+	const canUpdate = account.hasPermission("core.role.update");
 
 	useEffect(() => {
 		if (!meta) {
@@ -85,61 +85,93 @@ export default function RoleProperties(props: { plugin: WebPlugin, role?: lib.Ro
 		)));
 	}
 
+	const labelled = (text: string, tip: string) => <Tooltip title={tip}>{text}</Tooltip>;
+
 	return <>
-		<SectionHeader title="In Game Properties" />
-		<Form form={form} labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} disabled={!canUpdate}>
-			<Form.Item
-				name="order"
-				label={<Tooltip title="A lower value is a more privileged role">Order</Tooltip>}
-			>
-				<InputNumber />
-			</Form.Item>
-			<Form.Item
-				name="priority"
-				label={
-					<Tooltip title="Only the highest priority roles a player holds apply, used by Jail">
-						Priority
-					</Tooltip>
-				}
-			>
-				<InputNumber />
-			</Form.Item>
-			<Form.Item name="shortHand" label="Short hand">
-				<Input />
-			</Form.Item>
-			<Form.Item name="tag" label="Tag">
-				<Input />
-			</Form.Item>
-			<Form.Item name="color" label="Colour">
-				<ColorPicker allowClear format="rgb" disabledAlpha />
-			</Form.Item>
-			<Form.Item
-				name="autoAssignHours"
-				label={
-					<Tooltip title="Granted once a player reaches this much online time across the cluster">
-						Auto assign after (hours)
-					</Tooltip>
-				}
-			>
-				<InputNumber min={0} placeholder="Never" />
-			</Form.Item>
-			<Form.Item name="blockAutoAssign" label="Block auto assign" valuePropName="checked">
-				<Switch />
-			</Form.Item>
-			{canUpdate && <Form.Item wrapperCol={{ offset: 8 }}>
-				<Space>
-					<Button
-						type="primary"
-						loading={applying}
-						onClick={() => {
-							setApplying(true);
-							apply()
-								.catch(notifyErrorHandler("Error updating role properties"))
-								.finally(() => setApplying(false));
-						}}
-					>Apply</Button>
-				</Space>
-			</Form.Item>}
+		<SectionHeader
+			title="In Game Properties"
+			extra={canUpdate ? <Button
+				type="primary"
+				loading={applying}
+				onClick={() => {
+					setApplying(true);
+					apply()
+						.catch(notifyErrorHandler("Error updating role properties"))
+						.finally(() => setApplying(false));
+				}}
+			>Apply in game properties</Button> : undefined}
+		/>
+		<Form
+			form={form}
+			disabled={!canUpdate}
+			labelCol={{ span: 12 }}
+			wrapperCol={{ span: 12 }}
+			labelWrap
+		>
+			<Row gutter={[16, 0]}>
+				<Col xs={24} md={12} xl={8}>
+					<Form.Item
+						name="order"
+						label={labelled("Order", "A lower value is a more privileged role")}
+					>
+						<InputNumber style={{ width: "100%" }} />
+					</Form.Item>
+					<Form.Item
+						name="priority"
+						label={labelled(
+							"Priority",
+							"Only the roles with the highest priority a player holds apply, "
+							+ "which is how Jail suppresses every other role"
+						)}
+					>
+						<InputNumber style={{ width: "100%" }} />
+					</Form.Item>
+				</Col>
+
+				<Col xs={24} md={12} xl={8}>
+					<Form.Item
+						name="shortHand"
+						label={labelled("Short hand", "Short form of the name, used where space is limited")}
+					>
+						<Input />
+					</Form.Item>
+					<Form.Item
+						name="tag"
+						label={labelled("Tag", "Shown next to the names of players with this role")}
+					>
+						<Input />
+					</Form.Item>
+					<Form.Item
+						name="color"
+						label={labelled("Colour", "Used for the role name and tag in game")}
+					>
+						<ColorPicker allowClear format="rgb" disabledAlpha />
+					</Form.Item>
+				</Col>
+
+				<Col xs={24} md={12} xl={8}>
+					<Form.Item
+						name="autoAssignHours"
+						label={labelled(
+							"Auto assign after (hours)",
+							"Granted once a player reaches this much online time across the cluster. "
+							+ "Leave empty to never grant it automatically"
+						)}
+					>
+						<InputNumber min={0} placeholder="Never" style={{ width: "100%" }} />
+					</Form.Item>
+					<Form.Item
+						name="blockAutoAssign"
+						label={labelled(
+							"Block auto assign",
+							"Players holding this role are never granted any other role automatically"
+						)}
+						valuePropName="checked"
+					>
+						<Switch />
+					</Form.Item>
+				</Col>
+			</Row>
 		</Form>
 	</>;
 }

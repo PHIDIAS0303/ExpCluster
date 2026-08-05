@@ -141,12 +141,20 @@ end
 
 --- Build a role from the record sent by the controller
 --- @param record table
+--- @param names string[]? When given, record.permissions holds indexes into it
 --- @return ExpRoles.Role
-local function decode_role(record)
+local function decode_role(record, names)
     local meta = record.meta
     local allowed_actions = {}
-    for _, permission in pairs(record.permissions) do
-        allowed_actions[permission] = true
+    if names then
+        -- Indexes are zero based, having come from javascript
+        for _, index in pairs(record.permissions) do
+            allowed_actions[names[index + 1]] = true
+        end
+    else
+        for _, permission in pairs(record.permissions) do
+            allowed_actions[permission] = true
+        end
     end
 
     local flags = {}
@@ -732,6 +740,26 @@ end
     Sync entry points
 ]]
 
+--- Stop holding a pending role locally once the controller has confirmed it
+--- Roles assigned with assign_player_local are never pending so are untouched
+--- @param player_name string
+local function drop_confirmed_local(player_name)
+    local pending = script_data.pending[player_name]
+    if pending then
+        for _, role_id in pairs(script_data.synced_players[player_name] or {}) do
+            if remove_role_id(pending, role_id) then
+                remove_role_id(script_data.local_players[player_name], role_id)
+            end
+        end
+        if not next(pending) then script_data.pending[player_name] = nil end
+    end
+
+    local local_roles = script_data.local_players[player_name]
+    if local_roles and not next(local_roles) then
+        script_data.local_players[player_name] = nil
+    end
+end
+
 --- Restore local references to persistent script data after load
 function ExpRoles.on_load()
     script_data = compat.script_data["exp_roles"]
@@ -748,16 +776,18 @@ function ExpRoles.set_emit_events(enabled)
 end
 
 --- Replace all local state with the state held by the controller
---- @param payload { roles: table[], assignments: table[] }
+--- Permission names are sent once and referenced by index, see encodeRolesForLua
+--- @param payload { permission_names: string[], roles: table[], assignments: table[] }
 function ExpRoles.initialise(payload)
     local emit_updates = script_data.emit_updates
     script_data.emit_updates = false
 
+    local names = payload.permission_names
     script_data.roles = {}
     script_data.default_role_id = nil
     for _, record in pairs(payload.roles) do
         if not record.is_deleted then
-            script_data.roles[record.id] = decode_role(record)
+            script_data.roles[record.id] = decode_role(record, names)
             if record.is_default then
                 script_data.default_role_id = record.id
             end
@@ -771,8 +801,19 @@ function ExpRoles.initialise(payload)
         end
     end
 
-    -- Anything still pending was sent before the connection was lost, the
-    -- controller state received here is authoritative
+    -- The state received here is authoritative, so a pending role is either
+    -- confirmed and now held by synced_players, or it never landed and has to
+    -- be given up; either way it stops being held locally
+    for player_name, pending in pairs(script_data.pending) do
+        drop_confirmed_local(player_name)
+        for _, role_id in pairs(pending) do
+            remove_role_id(script_data.local_players[player_name], role_id)
+        end
+        local local_roles = script_data.local_players[player_name]
+        if local_roles and not next(local_roles) then
+            script_data.local_players[player_name] = nil
+        end
+    end
     script_data.pending = {}
 
     rebuild_role_views()
@@ -823,22 +864,7 @@ function ExpRoles.receive_assignment_updates(records)
             script_data.synced_players[player_name] = record.role_ids or {}
         end
 
-        -- Anything confirmed by the controller no longer needs to be held locally
-        local pending = script_data.pending[player_name]
-        if pending then
-            for _, role_id in pairs(script_data.synced_players[player_name] or {}) do
-                if remove_role_id(pending, role_id) then
-                    remove_role_id(script_data.local_players[player_name], role_id)
-                end
-            end
-            if not next(pending) then script_data.pending[player_name] = nil end
-        end
-
-        local local_roles = script_data.local_players[player_name]
-        if local_roles and not next(local_roles) then
-            script_data.local_players[player_name] = nil
-        end
-
+        drop_confirmed_local(player_name)
         rebuild_player_view(player_name)
 
         local player = game.get_player(player_name)
@@ -858,10 +884,8 @@ function ExpRoles.reject_assignment(payload)
 
     if #roles == 0 then return end
 
-    local emit_updates = script_data.emit_updates
-    script_data.emit_updates = false
+    -- Sync is false, so this is never sent back to the controller
     change_player_roles(player_name, roles, "unassign", "<server>", true, false)
-    script_data.emit_updates = emit_updates
 end
 
 --- Get the current script data for debugging purposes

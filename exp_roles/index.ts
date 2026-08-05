@@ -7,36 +7,9 @@ declare module "@clusterio/lib" {
 	}
 }
 
-lib.definePermission({
-	name: "exp_roles.role.list",
-	title: "List In Game Roles",
-	description: "List the in game properties of all roles.",
-	grantByDefault: true,
-});
-lib.definePermission({
-	name: "exp_roles.role.subscribe",
-	title: "Subscribe to In Game Role Updates",
-	description: "Receive updates when the in game properties of a role change.",
-	grantByDefault: true,
-});
-lib.definePermission({
-	name: "exp_roles.role.update",
-	title: "Update In Game Roles",
-	description: "Modify the in game properties of a role, such as its order and colour.",
-});
-
-lib.definePermission({
-	name: "exp_roles.assignment.list",
-	title: "List Role Assignments",
-	description: "List the roles held by each player in game.",
-	grantByDefault: true,
-});
-lib.definePermission({
-	name: "exp_roles.assignment.subscribe",
-	title: "Subscribe to Role Assignment Updates",
-	description: "Receive updates when the roles held by a player change.",
-	grantByDefault: true,
-});
+// The in game properties of a role are part of the role, so they are covered by
+// the core role permissions rather than permissions of their own. Assignments
+// are only ever sent between the controller and an instance, so they need none.
 
 export const plugin: lib.PluginDeclaration = {
 	name: "exp_roles",
