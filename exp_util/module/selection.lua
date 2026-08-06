@@ -23,7 +23,7 @@ local Selection = {
     --- @field player_index number
     --- @field selection Selection.Active
 
-    --- @type table<string, { [defines.events]: Selection.event_handler[] }>
+    --- @type table<string, { [defines.events]: Selection.event_handler<any>[] }>
     _registered = {},
 
     --- @package

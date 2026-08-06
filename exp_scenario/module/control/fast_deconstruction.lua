@@ -22,7 +22,7 @@ local min = math.min
 --- @field trees LuaEntity[]
 --- @field tree_count number
 --- @field permission "fast" | "allow" | "disallow"
---- @field task Async.AsyncReturn
+--- @field task Async.AsyncReturn<any>
 
 local cache --- @type TreeDeconCache?
 

@@ -84,7 +84,7 @@ local Commands = {
 --- Contains the different status values a command can return
 Commands.status = {}
 
---- @class (partial) Commands.types: table<string, Commands.InputParser | Commands.InputParserFactory>
+--- @class (partial) Commands.types: table<string, Commands.InputParser<any> | Commands.InputParserFactory<any>>
 --- Stores all input parsers and validators for different data types
 Commands.types = {}
 
@@ -103,7 +103,7 @@ end
 --- @class Commands.Argument
 --- @field name string The name of the argument
 --- @field description LocalisedString? The description of the argument
---- @field input_parser Commands.InputParser The input parser for the argument
+--- @field input_parser Commands.InputParser<any> The input parser for the argument
 --- @field optional boolean True when the argument is optional
 --- @field default any? The default value of the argument
 
@@ -281,7 +281,7 @@ end
 --- @alias Commands.InputParserFactory<T> fun(...: any): Commands.InputParser<T>
 
 --- Add a new input parser to the command library, this method validates that it does not already exist
---- @generic T : Commands.InputParser | Commands.InputParserFactory
+--- @generic T : Commands.InputParser<any> | Commands.InputParserFactory<any>
 --- @param data_type string The name of the data type the input parser reads in and validates, becomes a key of Commands.types
 --- @param input_parser T The function used to parse and validate the data type
 --- @return T # The function which was provided as the second argument
@@ -295,7 +295,7 @@ function Commands.add_data_type(data_type, input_parser)
 end
 
 --- Remove an input parser for a data type, must be the same string that was passed to add_input_parser
---- @param data_type string | Commands.InputParser | Commands.InputParserFactory The data type or input parser you want to remove the input parser for
+--- @param data_type string | Commands.InputParser<any> | Commands.InputParserFactory<any> The data type or input parser you want to remove the input parser for
 function Commands.remove_data_type(data_type)
     Commands.types[data_type] = nil
     for k, v in pairs(Commands.types) do
@@ -433,7 +433,7 @@ end
 --- Add a new required argument to the command of the given data type
 --- @param name string The name of the argument being added
 --- @param description LocalisedString? The description of the argument being added
---- @param input_parser Commands.InputParser The input parser to be used for the argument
+--- @param input_parser Commands.InputParser<any> The input parser to be used for the argument
 --- @return ExpCommand
 function Commands._prototype:argument(name, description, input_parser)
     assert_command_mutable(self)
@@ -454,7 +454,7 @@ end
 --- Add a new optional argument to the command of the given data type
 --- @param name string The name of the argument being added
 --- @param description LocalisedString? The description of the argument being added
---- @param input_parser Commands.InputParser The input parser to be used for the argument
+--- @param input_parser Commands.InputParser<any> The input parser to be used for the argument
 --- @return ExpCommand
 function Commands._prototype:optional(name, description, input_parser)
     assert_command_mutable(self)

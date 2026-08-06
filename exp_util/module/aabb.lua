@@ -7,26 +7,31 @@ local ceil = math.ceil
 local min = math.min
 local max = math.max
 
+--- An axis aligned bounding box using named members, the shorthand form is not supported
+--- @class ExpUtil_AABB.Box
+--- @field left_top MapPosition.struct
+--- @field right_bottom MapPosition.struct
+
 --- @class ExpUtil_AABB
 local AABB = {}
 
 --- Check if an area is valid
---- @param aabb BoundingBox
+--- @param aabb ExpUtil_AABB.Box
 --- @return boolean # True if the area is valid
 function AABB.valid(aabb)
     return aabb.left_top.x < aabb.right_bottom.x and aabb.left_top.y < aabb.right_bottom.y
 end
 
 --- Returns the size of the area contained within an AABB
---- @param aabb BoundingBox
+--- @param aabb ExpUtil_AABB.Box
 --- @return number
 function AABB.size(aabb)
     return (aabb.right_bottom.x - aabb.left_top.x) * (aabb.right_bottom.y - aabb.left_top.y)
 end
 
 --- Clone an area, allows for safe mutation of an input value
---- @param aabb BoundingBox
---- @return BoundingBox
+--- @param aabb ExpUtil_AABB.Box
+--- @return ExpUtil_AABB.Box
 function AABB.clone(aabb)
     return {
         left_top = { x = aabb.left_top.x, y = aabb.left_top.y },
@@ -35,8 +40,8 @@ function AABB.clone(aabb)
 end
 
 --- Expand an area to be integer aligned, expanding away from 0
---- @param aabb BoundingBox
---- @return BoundingBox
+--- @param aabb ExpUtil_AABB.Box
+--- @return ExpUtil_AABB.Box
 function AABB.expand(aabb)
     return {
         left_top = { x = floor(aabb.left_top.x), y = floor(aabb.left_top.y) },
@@ -45,8 +50,8 @@ function AABB.expand(aabb)
 end
 
 --- Contract an area to be integer aligned, contracting towards 0
---- @param aabb BoundingBox
---- @return BoundingBox
+--- @param aabb ExpUtil_AABB.Box
+--- @return ExpUtil_AABB.Box
 function AABB.contract(aabb)
     return {
         left_top = { x = ceil(aabb.left_top.x), y = ceil(aabb.left_top.y) },
@@ -55,9 +60,9 @@ function AABB.contract(aabb)
 end
 
 --- Expand an area to include all other areas
---- @param aabb BoundingBox
---- @param ... BoundingBox
---- @return BoundingBox
+--- @param aabb ExpUtil_AABB.Box
+--- @param ... ExpUtil_AABB.Box
+--- @return ExpUtil_AABB.Box
 function AABB.union(aabb, ...)
     local rtn = AABB.clone(aabb)
     for _, next_aabb in ipairs{ ... } do
@@ -70,9 +75,9 @@ function AABB.union(aabb, ...)
 end
 
 --- Contract an area to include to the overlap of all areas
---- @param aabb BoundingBox
---- @param ... BoundingBox
---- @return BoundingBox? # Nil if there is no intersection
+--- @param aabb ExpUtil_AABB.Box
+--- @param ... ExpUtil_AABB.Box
+--- @return ExpUtil_AABB.Box? # Nil if there is no intersection
 function AABB.intersect(aabb, ...)
     local rtn = AABB.clone(aabb)
     for _, next_aabb in ipairs{ ... } do
@@ -88,8 +93,8 @@ function AABB.intersect(aabb, ...)
 end
 
 --- Check if a point is contained within an area
---- @param aabb BoundingBox
---- @param point MapPosition
+--- @param aabb ExpUtil_AABB.Box
+--- @param point MapPosition.struct
 --- @return boolean # True if the point is within or on the edge of the bounding box
 function AABB.contains_point(aabb, point)
     return point.x >= aabb.left_top.x and point.y >= aabb.left_top.y
@@ -97,8 +102,8 @@ function AABB.contains_point(aabb, point)
 end
 
 --- Check if an area is fulling contained within another area
---- @param aabb BoundingBox
---- @param other BoundingBox
+--- @param aabb ExpUtil_AABB.Box
+--- @param other ExpUtil_AABB.Box
 --- @return boolean # True if the point is within or on the edge of the bounding box
 function AABB.contains_area(aabb, other)
     return AABB.contains_point(aabb, other.left_top) and AABB.contains_point(aabb, other.right_bottom)
