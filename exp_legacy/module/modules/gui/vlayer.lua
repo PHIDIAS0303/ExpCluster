@@ -22,9 +22,9 @@ local function aabb_align_expand(aabb)
     }
 end
 
-local vlayer_container
-local vlayer_gui_control_type
-local vlayer_gui_control_list
+local vlayer_container --- @type ExpElement
+local vlayer_gui_control_type --- @type ExpElement
+local vlayer_gui_control_list --- @type ExpElement
 
 local vlayer_control_type_list = {
     [1] = "energy",
@@ -87,7 +87,7 @@ SelectArea:on_selection(function(event)
     local container = Gui.get_left_element(vlayer_container, player)
     local disp = container.frame["vlayer_st_2"].disp.table
     local target = vlayer_control_type_list[disp[vlayer_gui_control_type.name].selected_index]
-    local entities
+    local entities --- @type LuaEntity[]
 
     if config.power_on_space and event.surface and event.surface.platform and target == "energy" then
         if player.force.technologies[config.power_on_space_research.name].level >= config.power_on_space_research.level then
