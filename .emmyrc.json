@@ -18,6 +18,7 @@
     },
     "$comment-disable": "Carried over from the luals config, which had these as editor only rather than checked in ci",
     "$comment-unnecessary-if": "Disabled by the config fmtk generates for itself, the api union types make it unreliable",
+    "$comment-need-check-nil": "To be enabled once the backlog is cleared, a third of it is MapPosition and BoundingBox being aliased as struct|[double, double]",
     "diagnostics": {
         "globals": [ "__DebugAdapter", "__Profiler" ],
         "disable": [
@@ -26,6 +27,7 @@
             "invert-if",
             "missing-parameter",
             "missing-return-value",
+            "need-check-nil",
             "param-type-mismatch",
             "preferred-local-alias",
             "redefined-local",

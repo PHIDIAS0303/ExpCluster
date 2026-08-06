@@ -164,7 +164,6 @@ local function clear_spawn_area(surface, offset)
     local get_tile = surface.get_tile
 
     -- Make sure a non water tile is used for filling
-    --- @diagnostic disable-next-line Incorrect Api Type: https://forums.factorio.com/viewtopic.php?f=233&t=109145&p=593761&hilit=get_tile#p593761
     local starting_tile = get_tile(offset)
     local fill_tile = starting_tile.collides_with("player") and "landfill" or starting_tile.name
     local fill_radius = config.spawn_area.landfill_radius
@@ -185,7 +184,6 @@ local function clear_spawn_area(surface, offset)
             if dst < tile_radius_sqr then
                 -- If it is inside the decon radius always set the tile
                 tiles_to_make[#tiles_to_make + 1] = { name = decon_tile, position = pos }
-                --- @diagnostic disable-next-line Incorrect Api Type: https://forums.factorio.com/viewtopic.php?f=233&t=109145&p=593761&hilit=get_tile#p593761
             elseif dst < fill_radius_sqr and get_tile(pos).collides_with("player") then
                 -- If it is inside the fill radius only set the tile if it is water
                 tiles_to_make[#tiles_to_make + 1] = { name = fill_tile, position = pos }

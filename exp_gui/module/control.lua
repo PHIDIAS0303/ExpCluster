@@ -188,9 +188,9 @@ function Gui._ensure_consistency(event)
 
     -- This check isn't needed, but allows the toolbar file to be deleted without modifying any lib code
     if Gui.toolbar then
-        --- @diagnostic disable-next-line invisible
+        --- @diagnostic disable-next-line: access-invisible
         Gui.toolbar._create_elements(player)
-        --- @diagnostic disable-next-line invisible
+        --- @diagnostic disable-next-line: access-invisible
         Gui.toolbar._ensure_consistency(player)
     end
 end
@@ -211,7 +211,7 @@ local function on_gui_opened(event)
 
         if visible then
             event.element = element
-            --- @diagnostic disable-next-line invisible
+            --- @diagnostic disable-next-line: access-invisible
             define:raise_event(event)
         end
     end

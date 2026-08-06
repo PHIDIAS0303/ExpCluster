@@ -29,7 +29,7 @@ Toolbar.on_gui_button_toggled = script.generate_event_name()
 --- @class _ExpElement._prototype
 --- @field on_button_toggled ExpElement.OnEventAdder<EventData.on_gui_button_toggled>
 
---- @diagnostic disable-next-line: invisible, inject-field
+--- @diagnostic disable-next-line: access-invisible, inject-field
 function ExpElement._prototype.on_button_toggled(self, handler)
     return self:on_event(Toolbar.on_gui_button_toggled, handler)
 end

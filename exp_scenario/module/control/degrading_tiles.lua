@@ -18,7 +18,6 @@ end
 --- @param surface LuaSurface
 --- @param position MapPosition
 local function degrade_tile(surface, position)
-    --- @diagnostic disable-next-line Incorrect Api Type: https://forums.factorio.com/viewtopic.php?f=233&t=109145&p=593761&hilit=get_tile#p593761
     local tile = surface.get_tile(position)
     local tile_name = tile.name
     local degrade_tile_name = config.degrade_order[tile_name]
@@ -61,7 +60,6 @@ end
 --- @param position MapPosition
 --- @return number?
 local function get_tile_strength(surface, position)
-    --- @diagnostic disable-next-line Incorrect Api Type: https://forums.factorio.com/viewtopic.php?f=233&t=109145&p=593761&hilit=get_tile#p593761
     local tile = surface.get_tile(position)
     local tile_name = tile.name
     local strength = config.strengths[tile_name]
