@@ -93,7 +93,7 @@ local Async = {
 Async.status = {}
 
 --- @class Async.AsyncFunction
---- @field id number The id of this async function
+--- @field id string The id of this async function
 --- @operator call: Async.AsyncReturn<any>
 Async._function_prototype = {}
 
@@ -104,10 +104,10 @@ Async._function_metatable = {
 }
 
 --- @class Async.AsyncReturn<F>
---- @field func_id number The id of the async function to be called
+--- @field func_id string The id of the async function to be called
 --- @field args any[] The arguments to call the function with
 --- @field tick number? If present, the function will be called on this game tick
---- @field next_id number? The id of the async function to be called with the return value
+--- @field next_id string? The id of the async function to be called with the return value
 --- @field canceled boolean? True if the call has been canceled
 --- @field completed boolean? True if the call has completed
 --- @field return_values any? The return values of the function call

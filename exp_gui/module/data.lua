@@ -62,6 +62,7 @@ local GuiData = {
 --- @field player_data table<uint, any>
 --- @field force_data table<uint, any>
 --- @field global_data table
+--- @field [DataKey] any
 -- This class has no prototype methods
 -- Same as raw but __index ensures the values exist
 

@@ -12,7 +12,7 @@ made with `assign_player_local`.
 ]]
 
 local clusterio_api = require("modules/clusterio/api")
-local compat = require("modules/clusterio/compat")
+local compat = require("modules/clusterio/compat") --[[@as LibCompat]]
 local Async = require("modules/exp_util/async")
 
 --- @class ExpRoles
