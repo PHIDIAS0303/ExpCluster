@@ -1,0 +1,42 @@
+{
+    "$schema": "https://raw.githubusercontent.com/EmmyLuaLs/emmylua-analyzer-rust/refs/heads/main/crates/emmylua_code_analysis/resources/schema.json",
+    "runtime": {
+        "version": "Lua5.2",
+        "requirePattern": [ "?", "?.lua" ]
+    },
+    "workspace": {
+        "$comment-moduleMap": "Replaces the fmtk --clusterio-modules plugin, rewrites each file's own module path rather than the require string",
+        "ignoreDir": [ ".github", "web", "dist", "factorio" ],
+        "ignoreGlobs": [ "**/node_modules/**", "**/dist/**" ],
+        "moduleMap": [
+            { "pattern": "^([^.]+)\\.module\\.module_exports$", "replace": "modules.$1" },
+            { "pattern": "^([^.]+)\\.module\\.(.+)$", "replace": "modules.$1.$2" }
+        ]
+    },
+    "doc": {
+        "privateName": [ "__*" ]
+    },
+    "$comment-disable": "Carried over from the luals config, which had these as editor only rather than checked in ci",
+    "$comment-unnecessary-if": "Disabled by the config fmtk generates for itself, the api union types make it unreliable",
+    "diagnostics": {
+        "globals": [ "__DebugAdapter", "__Profiler" ],
+        "disable": [
+            "assign-type-mismatch",
+            "await-in-sync",
+            "invert-if",
+            "missing-parameter",
+            "missing-return-value",
+            "param-type-mismatch",
+            "preferred-local-alias",
+            "redefined-local",
+            "redundant-parameter",
+            "redundant-return-value",
+            "return-type-mismatch",
+            "unbalanced-assignments",
+            "undefined-doc-param",
+            "unnecessary-assert",
+            "unnecessary-if",
+            "unused"
+        ]
+    }
+}

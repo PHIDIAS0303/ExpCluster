@@ -1,76 +1,93 @@
-name: FMTK Lint
+name: Lua Lint
 
 on:
   push:
   pull_request:
+
+env:
+  EMMYLUA_CHECK_VERSION: "0.24.0"
 
 jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Checkout clusterio modules
+        uses: actions/checkout@v4
+        with:
+          repository: clusterio/clusterio
+          path: .clusterio
+          sparse-checkout: packages/host/modules
+          sparse-checkout-cone-mode: false
       - uses: pnpm/action-setup@v4
         with:
           version: 10
       - uses: actions/setup-node@v4
         with:
           node-version: lts/*
-      - name: Install FMTK
+      - name: Generate Factorio typedefs
         run: |
-          # Pinned: 2.1.4+ generates typedefs targeting EmmyLua that LuaLS misreads
-          pnpm install factoriomod-debug@2.1.3
-          pnpm exec fmtk luals-addon
-          jq '.["workspace.library"] += ["${{ github.workspace }}/factorio/library"] | .["runtime.plugin"] = "${{ github.workspace }}/factorio/plugin.lua"' .luarc.json > temp.luarc.json
-          jq -s '.[0] * .[1].settings' temp.luarc.json ${{ github.workspace }}/factorio/config.json > check.luarc.json
-      - name: Install LuaLS
+          pnpm install factoriomod-debug
+          pnpm exec fmtk luals-addon "$RUNNER_TEMP/factorio"
+      - name: Install emmylua_check
         run: |
-          wget https://github.com/LuaLS/lua-language-server/releases/download/3.18.2/lua-language-server-3.18.2-linux-x64.tar.gz -q -O lusls.tar.gz
-          mkdir luals && tar -xf lusls.tar.gz -C luals && rm lusls.tar.gz
+          curl -fsSL "https://github.com/EmmyLuaLs/emmylua-analyzer-rust/releases/download/${EMMYLUA_CHECK_VERSION}/emmylua_check-linux-x64.tar.gz" \
+            | tar -xz -C "$RUNNER_TEMP"
       - name: Run Lint Report
         shell: bash
         run: |
-          ./luals/bin/lua-language-server --check=. --logpath=. --configpath=check.luarc.json --checklevel=Information --check_out_path=check.json
+          # Library paths are machine specific, so they are merged in rather than committed
+          jq -n --arg lib "$RUNNER_TEMP/factorio/library" --arg clusterio "$PWD/.clusterio/packages/host" \
+            '{ workspace: { library: [ $lib, $clusterio ], ignoreGlobs: [ ".clusterio/**" ] } }' \
+            > "$RUNNER_TEMP/ci.emmyrc.json"
+
+          # Exits non zero on error severity, so the gate below is used instead
+          "$RUNNER_TEMP/emmylua_check" . --config ".emmyrc.json,$RUNNER_TEMP/ci.emmyrc.json" \
+            --output-format json --output check.json || true
 
           # Credit to https://github.com/Krealle/luals-check-action/blob/main/action.yml
           # Although some minor fixes were needed
 
           # Format and print the messages (would be nice to format as a table, but that's too complex for jq)
-          cat check.json | \
-            jq -r \
-            'to_entries | map(.key as $file | .value[] | 
+          jq -r --arg root "$PWD/" \
+            '.[] | (.file | ltrimstr($root)) as $file | .diagnostics[] |
               {
-                file: $file | sub("file://${{ github.workspace }}/./"; ""), 
-                code: .code, 
+                file: $file,
+                code: .code,
                 line: .range.start.line,
-                message: (.message | split("\n") 
-                  | map(if startswith("- ") then .[2:] else . end) 
-                  | join("\n")), 
+                message: (.message | split("\n")
+                  | map(if startswith("- ") then .[2:] else . end)
+                  | join("\n")),
                 severity: (if .severity <= 1 then "ERR" else "WARN" end)
-              }) | 
-              map("**[\(.severity)] \(.code):** \(.file)#L\(.line)<br><code>\(.message)</code>") | .[]' \
-            > $GITHUB_STEP_SUMMARY
+              } |
+              "**[\(.severity)] \(.code):** \(.file)#L\(.line + 1)<br><code>\(.message)</code>"' \
+            check.json > "$GITHUB_STEP_SUMMARY"
 
           echo ""
 
           # Github Annotations (limited to 10)
-          cat check.json | \
-          jq -r \
-          'to_entries | map(.key as $file | .value[] | 
-            {
-              file: $file | sub("file://${{ github.workspace }}/./"; ""), 
-              title: .code, 
-              line: .range.start.line, 
-              endLine: .range.end.line, 
-              col: .range.start.character, 
-              endColumn: .range.end.character, 
-              message: .message | gsub("\n"; "%0A"; "m"), 
-              level: (if .severity <= 1 then "error" else "warning" end)
-            }) | 
-            map("::\(.level) file=\(.file),line=\(.line+1),endLine=\(.line+1),col=\(.col+1),endColumn=\(.endColumn+1),title=\(.title)::\(.message) (\(.title))") | .[]'
+          jq -r --arg root "$PWD/" \
+            '.[] | (.file | ltrimstr($root)) as $file | .diagnostics[] |
+              {
+                file: $file,
+                title: .code,
+                line: .range.start.line,
+                endLine: .range.end.line,
+                col: .range.start.character,
+                endColumn: .range.end.character,
+                message: (.message | gsub("\n"; "%0A"; "m")),
+                level: (if .severity <= 1 then "error" else "warning" end)
+              } |
+              "::\(.level) file=\(.file),line=\(.line + 1),endLine=\(.endLine + 1),col=\(.col + 1),endColumn=\(.endColumn + 1),title=\(.title)::\(.message) (\(.title))"' \
+            check.json
 
-          if [[ $(wc -l < check.json) > 1 ]] ; then
+          # An entry is emitted for every file checked, including clean ones, so
+          # the gate counts diagnostics and asserts the workspace was actually read
+          if [[ $(jq 'length' check.json) -lt 100 ]] ; then
+            echo "::error::Only $(jq 'length' check.json) files were checked, expected the whole workspace"
+            exit 1
+          elif [[ $(jq '[.[].diagnostics[]] | length' check.json) -gt 0 ]] ; then
             exit 1
           else
-            echo "✅ All checks succeeded!" | tee $GITHUB_STEP_SUMMARY
+            echo "✅ All checks succeeded!" | tee "$GITHUB_STEP_SUMMARY"
           fi
-          
