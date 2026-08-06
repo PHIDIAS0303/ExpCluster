@@ -102,7 +102,7 @@ Elements.reason_confirm = Gui.define("player_list/reason_confirm")
         local action_name = Elements.container.get_selected_action(player)
         local button_data = action_name and config.buttons[action_name]
         if button_data and button_data.reason_callback then
-            local reason = element.parent.entry.text
+            local reason = assert(assert(element.parent).entry).text --[[@as string?]]
             if reason == nil or not reason:find("%S") then reason = "no reason given" end
             button_data.reason_callback(player, reason)
         end

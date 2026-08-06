@@ -66,7 +66,7 @@ function Search.on_player_locale_changed(event)
         local ids = player.request_translations(required_translations)
         assert(ids, "Translation ids was nil")
         for i, command_name in ipairs(command_names) do
-            pending[ids[i]] = { locale, command_name }
+            pending[assert(ids[i])] = { locale, command_name }
         end
     end
 end

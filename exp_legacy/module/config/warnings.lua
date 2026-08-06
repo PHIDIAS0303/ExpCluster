@@ -2,6 +2,7 @@
 -- @config Warnings
 
 return {
+    --- @type (LocalisedString[] | fun(player: LuaPlayer, by_player_name: string, number_of_warnings: number))[]
     actions = { --- @setting actions what actions are taking at number of warnings
         -- if a localized string is used then __1__ will by_player_name and __2__ will be the current warning count (auto inserted)
         { "warnings.received", "" },

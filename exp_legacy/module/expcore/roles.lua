@@ -1115,8 +1115,9 @@ local function role_update(event)
     -- Updates the players permission group
     local highest = Roles.get_player_highest_role(player)
     if highest.permission_group then
-        if highest.permission_group[1] then
-            local group = game.permissions.get_group(highest.permission_group[2])
+        local permission_group = highest.permission_group --[[@as [boolean, string] ]]
+        if permission_group[1] then
+            local group = game.permissions.get_group(permission_group[2])
             if group then
                 Groups.add_to_permission_group_async(group, player)
             end

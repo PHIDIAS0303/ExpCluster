@@ -9,7 +9,10 @@ had, and event_handler expects `events` to be the handlers to register.
 local clusterio_api = require("modules/clusterio/api")
 local ExpRoles = require("modules/exp_roles/control")
 
-return {
+--- @class ExpRoles.EventHandlers
+--- @field on_load fun()
+--- @field events table<defines.events, fun(event: EventData)>
+local handlers = {
     on_load = ExpRoles.on_load,
     events = {
         [clusterio_api.events.on_server_startup] = ExpRoles.on_server_startup,
@@ -17,3 +20,5 @@ return {
         [defines.events.on_player_joined_game] = ExpRoles.on_player_joined_game,
     },
 }
+
+return handlers

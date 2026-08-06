@@ -137,7 +137,9 @@ local function on_player_ammo_inventory_changed(event)
     if not player or not player.character then return end
 
     local character_ammo = assert(player.get_inventory(defines.inventory.character_ammo))
-    local item = character_ammo[player.character.selected_gun_index]
+    local gun_index = player.character.selected_gun_index
+    --- @cast gun_index uint
+    local item = character_ammo[gun_index]
     if not item or not item.valid or not item.valid_for_read then
         return
     end
