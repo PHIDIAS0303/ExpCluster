@@ -10,7 +10,7 @@ The default permission authorities controlled by the flags: admin_only, system_o
 
 local Storage = require("modules/exp_util/storage")
 
-local Commands = require("modules/exp_commands") --- @class Commands
+local Commands = require("modules/exp_commands") --- @class (partial) Commands
 local add, allow, deny = Commands.add_permission_authority, Commands.status.success, Commands.status.unauthorised
 
 local authorities = {}

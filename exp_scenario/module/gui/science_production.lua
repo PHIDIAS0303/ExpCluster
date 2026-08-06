@@ -326,8 +326,7 @@ function Elements.science_table.refresh_row(science_table, row_data)
     Elements.production_label.refresh(row.used, row_data.used)
 end
 
---- @type table<string, { [string]: ExpGui_ScienceProduction.elements.science_table.row_data }>
-do local _row_data = {}
+do local _row_data = {} --- @type table<string, { [string]: ExpGui_ScienceProduction.elements.science_table.row_data }>
     --- Refresh the production tables for all online players
     function Elements.science_table.refresh_online()
         -- Refresh the row data for online forces
@@ -416,8 +415,7 @@ function Elements.eta_label.refresh(eta_label)
     eta_label.tooltip = display_data.tooltip
 end
 
---- @type Elements.eta_label.display_data
-do local _display_data = {}
+do local _display_data = {} --- @type Elements.eta_label.display_data
     --- Refresh the eta label for all online players
     function Elements.eta_label.refresh_online()
         -- Refresh the row data for online forces
@@ -477,8 +475,7 @@ local _fp_one_hour = defines.flow_precision_index.one_hour
 --- @field ten_minutes ExpGui_ScienceProduction._item_data
 --- @field one_hour ExpGui_ScienceProduction._item_data
 
---- @type table<string, { [string]: ExpGui_ScienceProduction.item_production_data }>
-do local _production_data = {}
+do local _production_data = {} --- @type table<string, { [string]: ExpGui_ScienceProduction.item_production_data }>
 
     --- Get the production stats for a force
     --- @param flow_stats any

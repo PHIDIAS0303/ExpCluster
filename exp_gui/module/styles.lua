@@ -1,4 +1,4 @@
---- @class Gui
+--- @class (partial) Gui
 local Gui = require("modules/exp_gui")
 
 --- @class Gui.styles

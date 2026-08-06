@@ -16,7 +16,7 @@ Storage.register(player_elements, function(tbl)
     player_elements = tbl
 end)
 
---- @class Gui
+--- @class (partial) Gui
 local Gui = {
     define = ExpElement.new,
     from_argument = ExpElement.from_argument,

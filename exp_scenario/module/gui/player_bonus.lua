@@ -47,8 +47,7 @@ Elements.bonus_used = Gui.define("player_bonus/bonus_used")
     :element_data(0) --[[ @as any ]]
 
 --- Value is cached to save perf
---- @type table<number, number>
-do local _points_limit = {}
+do local _points_limit = {} --- @type table<number, number>
     --- Clear the cache for points limit
     --- @param player LuaPlayer
     function Elements.bonus_used._clear_points_limit_cache(player)

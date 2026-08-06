@@ -1,5 +1,5 @@
 
---- @class Gui
+--- @class (partial) Gui
 local Gui = require("modules/exp_gui")
 local ExpElement = require("modules/exp_gui/prototype")
 local mod_gui = require("mod-gui")

@@ -61,7 +61,7 @@ local Search = require("modules/exp_commands/search")
 --- @type LuaPlayer?
 local _print_player
 
---- @class Commands
+--- @class (partial) Commands
 local Commands = {
     color = ExpUtil.color,
     format_rich_text_color = ExpUtil.format_rich_text_color,
@@ -84,7 +84,7 @@ local Commands = {
 --- Contains the different status values a command can return
 Commands.status = {}
 
---- @class Commands.types: table<string, Commands.InputParser | Commands.InputParserFactory>
+--- @class (partial) Commands.types: table<string, Commands.InputParser | Commands.InputParserFactory>
 --- Stores all input parsers and validators for different data types
 Commands.types = {}
 

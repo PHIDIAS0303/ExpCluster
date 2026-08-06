@@ -7,7 +7,7 @@ local config = require("modules.exp_legacy.config.spawn_area")
 --- Apply an offset to a LuaPosition
 --- @param position MapPosition
 --- @param offset MapPosition
---- @return MapPosition.0
+--- @return MapPosition.struct
 local function apply_offset(position, offset)
     return {
         x = (position.x or position[1]) + (offset.x or offset[1]),

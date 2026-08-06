@@ -261,7 +261,6 @@ local empty_table = setmetatable({}, {
 --- Default status, will raise on_function_complete
 --- @param ... any The return value of the async call
 --- @return Async.Status, any[]
---- @type Async.Status
 function Async.status.complete(...)
     if ... == nil then
         return Async.status.complete, empty_table
@@ -272,7 +271,6 @@ end
 --- Will queue the function to be called again on the next tick using the new arguments
 --- @param ... any The arguments to call the function with
 --- @return Async.Status, any[]
---- @type Async.Status
 function Async.status.continue(...)
     if ... == nil then
         return Async.status.continue, empty_table
@@ -284,7 +282,6 @@ end
 --- @param ticks number The number of ticks to delay for
 --- @param ... any The arguments to call the function with
 --- @return Async.Status, number, any[]
---- @type Async.Status
 function Async.status.delay(ticks, ...)
     ExpUtil.assert_argument_type(ticks, "number", 1, "ticks")
     assert(ticks > 0, "Ticks must be a positive number")

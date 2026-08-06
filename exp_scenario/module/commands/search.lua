@@ -10,7 +10,10 @@ local format_player_name = Commands.format_player_name_locale
 local format_number = require("util").format_number
 
 --- A player who is of a lower role than the executing player
---- @type Commands.InputParser
+--- @param input string
+--- @param player LuaPlayer
+--- @return Commands.Status
+--- @return LuaItemPrototype | LocalisedString
 local function parse_item(input, player)
     -- First Case - internal name is given
     -- Second Case - rich text is given
@@ -146,7 +149,8 @@ Commands.new("search-online", { "exp-commands_search.description-online" })
     end)
 
 --- Return the amount of an item a player has
---- @type SortFunction
+--- @param data SearchResult
+--- @return number
 local function sort_by_count(data)
     return data.count
 end

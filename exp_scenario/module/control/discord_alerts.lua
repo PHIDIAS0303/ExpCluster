@@ -39,7 +39,7 @@ local function get_player_name(event)
 end
 
 --- Convert a colour value into hex
---- @param color Color.0
+--- @param color Color.struct
 --- @return string
 local function to_hex(color)
     local hex_digits = "0123456789ABCDEF"
@@ -53,7 +53,7 @@ local function to_hex(color)
 end
 
 --- Emit the requires json to file for the given event arguments
---- @param opts { title: string?, color: (Color.0 | string)?, description: string?, tick: number?, fields: { name: string, value: string, inline: boolean? }[] }
+--- @param opts { title: string?, color: (Color.struct | string)?, description: string?, tick: number?, fields: { name: string, value: string, inline: boolean? }[] }
 local function emit_event(opts)
     local admins_online = 0
     local players_online = 0

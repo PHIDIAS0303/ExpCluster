@@ -11,7 +11,10 @@ local player_has_flag = Roles.player_has_flag
 
 local Reports = require("modules.exp_legacy.modules.control.reports") --- @dep modules.control.reports
 
---- @type Commands.InputParser
+--- @param input string
+--- @param player LuaPlayer
+--- @return Commands.Status
+--- @return LuaPlayer | LocalisedString
 local function reportable_player(input, player)
     local success, status, result = parse_input(input, player, Commands.types.player)
     if not success then return status, result end

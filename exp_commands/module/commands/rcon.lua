@@ -12,7 +12,7 @@ local ExpUtil = require("modules/exp_util")
 local Async = require("modules/exp_util/async")
 local Storage = require("modules/exp_util/storage")
 
-local Commands = require("modules/exp_commands") --- @class Commands
+local Commands = require("modules/exp_commands") --- @class (partial) Commands
 
 local rcon_env = {} --- @type table<string, any>
 local rcon_static = {} --- @type table<string, any>
