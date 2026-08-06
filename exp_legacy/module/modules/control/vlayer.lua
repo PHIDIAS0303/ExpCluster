@@ -582,7 +582,7 @@ local function handle_circuit_interfaces()
         if not interface.valid then
             vlayer_data.entity_interfaces.circuit[index] = nil
         else
-            local control = interface.get_or_create_control_behavior()
+            local control = interface.get_or_create_control_behavior() --[[@as LuaConstantCombinatorControlBehavior]]
             if control.sections_count == 0 then
                 control.add_section()
             end
