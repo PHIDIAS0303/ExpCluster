@@ -104,19 +104,21 @@ export default function RoleProperties(props: { plugin: WebPlugin, role?: lib.Ro
 		<Form
 			form={form}
 			disabled={!canUpdate}
-			labelAlign="left"
 			labelCol={{ span: 12 }}
 			wrapperCol={{ span: 12 }}
 			labelWrap
 		>
 			<Row gutter={[16, 0]}>
-				<Col xs={24} md={12} xl={8}>
+				<Col xs={24} sm={12} xl={6}>
 					<Form.Item
 						name="order"
 						label={labelled("Order", "A lower value is a more privileged role")}
 					>
 						<InputNumber style={{ width: "100%" }} />
 					</Form.Item>
+				</Col>
+
+				<Col xs={24} sm={12} xl={6}>
 					<Form.Item
 						name="priority"
 						label={labelled(
@@ -129,19 +131,25 @@ export default function RoleProperties(props: { plugin: WebPlugin, role?: lib.Ro
 					</Form.Item>
 				</Col>
 
-				<Col xs={24} md={12} xl={8}>
+				<Col xs={24} sm={12} xl={6}>
 					<Form.Item
 						name="shortHand"
 						label={labelled("Short hand", "Short form of the name, used where space is limited")}
 					>
 						<Input />
 					</Form.Item>
+				</Col>
+
+				<Col xs={24} sm={12} xl={6}>
 					<Form.Item
 						name="tag"
 						label={labelled("Tag", "Shown next to the names of players with this role")}
 					>
 						<Input />
 					</Form.Item>
+				</Col>
+
+				<Col xs={24} sm={12} xl={6}>
 					<Form.Item
 						name="color"
 						label={labelled("Colour", "Used for the role name and tag in game")}
@@ -150,7 +158,7 @@ export default function RoleProperties(props: { plugin: WebPlugin, role?: lib.Ro
 					</Form.Item>
 				</Col>
 
-				<Col xs={24} md={12} xl={8}>
+				<Col xs={24} sm={12} xl={6}>
 					<Form.Item
 						name="autoAssignHours"
 						label={labelled(
@@ -161,6 +169,9 @@ export default function RoleProperties(props: { plugin: WebPlugin, role?: lib.Ro
 					>
 						<InputNumber min={0} placeholder="Never" style={{ width: "100%" }} />
 					</Form.Item>
+				</Col>
+
+				<Col xs={24} sm={12} xl={6}>
 					<Form.Item
 						name="blockAutoAssign"
 						label={labelled(
