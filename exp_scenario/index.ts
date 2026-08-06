@@ -1,6 +1,9 @@
 import * as lib from "@clusterio/lib";
 // import * as Messages from "./messages";
 
+// Defines a permission for every in game action and role flag used by the scenario
+import "./permissions";
+
 lib.definePermission({
 	name: "exp_scenario.config.view",
 	title: "View ExpScenario Config",
