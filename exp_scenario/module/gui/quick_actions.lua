@@ -49,7 +49,7 @@ local function new_quick_action(command, on_click)
 
     Elements[command_name] = element
     Actions[command_name] = {
-        command = command --[[ @as ExpCommand ]],
+        command = command --[[@as ExpCommand]],
         element = element,
     }
 end

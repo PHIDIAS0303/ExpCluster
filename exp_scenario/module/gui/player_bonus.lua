@@ -47,7 +47,7 @@ Elements.bonus_used = Gui.define("player_bonus/bonus_used")
         font = "heading-2",
         color = { 1, 0, 0 },
     }
-    :element_data(0) --[[ @as any ]]
+    :element_data(0) --[[@as any]]
 
 --- Value is cached to save perf
 do local _points_limit = {} --- @type table<number, number>
@@ -147,7 +147,7 @@ Elements.reset_button = Gui.define("player_bonus/reset_button")
         Elements.bonus_table.reset_sliders(element_data.bonus_table)
         local bonus_cost = Elements.bonus_table.calculate_cost(element_data.bonus_table)
         Elements.bonus_used.refresh(element_data.bonus_used, bonus_cost)
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- Link an apply button to this reset button so that it will be disabled after being pressed
 --- @param reset_button LuaGuiElement
@@ -188,7 +188,7 @@ Elements.apply_button = Gui.define("player_bonus/apply_button")
             Elements.bonus_table.save_sliders(element_data.bonus_table)
             Elements.container.apply_player_bonus(player)
         end
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- Link an apply button to this reset button so that it will be disabled after being pressed
 --- @param apply_button LuaGuiElement
@@ -209,7 +209,7 @@ Elements.bonus_table_label = Gui.define("player_bonus/table_label")
     }
     :style{
         width = Gui.from_argument(3, 70),
-    } --[[ @as any ]]
+    } --[[@as any]]
 
 --- @class ExpGui_PlayerBonus.elements.bonus_slider.elements
 --- @field bonus_used LuaGuiElement
@@ -267,7 +267,7 @@ Elements.bonus_slider = Gui.define("player_bonus/bonus_slider")
         element_data.label.caption = Elements.bonus_slider.calculate_slider_caption(bonus_data, value)
         element_data.apply_button.enabled = Elements.bonus_used.update(element_data.bonus_used, value_change * bonus_data._cost_scale)
         element_data.reset_button.enabled = true
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- Get the caption of the slider label
 --- @param bonus_data ExpGui_PlayerBonus.bonus_data
@@ -313,7 +313,7 @@ Elements.bonus_table = Gui.define("player_bonus/bonus_table")
     :draw(function(_, parent)
         return Gui.elements.scroll_table(parent, 300, 3)
     end)
-    :element_data{} --[[ @as any ]]
+    :element_data{} --[[@as any]]
 
 --- Adds a row to the milestone table
 --- @param bonus_table LuaGuiElement
@@ -380,7 +380,7 @@ Elements.container = Gui.define("player_bonus/container")
         Elements.bonus_used.refresh(elements.bonus_used, bonus_cost)
 
         return Gui.elements.container.get_root_element(container)
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- Set the bonus value for a player
 --- @param player LuaPlayer

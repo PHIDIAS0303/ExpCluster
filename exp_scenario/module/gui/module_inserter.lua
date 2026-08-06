@@ -78,7 +78,7 @@ Elements.create_selection_planner = Gui.define("module_inserter/create_selection
     :on_click(function(def, player, element)
         --- @cast def ExpGui_ModuleInserter.elements.create_selection_planner
         SelectArea:start(player, def.data[element])
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- Used to select the machine to apply modules to
 --- @class ExpGui_ModuleInserter.elements.machine_selector: ExpElement
@@ -98,7 +98,7 @@ Elements.machine_selector = Gui.define("module_inserter/machine_selector")
     :on_elem_changed(function(def, player, element, event)
         --- @cast def ExpGui_ModuleInserter.elements.machine_selector
         local element_data = def.data[element]
-        local machine_name = element.elem_value --[[ @as string? ]]
+        local machine_name = element.elem_value --[[@as string?]]
         if not machine_name then
             if element_data.on_last_row then
                 Elements.module_table.reset_row(element_data.module_table, element)
@@ -112,7 +112,7 @@ Elements.machine_selector = Gui.define("module_inserter/machine_selector")
                 Elements.module_table.add_row(element_data.module_table)
             end
         end
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- Used to select the modules to be applied
 Elements.module_selector = Gui.define("module_inserter/module_selector")
@@ -140,7 +140,7 @@ Elements.module_table = Gui.define("module_inserter/module_table")
         local slots_per_row = config.module_slots_per_row + 1
         return Gui.elements.scroll_table(parent, 280, slots_per_row)
     end)
-    :element_data{} --[[ @as any ]]
+    :element_data{} --[[@as any]]
 
 --- Get all the rows in a module table
 --- @param module_table LuaGuiElement
@@ -334,7 +334,7 @@ SelectArea:on_selection(function(event, module_table)
     }
 
     for _, row in pairs(Elements.module_table.get_rows(module_table)) do
-        local machine_name = row.machine_selector.elem_value --[[ @as string? ]]
+        local machine_name = row.machine_selector.elem_value --[[@as string?]]
         if not machine_name then
             goto continue
         end
@@ -349,7 +349,7 @@ SelectArea:on_selection(function(event, module_table)
         -- Get all the modules selected
         for i = 1, entity_prototype.module_inventory_size do
             local module_selector = module_selectors[i]
-            local module = module_selector.elem_value --[[ @as { name: string, quality: string }? ]]
+            local module = module_selector.elem_value --[[@as { name: string, quality: string }?]]
             if module then
                 -- Module selected, add it the module arrays
                 local no_prod_name = module.name:gsub("productivity", "efficiency")

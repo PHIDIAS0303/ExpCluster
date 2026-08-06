@@ -48,14 +48,14 @@ Elements.open_action_bar = Gui.define("player_list/open_action_bar")
         --- @cast def ExpGui_PlayerList.elements.open_action_bar
         Elements.container.toggle_selected_player(player, def.data[element])
         Elements.player_table.refresh_player(player)
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- Set whether an open action bar button shows as highlighted
 --- @param open_button LuaGuiElement
 --- @param highlighted boolean
 function Elements.open_action_bar.set_highlight(open_button, highlighted)
     open_button.style = highlighted and "tool_button" or "frame_button"
-    local style = open_button.style
+    local style = open_button.style --[[@as LuaStyle]]
     style.padding = -2
     style.width = 8
     style.height = 14
@@ -80,7 +80,7 @@ Elements.close_action_bar = Gui.define("player_list/close_action_bar")
     :on_click(function(_, player)
         Elements.container.set_selected_player(player, nil)
         Elements.player_table.refresh_player(player)
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- Button used to confirm a reason
 --- @class ExpGui_PlayerList.elements.reason_confirm: ExpElement
@@ -109,7 +109,7 @@ Elements.reason_confirm = Gui.define("player_list/reason_confirm")
         element.parent.entry.text = ""
         Elements.container.set_selected_player(player, nil)
         Elements.player_table.refresh_player(player)
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- Clickable player name label, left click opens the map and right click toggles the action bar
 --- @class ExpGui_PlayerList.elements.player_name_label: ExpElement
@@ -142,7 +142,7 @@ Elements.player_name_label = Gui.define("player_list/player_name_label")
             Elements.container.toggle_selected_player(player, selected_player)
             Elements.player_table.refresh_player(player)
         end
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- @class ExpGui_PlayerList.elements.player_table.row
 --- @field open_button LuaGuiElement
@@ -165,7 +165,7 @@ Elements.player_table = Gui.define("player_list/player_table")
     end)
     :style{
         padding = { 1, 0, 1, 2 },
-    } --[[ @as any ]]
+    } --[[@as any]]
 
 --- Store the action and reason bars associated with a player table
 --- @param player_table LuaGuiElement
@@ -342,7 +342,7 @@ Elements.action_bar = Gui.define("player_list/action_bar")
     :style{
         height = 35,
         padding = { 1, 3 },
-    } --[[ @as any ]]
+    } --[[@as any]]
 
 --- Update the action bar buttons to match the selection for a player, hidden when nothing is selected
 --- @param action_bar LuaGuiElement
@@ -390,7 +390,7 @@ Elements.reason_bar = Gui.define("player_list/reason_bar")
     :style{
         height = 35,
         padding = { -1, 3 },
-    } --[[ @as any ]]
+    } --[[@as any]]
 
 --- Update the reason bar visibility to match the selection, shown only while an action awaits a reason
 --- @param reason_bar LuaGuiElement
@@ -420,7 +420,7 @@ Elements.container = Gui.define("player_list/container")
         Elements.player_table.rebuild(player_table, row_data)
 
         return Gui.elements.container.get_root_element(container)
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- Get or create the selection state for a player
 --- @param player LuaPlayer

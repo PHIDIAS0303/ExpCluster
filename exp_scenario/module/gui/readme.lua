@@ -47,7 +47,7 @@ Elements.title_table = Gui.define("readme/title_table")
         cell_padding = 0,
         vertical_align = "center",
         horizontally_stretchable = true,
-    } --[[ @as any ]]
+    } --[[@as any]]
 
 --- Scroll pane used for title tables
 --- @class ExpGui_Readme.elements.title_table_scroll: ExpElement
@@ -64,7 +64,7 @@ Elements.title_table_scroll = Gui.define("readme/title_table_scroll")
         padding = { 1, 3 },
         maximal_height = scroll_height,
         horizontally_stretchable = true,
-    } --[[ @as any ]]
+    } --[[@as any]]
 
 --- Sub content frame
 --- @class ExpGui_Readme.elements.sub_content: ExpElement
@@ -80,7 +80,7 @@ Elements.sub_content = Gui.define("readme/sub_content")
         horizontal_align = "center",
         padding = { 2, 2 },
         top_margin = 2,
-    } --[[ @as any ]]
+    } --[[@as any]]
 
 --- @class ExpGui_Readme.elements.join_server.elements
 --- @field server_id string
@@ -119,7 +119,7 @@ Elements.join_server = Gui.define("readme/join_server")
         --- @cast def ExpGui_Readme.elements.join_server
         local server_id = def.data[button].server_id
         External.request_connection(player, server_id, true)
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- Refresh join server button
 --- @param button LuaGuiElement
@@ -244,7 +244,7 @@ define_tab(
         )
 
         return container
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 )
 
 --- Rules tab
@@ -261,14 +261,15 @@ define_tab(
 
         local rules = Gui.elements.scroll_table(container, scroll_height, 1)
         rules.style = "bordered_table"
-        rules.style.cell_padding = 4
+        local rules_style = rules.style --[[@as LuaStyle]]
+        rules_style.cell_padding = 4
 
         for i = 1, 15 do
             Gui.elements.centered_label(rules, frame_width - 30, { "exp-gui_readme.rules-" .. i })
         end
 
         return container
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 )
 
 --- Commands tab
@@ -287,7 +288,8 @@ define_tab(
 
         local commands = Gui.elements.scroll_table(container, scroll_height, 2)
         commands.style = "bordered_table"
-        commands.style.cell_padding = 0
+        local commands_style = commands.style --[[@as LuaStyle]]
+        commands_style.cell_padding = 0
 
         for name, command in pairs(Commands.list_for_player(player)) do
             Gui.elements.centered_label(commands, 120, name)
@@ -295,7 +297,7 @@ define_tab(
         end
 
         return container
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 )
 
 --- Servers tab
@@ -338,7 +340,7 @@ define_tab(
         end
 
         return container
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 )
 
 --- Backers tab
@@ -433,7 +435,7 @@ define_tab(
         end
 
         return container
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 )
 
 --- @class (exact) ExpGui_Readme.elements.readme_data.param table
@@ -599,7 +601,7 @@ define_tab(
         end
 
         return container
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 )
 
 --- @class ExpGui_Readme.elements.container.elements

@@ -32,7 +32,7 @@ commands.set_trains_to_automatic = Commands.new("set-trains-to-automatic", { "ex
         end
 
         game.print{ "exp-commands_trains.response", format_player_name(player), format_number(#trains, false) }
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 return {
     commands = commands,

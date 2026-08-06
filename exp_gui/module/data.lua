@@ -154,7 +154,7 @@ end
 --- @param scope string
 --- @return GuiData
 function GuiData.get(scope)
-    return GuiData._scopes[scope] --[[ @as GuiData ]]
+    return GuiData._scopes[scope] --[[@as GuiData]]
 end
 
 --- Used to clean up data from destroyed elements

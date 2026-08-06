@@ -36,7 +36,7 @@ commands.waterfill = Commands.new("waterfill", { "exp-commands_waterfill.descrip
             SelectArea:start(player)
             return Commands.status.success{ "exp-commands_waterfill.enter" }
         end
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- When an area is selected to be converted to water
 SelectArea:on_selection(function(event)

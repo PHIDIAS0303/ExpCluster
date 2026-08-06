@@ -34,7 +34,7 @@ commands.teleport = Commands.new("teleport", { "exp-commands_teleport.descriptio
         elseif not teleport_player(other_player, target_player.physical_surface, target_player.physical_position) then
             return Commands.status.error{ "exp-commands_teleport.unavailable" }
         end
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- Teleports a player to you.
 --- @class ExpCommands_Teleport.commands.bring: ExpCommand
@@ -49,7 +49,7 @@ commands.bring = Commands.new("bring", { "exp-commands_teleport.description-brin
         elseif not teleport_player(other_player, player.physical_surface, player.physical_position) then
             return Commands.status.error{ "exp-commands_teleport.unavailable" }
         end
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- Teleports you to a player.
 --- @class ExpCommands_Teleport.commands.goto: ExpCommand
@@ -64,7 +64,7 @@ commands["goto"] = Commands.new("goto", { "exp-commands_teleport.description-got
         elseif not teleport_player(player, other_player.physical_surface, other_player.physical_position) then
             return Commands.status.error{ "exp-commands_teleport.unavailable" }
         end
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- Teleport to spawn
 --- @class ExpCommands_Teleport.commands.spawn: ExpCommand
@@ -92,7 +92,7 @@ commands.spawn = Commands.new("spawn", { "exp-commands_teleport.description-spaw
         else
             return Commands.status.unauthorised()
         end
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 return {
     commands = commands,

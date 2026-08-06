@@ -158,7 +158,7 @@ function ExpElement.new(name)
         },
     }
 
-    ExpElement._elements[element_name] = instance --[[ @as ExpElement ]]
+    ExpElement._elements[element_name] = instance --[[@as ExpElement]]
     return setmetatable(instance, ExpElement._metatable)
 end
 
@@ -460,7 +460,7 @@ function ExpElement._prototype:raise_event(event)
     for _, handler in ipairs(handlers) do
         -- All gui elements will contain player and element, other events might have these as nil
         -- Therefore only the signature of on_event has these values as optional
-        handler(self, player --[[ @as LuaPlayer ]], event.element, event --[[ @as EventData ]])
+        handler(self, player --[[@as LuaPlayer]], event.element, event --[[@as EventData]])
     end
 end
 

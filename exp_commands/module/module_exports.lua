@@ -159,7 +159,7 @@ Commands.server = setmetatable({
         Commands.error("Command does not support rcon usage, requires LuaPlayer." .. key)
         error("Command does not support rcon usage, requires LuaPlayer." .. key)
     end,
-}) --[[ @as LuaPlayer ]]
+}) --[[@as LuaPlayer]]
 
 --- Status Returns.
 -- Return values used by command callbacks

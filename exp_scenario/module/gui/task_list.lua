@@ -105,7 +105,7 @@ Elements.new_task_button = Gui.define("task_list/new_task_button")
             body = "",
             new = true,
         })
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- Refresh the visibility based on player permissions
 --- @param new_task_button LuaGuiElement
@@ -154,7 +154,7 @@ Elements.view_task_button = Gui.define("task_list/view_task_button")
         --- @cast def ExpGui_TaskList.element.view_task_button
         local elements = def.data[view_task_button]
         Elements.container.open_view_task(elements.container, elements.task)
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- Refresh the title and tooltip of the view task button
 --- @param view_task_button LuaGuiElement
@@ -187,19 +187,19 @@ Elements.no_tasks_header = Gui.define("task_list/no_tasks_header")
     :style{
         padding = { 2, 0 },
         bottom_margin = 0,
-    } --[[ @as any ]]
+    } --[[@as any]]
 
 --- Refresh the visibility of the no tasks label
 --- @param no_tasks_header LuaGuiElement
 function Elements.no_tasks_header.refresh(no_tasks_header)
-    local force = Gui.get_player(no_tasks_header).force --[[ @as LuaForce ]]
+    local force = Gui.get_player(no_tasks_header).force --[[@as LuaForce]]
     no_tasks_header.visible = not Elements.container.has_tasks(force)
 end
 
 --- Refresh the visibility of the no tasks label
 --- @param player LuaPlayer
 function Elements.no_tasks_header.refresh_player(player)
-    local visible = not Elements.container.has_tasks(player.force --[[ @as LuaForce ]])
+    local visible = not Elements.container.has_tasks(player.force --[[@as LuaForce]])
     for _, no_tasks_header in Elements.no_tasks_header:tracked_elements(player) do
         no_tasks_header.visible = visible
     end
@@ -246,7 +246,7 @@ Elements.task_list = Gui.define("task_list/task_list")
 
         return task_list
     end)
-    :element_data{} --[[ @as any ]]
+    :element_data{} --[[@as any]]
 
 --- Adds a task to the task list
 --- @param task_list LuaGuiElement
@@ -330,7 +330,7 @@ Elements.task_footer = Gui.define("task_list/task_footer")
         height = 0,
         padding = 5,
         use_header_filler = false,
-    } --[[ @as any ]]
+    } --[[@as any]]
 
 --- @class ExpGui_TaskList.elements.close_task_button.elements
 --- @field container LuaGuiElement
@@ -354,7 +354,7 @@ Elements.close_task_button = Gui.define("task_list/close_task_button")
         --- @cast def ExpGui_TaskList.element.close_task_button
         local elements = def.data[close_task_button]
         Elements.container.close_footers(elements.container)
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- @class ExpGui_TaskList.elements.task_button.elements
 --- @field task ExpGui_TaskList.Task?
@@ -379,7 +379,7 @@ Elements.edit_task_button = Gui.define("task_list/edit_task_button")
         --- @cast def ExpGui_TaskList.element.edit_task_button
         local elements = def.data[edit_task_button]
         Elements.container.open_edit_task(elements.container, assert(elements.task))
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- Refresh the edit button
 --- @param edit_task_button LuaGuiElement
@@ -415,9 +415,9 @@ Elements.delete_task_button = Gui.define("task_list/delete_task_button")
     :on_click(function(def, player, delete_task_button)
         --- @cast def ExpGui_TaskList.element.delete_task_button
         local elements = def.data[delete_task_button]
-        Elements.container.remove_task(player.force --[[ @as LuaForce ]], elements.task)
+        Elements.container.remove_task(player.force --[[@as LuaForce]], elements.task)
         Elements.container.close_footers(elements.container)
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- Refresh the delete button
 --- @param delete_task_button LuaGuiElement
@@ -477,7 +477,7 @@ Elements.view_task_footer = Gui.define("task_list/view_task_footer")
         }
 
         return view_task_footer
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- Refresh the view task with new task details
 --- @param view_task_footer LuaGuiElement
@@ -534,7 +534,7 @@ Elements.task_message_textfield = Gui.define("task_list/task_message_textfield")
         --- @cast def ExpGui_TaskList.elements.task_message_textfield
         local confirm_task_button = def.data[task_message_textfield].confirm_task_button
         confirm_task_button.enabled = string.len(task_message_textfield.text) > 5
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- Set the confirm task button to update on text changed
 --- @param task_message_textfield LuaGuiElement
@@ -590,13 +590,13 @@ Elements.confirm_task_button = Gui.define("task_list/confirm_task_button")
 
         Elements.container.close_footers(elements.container)
 
-        local force = player.force --[[ @as LuaForce ]]
+        local force = player.force --[[@as LuaForce]]
         if task.new then
             Elements.container.add_task(force, task)
         else
             Elements.container.refresh_force_online(force, task)
         end
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- Refresh the confirm task button
 --- @param confirm_task_button LuaGuiElement
@@ -649,7 +649,7 @@ Elements.discard_task_button = Gui.define("task_list/discard_task_button")
         else
             Elements.container.open_view_task(elements.container, task)
         end
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- Refresh the discard task button
 --- @param discard_task_button LuaGuiElement
@@ -696,7 +696,7 @@ Elements.edit_task_footer = Gui.define("task_list/edit_task_footer")
         }
 
         return edit_task_footer
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- Refresh the view task with new task details
 --- @param edit_task_footer LuaGuiElement
@@ -781,7 +781,7 @@ Elements.container = Gui.define("task_list/container")
 
         -- Add tasks to the list if there are any
         local player = Gui.get_player(parent)
-        local force = player.force --[[ @as LuaForce ]]
+        local force = player.force --[[@as LuaForce]]
         local tasks = def.data[force]
         if tasks then
             for _, task in ipairs(tasks) do
@@ -796,11 +796,11 @@ Elements.container = Gui.define("task_list/container")
         elements.edit_task_footer.visible = false
 
         -- Set the data and return
-        def.data[root] = elements --[[ @as any ]]
+        def.data[root] = elements --[[@as any]]
         return root
     end)
     :global_data{ next_task_id = 1 }
-    :force_data{} --[[ @as any ]]
+    :force_data{} --[[@as any]]
 
 --- Check if a force has tasks
 --- @param force LuaForce
@@ -885,7 +885,7 @@ end
 --- Refresh all tasks for a player
 --- @param player LuaPlayer
 function Elements.container.refresh_player(player)
-    local tasks = Elements.container.data[ player.force --[[ @as LuaForce ]] ]
+    local tasks = Elements.container.data[ player.force --[[@as LuaForce]] ]
     for _, container in Elements.container:tracked_elements(player) do
         local elements = Elements.container.data[container]
         Elements.task_list.refresh_tasks(elements.task_list, tasks)
@@ -908,7 +908,7 @@ end
 
 --- Add the element to the left flow with a toolbar button
 Gui.add_left_element(Elements.container, function(player)
-    return Elements.container.has_tasks(player.force --[[ @as LuaForce ]])
+    return Elements.container.has_tasks(player.force --[[@as LuaForce]])
 end)
 
 Gui.toolbar.create_button{

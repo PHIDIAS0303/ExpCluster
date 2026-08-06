@@ -31,7 +31,7 @@ end
 
 -- gets the action player and a coloured name for the action to be used on
 local function get_action_player(player)
-    local selected_player = get_selected_player(player) --[[ @as LuaPlayer ]]
+    local selected_player = get_selected_player(player) --[[@as LuaPlayer]]
     local selected_player_color = format_player_name(selected_player)
     return selected_player, selected_player_color
 end

@@ -284,7 +284,7 @@ local server_role = setmetatable({
 --- @param player LuaPlayer | string | nil
 --- @return ExpRoles.Role[]
 function ExpRoles.get_player_roles(player)
-    local player_name = type(player) == "table" and player.name or player --[[ @as string? ]]
+    local player_name = type(player) == "table" and player.name or player --[[@as string?]]
     -- The server is not a player and is allowed to do anything
     if player_name == nil then return { server_role } end
 
@@ -678,7 +678,7 @@ end
 --- @param silent boolean?
 --- @param sync boolean
 local function change_player_roles(player, roles, change_type, by_player_name, silent, sync)
-    local player_name = type(player) == "table" and player.name or player --[[ @as string? ]]
+    local player_name = type(player) == "table" and player.name or player --[[@as string?]]
     if not player_name then return end
 
     local role_objects = resolve_roles(roles)

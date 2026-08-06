@@ -43,7 +43,7 @@ commands.artillery = Commands.new("artillery", { "exp-commands_artillery.descrip
         end
         SelectArea:start(player)
         return Commands.status.success{ "exp-commands_artillery.enter" }
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- when an area is selected to add protection to the area
 SelectArea:on_selection(function(event)

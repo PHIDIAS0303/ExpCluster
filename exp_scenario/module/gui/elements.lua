@@ -22,7 +22,7 @@ Elements.online_player_dropdown = Gui.define("player_dropdown")
     end)
     :style{
         height = 24,
-    } --[[ @as any ]]
+    } --[[@as any]]
 
 --- To help with caching and avoid context changes the player list from the previous update is remembered
 do local _player_names = {} --- @type (string?)[]

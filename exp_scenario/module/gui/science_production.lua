@@ -79,7 +79,7 @@ Elements.production_label = Gui.define("science_production/production_label")
 
         def.data[label] = suffix
         return label
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- @class Elements.production_label.display_data
 --- @field caption LocalisedString
@@ -144,12 +144,12 @@ Elements.no_production_label = Gui.define("science_production/no_production_labe
         padding = { 2, 4 },
         single_line = false,
         width = 200,
-    } --[[ @as any ]]
+    } --[[@as any]]
 
 --- Refresh a no production label
 --- @param no_production_label LuaGuiElement
 function Elements.no_production_label.refresh(no_production_label)
-    local force = Gui.get_player(no_production_label).force --[[ @as LuaForce ]]
+    local force = Gui.get_player(no_production_label).force --[[@as LuaForce]]
     no_production_label.visible = not Elements.container.has_production(force)
 end
 
@@ -157,7 +157,7 @@ end
 function Elements.no_production_label.refresh_online()
     local force_data = {}
     for player, no_production_label in Elements.no_production_label:online_elements() do
-        local force = player.force --[[ @as LuaForce ]]
+        local force = player.force --[[@as LuaForce]]
         local visible = force_data[force.name]
         if visible == nil then
             visible = not Elements.container.has_production(force)
@@ -196,7 +196,7 @@ Elements.science_table = Gui.define("science_production/science_table")
         science_table.style.column_alignments[3] = "right"
         return science_table
     end) 
-    :element_data{} --[[ @as any ]]
+    :element_data{} --[[@as any]]
 
 --- Calculate the data needed to add or refresh a row
 --- @param force LuaForce
@@ -312,7 +312,8 @@ function Elements.science_table.refresh_row(science_table, row_data)
     -- Update the icon
     local icon = row.icon
     icon.style = row_data.icon_style
-    icon.style.height = 55
+    local icon_style = icon.style --[[@as LuaStyle]]
+    icon_style.height = 55
 
     -- Update the element visibility
     row.net_suffix.visible = true
@@ -360,7 +361,7 @@ Elements.eta_label = Gui.define("science_production/eta_label")
         caption = clock_time_format_nil,
         tooltip = long_time_format_nil,
         style = "frame_title",
-    } --[[ @as any ]]
+    } --[[@as any]]
 
 --- @class Elements.eta_label.display_data
 --- @field caption LocalisedString
@@ -409,7 +410,7 @@ end
 --- Refresh an eta label
 --- @param eta_label LuaGuiElement
 function Elements.eta_label.refresh(eta_label)
-    local force = Gui.get_player(eta_label).force --[[ @as LuaForce ]]
+    local force = Gui.get_player(eta_label).force --[[@as LuaForce]]
     local display_data = Elements.eta_label.calculate_display_data(force)
     eta_label.caption = display_data.caption
     eta_label.tooltip = display_data.tooltip
@@ -441,7 +442,7 @@ Elements.container = Gui.define("science_production/container")
         local container = Gui.elements.container(parent)
         Gui.elements.header(container, { caption = { "exp-gui_science-production.caption-main" } })
 
-        local force = Gui.get_player(parent).force --[[ @as LuaForce ]]
+        local force = Gui.get_player(parent).force --[[@as LuaForce]]
         local science_table = Elements.science_table(container)
         for _, science_pack in ipairs(config) do
             --- @cast science_pack any
@@ -460,7 +461,7 @@ Elements.container = Gui.define("science_production/container")
         end
 
         return Gui.elements.container.get_root_element(container)
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- Cached mostly because they are long names
 local _fp_one_minute = defines.flow_precision_index.one_minute

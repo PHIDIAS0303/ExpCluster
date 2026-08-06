@@ -85,7 +85,7 @@ function Toolbar.set_button_toggled_state(define, player, state, _from_left)
         button.style = state and toolbar_button_active_style or toolbar_button_default_style
 
         -- Make the extra required adjustments
-        local style = button.style
+        local style = button.style --[[@as LuaStyle]]
         style.minimal_width = original_width
         style.maximal_height = original_height
         if button.type == "sprite-button" then
@@ -393,7 +393,7 @@ end
 --- @param player LuaPlayer
 --- @param order Gui.ToolbarOrder
 function Toolbar.set_order(player, order)
-    local list = elements.toolbar_settings.data[player] --[[ @as LuaGuiElement ]]
+    local list = elements.toolbar_settings.data[player] --[[@as LuaGuiElement]]
     local left_flow = Gui.get_left_flow(player)
     local top_flow = Gui.get_top_flow(player)
 
@@ -466,7 +466,7 @@ end
 function Toolbar.get_state(player)
     -- Get the order of toolbar buttons
     local order = {}
-    local list = elements.toolbar_settings.data[player] --[[ @as LuaGuiElement ]]
+    local list = elements.toolbar_settings.data[player] --[[@as LuaGuiElement]]
     for index, item in pairs(list.children) do
         order[index] = { name = item.name, favourite = elements.toolbar_list_item.data[item].set_favourite.state }
     end
@@ -487,7 +487,7 @@ end
 --- @param player LuaPlayer
 function Toolbar._create_elements(player)
     -- Add any missing items to the gui
-    local toolbar_list = elements.toolbar_settings.data[player] --[[ @as LuaGuiElement ]]
+    local toolbar_list = elements.toolbar_settings.data[player] --[[@as LuaGuiElement]]
     local previous_last_index = #toolbar_list.children_names
     for define in pairs(Gui.top_elements) do
         if define ~= elements.close_toolbar and toolbar_list[define.name] == nil then
@@ -513,7 +513,7 @@ end
 --- @param player LuaPlayer
 function Toolbar._ensure_consistency(player)
     -- Update the toolbar buttons
-    local list = elements.toolbar_settings.data[player] --[[ @as LuaGuiElement ]]
+    local list = elements.toolbar_settings.data[player] --[[@as LuaGuiElement]]
     for _, button in ipairs(toolbar_buttons) do
         -- Update the visible state based on if the player is allowed the button
         local element = Gui.get_top_element(button, player)
@@ -658,7 +658,7 @@ elements.set_favourite = Gui.define("set_favourite")
         width = 180,
     }
     :on_checked_state_changed(function(def, player, element)
-        local define = ExpElement.get(element.tags.element_name --[[ @as string ]])
+        local define = ExpElement.get(element.tags.element_name --[[@as string]])
         local top_element = Gui.get_top_element(define, player)
         local had_visible = Toolbar.has_visible_buttons(player)
         top_element.visible = element.state

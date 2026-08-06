@@ -273,7 +273,7 @@ local warp_textfield = Gui.define("warp_textfield")
     :on_confirmed(function(def, player, element)
         local warp_id = element.parent.caption
         local warp_name = element.text
-        local warp_icon = element.parent.parent["icon-" .. warp_id][warp_icon_editing.name].elem_value --[[ @as SignalID ]]
+        local warp_icon = element.parent.parent["icon-" .. warp_id][warp_icon_editing.name].elem_value --[[@as SignalID]]
         if warp_icon.type == nil then warp_icon.type = "item" end
         Warps.set_editing(warp_id, player.name)
         Warps.update_warp(warp_id, warp_name, warp_icon, player.name)
@@ -293,7 +293,7 @@ local confirm_edit_button = Gui.define("confirm_edit_button")
     :on_click(function(def, player, element)
         local warp_id = element.parent.caption
         local warp_name = element.parent.parent["name-" .. warp_id][warp_textfield.name].text
-        local warp_icon = element.parent.parent["icon-" .. warp_id][warp_icon_editing.name].elem_value --[[ @as SignalID ]]
+        local warp_icon = element.parent.parent["icon-" .. warp_id][warp_icon_editing.name].elem_value --[[@as SignalID]]
         if warp_icon.type == nil then warp_icon.type = "item" end
         Warps.set_editing(warp_id, player.name)
         Warps.update_warp(warp_id, warp_name, warp_icon, player.name)

@@ -42,7 +42,7 @@ Elements.server_ups = Gui.define("server_ups")
         if not existing or not existing.valid then
             def.data[player] = element -- Only set if previous is invalid
         end
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- Refresh the caption for all online players
 --- @param ups number The UPS to be displayed

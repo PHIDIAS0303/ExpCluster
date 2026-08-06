@@ -93,7 +93,7 @@ Elements.table_label = Gui.define("player_stats/table_label")
     }
     :style{
         width = Gui.from_argument("width"),
-    } --[[ @as any ]]
+    } --[[@as any]]
 
 --- Data table that shows all data for a player
 --- @class ExpGui_PlayerStats.elements.player_stats_table: ExpElement
@@ -139,7 +139,7 @@ Elements.player_stats_table = Gui.define("player_stats/data_table")
 
         def.data[data_table] = labels
         return data_table
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- Refresh a data table with the most recent stats for a player
 --- @param data_table LuaGuiElement
@@ -185,7 +185,7 @@ Elements.player_dropdown = Gui.define("player_stats/player_dropdown")
         local data_table = def.data[element]
         local target_player = ElementsExtra.online_player_dropdown.get_selected(element)
         Elements.player_stats_table.refresh(data_table, target_player)
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- Refresh all stats tables associated with a player dropdown
 function Elements.player_dropdown.refresh_online()

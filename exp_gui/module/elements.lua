@@ -28,7 +28,7 @@ Elements.aligned_flow = Gui.define("aligned_flow")
             vertically_stretchable = vertical_align ~= "center",
             horizontally_stretchable = horizontal_align ~= "center",
         }
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- A solid horizontal white bar element
 --- @class Gui.elements.bar: ExpElement
@@ -48,7 +48,7 @@ Elements.bar = Gui.define("bar")
         else
             style.horizontally_stretchable = true
         end
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- A label which is centered
 --- @class Gui.elements.centered_label: ExpElement
@@ -63,7 +63,7 @@ Elements.centered_label = Gui.define("centered_label")
         horizontal_align = "center",
         single_line = false,
         width = Gui.from_argument(1),
-    } --[[ @as any ]]
+    } --[[@as any]]
 
 --- A label which has two white bars on either side of it
 --- @class Gui.elements.title_label: ExpElement
@@ -91,7 +91,7 @@ Elements.title_label = Gui.define("title_label")
         Elements.bar(flow)
 
         return label
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- A fixed size vertical scroll pane
 --- @class Gui.elements.scroll_pane: ExpElement
@@ -109,7 +109,7 @@ Elements.scroll_pane = Gui.define("scroll_pane")
         padding = { 1, 3 },
         maximal_height = Gui.from_argument(1),
         horizontally_stretchable = true,
-    } --[[ @as any ]]
+    } --[[@as any]]
 
 --- A fixed size vertical scroll pane containing a table
 --- @class Gui.elements.scroll_table: ExpElement
@@ -132,7 +132,7 @@ Elements.scroll_table = Gui.define("scroll_table")
         cell_padding = 1,
         vertical_align = "center",
         horizontally_stretchable = true,
-    } --[[ @as any ]]
+    } --[[@as any]]
 
 --- A container frame
 --- @class Gui.elements.container: ExpElement
@@ -159,7 +159,7 @@ Elements.container = Gui.define("container")
         vertically_stretchable = false,
         horizontally_stretchable = false,
         minimal_width = Gui.from_argument(1),
-    } --[[ @as any ]]
+    } --[[@as any]]
 
 --- Get the root element of a container
 --- @param container LuaGuiElement
@@ -183,7 +183,7 @@ Elements.subframe_base = Gui.define("container_subframe")
         padding = { 3, 6, 0, 6 },
         use_header_filler = false,
         horizontally_stretchable = true,
-    } --[[ @as any ]]
+    } --[[@as any]]
 
 --- @class Gui.elements.header.opts
 --- @field name string?
@@ -212,7 +212,7 @@ Elements.header = Gui.define("container_header")
         subframe.add{ type = "empty-widget" }.style.horizontally_stretchable = true
 
         return subframe
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- @class Gui.elements.footer.opts
 --- @field name string?
@@ -241,7 +241,7 @@ Elements.footer = Gui.define("container_footer")
         subframe.add{ type = "empty-widget" }.style.horizontally_stretchable = true
 
         return subframe
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- A button used to destroy its target when clicked, intended for screen frames
 --- @class Gui.elements.screen_frame_close: ExpElement
@@ -259,7 +259,7 @@ Elements.screen_frame_close = Gui.define("screen_frame_close")
     :on_click(function(def, player, element, event)
         --- @cast def Gui.elements.screen_frame_close
         Gui.destroy_if_valid(def.data[element])
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- A draggable frame with close button and button flow
 --- @class Gui.elements.screen_frame: ExpElement
@@ -313,7 +313,7 @@ Elements.screen_frame = Gui.define("screen_frame")
             direction = "vertical",
             style = "inside_shallow_frame_packed",
         }
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- Get the button flow for a screen frame
 --- @param screen_frame LuaGuiElement

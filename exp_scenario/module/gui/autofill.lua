@@ -49,7 +49,7 @@ Elements.toggle_section_button = Gui.define("autofill/toggle_section_button")
             element.sprite = "utility/expand"
             element.tooltip = { "exp-gui_autofill.tooltip-toggle-section-expand" }
         end
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- Toggle if an entity will be autofilled when played
 --- @class ExpGui_Autofill.elements.toggle_entity_button: ExpElement
@@ -88,7 +88,7 @@ Elements.toggle_entity_button = Gui.define("autofill/toggle_entity_button")
         style.padding = 0
         style.height = 22
         style.width = 22
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- Toggle if an item will be inserted into an entity
 --- @class ExpGui_Autofill.elements.toggle_item_button: ExpElement
@@ -127,7 +127,7 @@ Elements.toggle_item_button = Gui.define("autofill/toggle_item_button")
         style.padding = -2
         style.height = 32
         style.width = 32
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- The amount of an item to insert
 --- @class ExpGui_Autofill.elements.amount_textfield: ExpElement
@@ -165,7 +165,7 @@ Elements.amount_textfield = Gui.define("autofill/amount_textfield")
             element.text = tostring(clamped)
             player.print{ "exp-gui_autofill.invalid", clamped, rich_img("item", item_settings.name), rich_img("entity", item_settings.entity) }
         end
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- A disabled version of the autofill settings used as a filler
 Elements.disabled_autofill_setting = Gui.define("autofill/empty_autofill_setting")
@@ -221,9 +221,9 @@ Elements.section = Gui.define("autofill/section")
     end)
     :on_click(function(def, player, element, event)
         --- @cast def ExpGui_Autofill.elements.section
-        event.element = def.data[element] --[[ @as LuaGuiElement ]]
+        event.element = def.data[element] --[[@as LuaGuiElement]]
         Elements.toggle_section_button:raise_event(event)
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- Add an item category to a section, at most three can exist
 --- @param section LuaGuiElement
@@ -238,7 +238,7 @@ function Elements.section.add_category(section, category_name)
     category.style.vertical_spacing = 1
 
     local ctn = 0
-    local entity_settings = Elements.section.data[section] --[[ @as ExpGui_Autofill.entity_settings ]]
+    local entity_settings = Elements.section.data[section] --[[@as ExpGui_Autofill.entity_settings]]
     for _, item_data in pairs(entity_settings.items) do
         if item_data.category == category_name then
             Elements.toggle_item_button(category, item_data)
@@ -312,7 +312,7 @@ Elements.container = Gui.define("autofill/container")
         end
 
         return container.parent
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- Get the autofill settings for a player
 --- @param player LuaPlayer
