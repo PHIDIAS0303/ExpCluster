@@ -200,7 +200,7 @@ function Roles.debug()
     local output = ""
     for index, role_name in ipairs(Roles.config.order) do
         local role = Roles.config.roles[role_name]
-        local color = role.custom_color or Colours.white
+        local color = role.custom_color or Colours.white --[[@as Color.struct]]
         local color_str = string.format("[color=%d, %d, %d]", color.r, color.g, color.b)
         output = output .. string.format("\n%s %s) %s[/color]", color_str, index, serpent.line(role))
     end
