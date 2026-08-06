@@ -399,7 +399,7 @@ end
 --- @param self ExpRoles.Role
 --- @param action string
 --- @return boolean
-function Role:is_allowed(action)
+function Role.is_allowed(self, action)
     local allowed = self.allowed_actions
     return allowed["core.admin"] or allowed[permission_from_action(action)] or false
 end
@@ -408,7 +408,7 @@ end
 --- @param self ExpRoles.Role
 --- @param name string
 --- @return boolean
-function Role:has_flag(name)
+function Role.has_flag(self, name)
     return self.allowed_actions[permission_from_flag(name)] or false
 end
 
@@ -416,7 +416,7 @@ end
 --- @param self ExpRoles.Role
 --- @param online boolean? When given, filter by connected state
 --- @return LuaPlayer[]
-function Role:get_players(online)
+function Role.get_players(self, online)
     local players = {}
     for player_name, role_names in pairs(ExpRoles.config.players) do
         for _, role_name in pairs(role_names) do
@@ -437,7 +437,7 @@ end
 --- @param self ExpRoles.Role
 --- @param message LocalisedString
 --- @return number # Number of players the message was sent to
-function Role:print(message)
+function Role.print(self, message)
     local players = self:get_players(true)
     for _, player in pairs(players) do
         player.print(message)
