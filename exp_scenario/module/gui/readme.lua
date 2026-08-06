@@ -361,32 +361,32 @@ define_tab(
                 roles = { "Senior Administrator", "Administrator" },
                 title = { "exp-gui_readme.backers-management" },
                 width = 230,
-                players = {},
+                players = {}, --- @type string[]
             },
             {
                 roles = { "Board Member", "Senior Backer" },
                 title = { "exp-gui_readme.backers-board" },
                 width = 145,
-                players = {},
+                players = {}, --- @type string[]
             },
             {
                 roles = { "Sponsor", "Supporter" },
                 title = { "exp-gui_readme.backers-backers" },
                 width = 196,
-                players = {},
+                players = {}, --- @type string[]
             },
             {
                 roles = { "Moderator", "Trainee" },
                 title = { "exp-gui_readme.backers-staff" },
                 width = 235,
-                players = {},
+                players = {}, --- @type string[]
             },
             {
                 roles = {},
                 time = 3 * 3600 * 60,
                 title = { "exp-gui_readme.backers-active" },
                 width = 235,
-                players = {},
+                players = {}, --- @type string[]
             },
         }
 
@@ -610,6 +610,7 @@ define_tab(
 --- Main readme container
 --- @class ExpGui_Readme.elements.container: ExpElement
 --- @field data table<LuaGuiElement, ExpGui_Readme.elements.container.elements>
+--- @overload fun(parent: LuaGuiElement): LuaGuiElement
 Elements.container = Gui.define("readme/container")
     :track_all_elements()
     :draw(function(def, parent)

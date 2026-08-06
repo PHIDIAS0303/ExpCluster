@@ -265,7 +265,7 @@ end
 
 --- Container added to the left gui flow
 --- @class ExpGui_Autofill.elements.container: ExpElement
---- @field data table<string, ExpGui_Autofill.entity_settings>
+--- @field data table<LuaPlayer, table<string, ExpGui_Autofill.entity_settings>>
 Elements.container = Gui.define("autofill/container")
     :draw(function(def, parent)
         --- @cast def ExpGui_Autofill.elements.container
