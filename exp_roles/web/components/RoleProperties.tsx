@@ -104,6 +104,7 @@ export default function RoleProperties(props: { plugin: WebPlugin, role?: lib.Ro
 		<Form
 			form={form}
 			disabled={!canUpdate}
+			labelAlign="left"
 			labelCol={{ span: 12 }}
 			wrapperCol={{ span: 12 }}
 			labelWrap
