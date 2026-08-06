@@ -31,7 +31,7 @@ local function append_playtime(player_name)
 end
 
 --- Get the player name from an event
---- @param event { player_index: number, by_player_name: string? }
+--- @param event { player_index: uint, by_player_name: string? }
 --- @return string, string
 local function get_player_name(event)
     local player = game.players[event.player_index]

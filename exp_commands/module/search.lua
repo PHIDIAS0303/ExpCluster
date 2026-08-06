@@ -3,7 +3,7 @@ local Search = {}
 local Storage = require("modules/exp_util/storage")
 
 --- Setup the storage to contain the pending translations and the completed ones
-local pending = {} --- @type { [1]: string, [2]: string }[]
+local pending = {} --- @type table<uint, [string, string]>
 local translations = {} --- @type table<string, table<string, string>>
 Storage.register({
     pending,

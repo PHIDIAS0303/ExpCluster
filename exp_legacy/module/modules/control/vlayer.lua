@@ -617,7 +617,7 @@ local function handle_circuit_interfaces()
 
             -- Clear remaining signals to prevent outdated values being present (caused by count > 0 check)
             for clear_index = signal_index, #circuit do
-                if not circuit_oc.get_slot(clear_index).signal then
+                if not circuit_oc.get_slot(clear_index).value then
                     break -- There are no more signals to clear
                 end
 

@@ -42,7 +42,7 @@ Commands.new("get-roles", { "exp-commands_roles.description-get" })
         --- @cast other_player LuaPlayer?
         local roles = get_roles_ordered()
         local roles_formatted = { "" } --- @type LocalisedString
-        local response = { "exp-commands_roles.list-roles", roles_formatted }
+        local response = { "exp-commands_roles.list-roles", roles_formatted } --[[@as LocalisedString]]
         if other_player then
             roles = get_player_roles(other_player)
             response[1] = "exp-commands_roles.list-player"

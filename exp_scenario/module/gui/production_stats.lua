@@ -9,6 +9,7 @@ local Roles = require("modules/exp_legacy/expcore/roles")
 local Elements = {}
 
 --- The flow precision values in the same order as production_precision_dropdown.items
+--- @type defines.flow_precision_index[]
 local precision_indexes = {
     defines.flow_precision_index.five_seconds,
     defines.flow_precision_index.one_minute,
