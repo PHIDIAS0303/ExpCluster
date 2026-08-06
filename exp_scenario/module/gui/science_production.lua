@@ -416,7 +416,7 @@ function Elements.eta_label.refresh(eta_label)
     eta_label.tooltip = display_data.tooltip
 end
 
-do local _display_data = {} --- @type Elements.eta_label.display_data
+do local _display_data = {} --- @type table<string, Elements.eta_label.display_data>
     --- Refresh the eta label for all online players
     function Elements.eta_label.refresh_online()
         -- Refresh the row data for online forces

@@ -207,7 +207,7 @@ end
 function ExpUtil.auto_complete(options, input, use_key, rtn_key, use_pattern)
     input = input:lower()
     local plain = use_pattern ~= true
-    local found = {} --- @type { length: number, index: number, start: boolean, value: any }
+    local found = {} --- @type { length: number?, index: number?, start: boolean?, value: any }
     for k, v in pairs(options) do
         local str = use_key and k or v
         local index = str:lower():find(input, nil, plain)

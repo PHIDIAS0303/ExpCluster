@@ -77,7 +77,8 @@ local function get_player_cache(player_index)
 
     -- Create a new cache if the previous on is in use
     if not cache or cache.task and not cache.task.completed then
-        cache = {} --[[@as any]]
+        --- @diagnostic disable-next-line: missing-fields
+        cache = {} --[[@as TreeDeconCache]]
     end
 
     local player = assert(game.get_player(player_index))

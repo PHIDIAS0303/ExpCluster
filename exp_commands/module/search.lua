@@ -50,6 +50,7 @@ function Search.prepare(custom_commands)
             name = name,
             description = locale_desc,
             help_text = locale_desc,
+            usage = locale_desc,
             aliases = {},
         }
     end

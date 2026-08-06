@@ -128,6 +128,7 @@ Elements.milestone_table = Gui.define("research_milestones/milestone_table")
 
 do local _row_data = {}
     --- @type ExpGui_ResearchMilestones.elements.milestone_table.row_data
+    --- @diagnostic disable-next-line: missing-fields
     local empty_row_data = { color = font_color.positive }
 
     --- Get the row data for a force and research

@@ -277,8 +277,8 @@ local function apply_planners_in_area(player, area, machine_name, planner_with_p
     -- Bounding box table to be reused in the loop below
     --- @type BoundingBox
     local param_area = {
-        left_top = {},
-        right_bottom = {}
+        left_top = { x = 0, y = 0 },
+        right_bottom = { x = 0, y = 0 },
     }
 
     -- Update area param table to be reused in the loop below
