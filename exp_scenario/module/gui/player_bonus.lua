@@ -22,13 +22,16 @@ local Elements = {}
 --- @field _cost_scale number
 
 --- For perf calculate the division of scale against cost ahead of time
-for _, bonus_data in pairs(config.player_bonus) do
+--- @type table<string, ExpGui_PlayerBonus.bonus_data>
+local player_bonus = config.player_bonus
+
+for _, bonus_data in pairs(player_bonus) do
     bonus_data._cost_scale = bonus_data.cost / bonus_data.scale
 end
 
 --- Progress bar which displays how much of a bonus has been used
 --- @class ExpGui_PlayerBonus.elements.bonus_used: ExpElement
---- @field data number
+--- @field data table<LuaGuiElement, number>
 --- @overload fun(parent: LuaGuiElement): LuaGuiElement
 Elements.bonus_used = Gui.define("player_bonus/bonus_used")
     :track_all_elements()
@@ -441,7 +444,7 @@ end
 function Elements.container.calculate_cost(player)
     local cost = 0
     local player_data = Elements.container.data[player]
-    for _, bonus_data in pairs(config.player_bonus) do
+    for _, bonus_data in pairs(player_bonus) do
         cost = cost + (player_data[bonus_data.name] or 0) * bonus_data._cost_scale
     end
     return cost
