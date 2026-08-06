@@ -166,7 +166,6 @@ end
 function GuiIter.get_tracked_elements(scope, filter)
     local class_name = ExpUtil.get_class_name(filter)
     if class_name == "nil" then
-        --- @cast filter nil
         return GuiIter.all_elements(scope)
     elseif class_name == "LuaPlayer" then
         --- @cast filter LuaPlayer
@@ -189,7 +188,6 @@ end
 function GuiIter.get_online_elements(scope, filter)
     local class_name = ExpUtil.get_class_name(filter)
     if class_name == "nil" then
-        --- @cast filter nil
         return GuiIter.filtered_elements(scope, game.connected_players)
     elseif class_name == "LuaPlayer" then
         --- @cast filter LuaPlayer
@@ -235,7 +233,7 @@ end
 function GuiIter.remove_element(scope, player_index, element_index)
     local scope_elements = registered_scopes[scope]
     if not scope_elements then return end
-    local player_elements = registered_scopes[player_index]
+    local player_elements = scope_elements[player_index]
     if not player_elements then return end
     player_elements[element_index] = nil
 end

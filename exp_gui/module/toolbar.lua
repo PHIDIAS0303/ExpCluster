@@ -350,7 +350,7 @@ local function move_toolbar_button(player, item, offset)
 
     -- Swap the position in the list
     local list = assert(item.parent)
-    local other_item = list.children[new_index]
+    local other_item = assert(list.children[new_index])
     list.swap_children(old_index, new_index)
 
     -- Swap the position in the top flow, offset by 1 because of settings button
@@ -499,7 +499,8 @@ function Toolbar._create_elements(player)
     -- Reset the state of the previous last child
     local children = toolbar_list.children
     if previous_last_index > 0 then
-        elements.toolbar_list_item.data[children[previous_last_index]].move_item_down.enabled = true
+        local previous_last = assert(children[previous_last_index])
+        elements.toolbar_list_item.data[previous_last].move_item_down.enabled = true
     end
 
     -- Set the state of the move buttons for the first and last element

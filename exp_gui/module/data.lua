@@ -90,13 +90,16 @@ function GuiData._metatable.__index(self, key)
     assert(type(key) == "userdata", "Index type '" .. ExpUtil.get_class_name(key) .. "' given to GuiData. Must be of type userdata.")
     local object_name = key.object_name --- @diagnostic disable-line assign-type-mismatch
     if object_name == "LuaGuiElement" then
+        --- @cast key LuaGuiElement
         local data = self._raw.element_data
         local player_elements = data and data[key.player_index]
         return player_elements and player_elements[key.index]
     elseif object_name == "LuaPlayer" then
+        --- @cast key LuaPlayer
         local data = self._raw.player_data
         return data and data[key.index]
     elseif object_name == "LuaForce" then
+        --- @cast key LuaForce
         local data = self._raw.force_data
         return data and data[key.index]
     else

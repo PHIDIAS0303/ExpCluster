@@ -88,7 +88,7 @@ end
 --- @param define ExpElement
 --- @param visible Gui.VisibleCallback | boolean | nil
 function Gui.add_top_element(define, visible)
-    assert(Gui.top_elements[define.name] == nil, "Element is already added to the top flow")
+    assert(Gui.top_elements[define] == nil, "Element is already added to the top flow")
     Gui.top_elements[define] = visible or false
 end
 
@@ -96,7 +96,7 @@ end
 --- @param define ExpElement
 --- @param visible Gui.VisibleCallback | boolean | nil
 function Gui.add_left_element(define, visible)
-    assert(Gui.left_elements[define.name] == nil, "Element is already added to the left flow")
+    assert(Gui.left_elements[define] == nil, "Element is already added to the left flow")
     Gui.left_elements[define] = visible or false
 
 end
@@ -105,7 +105,7 @@ end
 --- @param define ExpElement
 --- @param visible Gui.VisibleCallback | boolean | nil
 function Gui.add_relative_element(define, visible)
-    assert(Gui.relative_elements[define.name] == nil, "Element is already added to the relative flow")
+    assert(Gui.relative_elements[define] == nil, "Element is already added to the relative flow")
     Gui.relative_elements[define] = visible or false
 end
 
