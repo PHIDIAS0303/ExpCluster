@@ -404,9 +404,9 @@ end
 --- @return ExpGui_RocketInfo.elements.progress_table.row_data[]
 function Elements.progress_table.calculate_row_data_all(silo_data)
     local row_data = {}
-    for unit_number, silo_data in pairs(silo_data) do
-        if silo_data.entity.valid then
-            row_data[unit_number] = Elements.progress_table.calculate_row_data(silo_data)
+    for unit_number, silo in pairs(silo_data) do
+        if silo.entity.valid then
+            row_data[unit_number] = Elements.progress_table.calculate_row_data(silo)
         else
             -- Prune silos that are no longer valid
             silo_data[unit_number] = nil
@@ -433,7 +433,9 @@ function Elements.progress_table.add_row(progress_table, row_data)
     progress.style.padding = { 0, 2 }
     progress.style.font_color = row_data.color
 
-    rows[row_data.entity.unit_number] = { x = x, y = y, progress = progress }
+    local unit_number = row_data.entity.unit_number
+    --- @cast unit_number uint
+    rows[unit_number] = { x = x, y = y, progress = progress }
 end
 
 --- Remove a silo row from the progress table
@@ -455,7 +457,9 @@ end
 --- @param row_data ExpGui_RocketInfo.elements.progress_table.row_data
 function Elements.progress_table.refresh_row(progress_table, row_data)
     local element_data = Elements.progress_table.data[progress_table]
-    local row = element_data.rows[row_data.entity.unit_number]
+    local unit_number = row_data.entity.unit_number
+    --- @cast unit_number uint
+    local row = element_data.rows[unit_number]
     row.x.caption = row_data.x
     row.y.caption = row_data.y
     row.progress.caption = row_data.caption
@@ -620,7 +624,9 @@ end
 function Elements.container.add_silo(entity)
     local force = entity.force --[[ @as LuaForce ]]
     local silos = Elements.container._get_force_data(force).silos
-    silos[entity.unit_number] = {
+    local unit_number = entity.unit_number
+    --- @cast unit_number uint
+    silos[unit_number] = {
         entity = entity,
         launched = 0,
         awaiting_reset = false,
@@ -632,7 +638,9 @@ end
 function Elements.container.increment_silo(entity)
     local force = entity.force --[[ @as LuaForce ]]
     local silos = Elements.container._get_force_data(force).silos
-    local silo_data = silos[entity.unit_number]
+    local unit_number = entity.unit_number
+    --- @cast unit_number uint
+    local silo_data = silos[unit_number]
     if not silo_data then return end
     silo_data.launched = silo_data.launched + 1
     silo_data.awaiting_reset = true
@@ -653,7 +661,8 @@ Gui.toolbar.create_button{
 --- Record the launch and update the stats when a cargo pod finishes ascending
 --- @param event EventData.on_cargo_pod_finished_ascending
 local function on_cargo_pod_finished_ascending(event)
-    local force = event.cargo_pod.force --[[ @as LuaForce ]]
+    local force = event.cargo_pod.force
+    --- @cast force LuaForce
     local rockets_launched = force.rockets_launched
 
     -- Update the launch stats for the force
@@ -669,6 +678,7 @@ local function on_cargo_pod_finished_ascending(event)
 
     -- Append the launch tick into the times array
     local times = Elements.container.get_launch_times(force)
+    --- @cast rockets_launched uint
     times[rockets_launched] = event.tick
 
     -- Discard the launch time that is no longer needed by any rolling average unless it is a milestone
