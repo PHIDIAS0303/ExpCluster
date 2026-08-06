@@ -327,7 +327,7 @@ function Elements.science_table.refresh_row(science_table, row_data)
     Elements.production_label.refresh(row.used, row_data.used)
 end
 
-do local _row_data = {} --- @type table<string, { [string]: ExpGui_ScienceProduction.elements.science_table.row_data }>
+do local _row_data = {} --- @type table<string, table<number, ExpGui_ScienceProduction.elements.science_table.row_data>>
     --- Refresh the production tables for all online players
     function Elements.science_table.refresh_online()
         -- Refresh the row data for online forces

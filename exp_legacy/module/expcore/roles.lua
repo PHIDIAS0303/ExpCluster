@@ -894,7 +894,7 @@ role:set_permission_group('Admin')
 function Roles._prototype:set_permission_group(name, use_factorio_api)
     ExpUtil.assert_not_runtime()
     if use_factorio_api then
-        self.permission_group = { true, name }
+        self.permission_group = { true, name } --[[@as [boolean, string] ]]
     else
         local group = Groups.get_group_by_name(name)
         if not group then return end

@@ -4,7 +4,7 @@ local ExpUtil = require("modules/exp_util")
 local concat = table.concat
 local inspect = table.inspect
 local pcall = pcall
-local loadstring = loadstring --- @diagnostic disable-line
+local loadstring = load
 local rawset = rawset
 
 local Public = {}

@@ -291,9 +291,13 @@ local confirm_edit_button = Gui.define("confirm_edit_button")
     }
     :style(Styles.sprite22)
     :on_click(function(def, player, element)
-        local warp_id = element.parent.caption
-        local warp_name = element.parent.parent["name-" .. warp_id][warp_textfield.name].text
-        local warp_icon = element.parent.parent["icon-" .. warp_id][warp_icon_editing.name].elem_value --[[@as SignalID]]
+        local parent = assert(element.parent)
+        local grandparent = assert(parent.parent)
+        local warp_id = parent.caption --[[@as string]]
+        local name_flow = assert(grandparent["name-" .. warp_id])
+        local icon_flow = assert(grandparent["icon-" .. warp_id])
+        local warp_name = assert(name_flow[warp_textfield.name]).text
+        local warp_icon = assert(icon_flow[warp_icon_editing.name]).elem_value --[[@as SignalID]]
         if warp_icon.type == nil then warp_icon.type = "item" end
         Warps.set_editing(warp_id, player.name)
         Warps.update_warp(warp_id, warp_name, warp_icon, player.name)
@@ -778,7 +782,7 @@ Event.on_nth_tick(math.floor(60 / config.update_smoothing), function()
         end
 
         -- Check if the force has any warps
-        local closest_warp = nil
+        local closest_warp = nil --- @type { warp_id: string, name: string }?
         local closest_distance = nil
         if #warp_ids > 0 then
             local surface = player.surface
