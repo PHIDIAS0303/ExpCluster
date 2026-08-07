@@ -180,7 +180,7 @@ local warp_icon_button = Gui.define("warp_icon_button")
     :style(Styles.sprite32)
     :on_click(function(def, player, element)
         if element.type == "choose-elem-button" then return end
-        local warp_id = element.parent.caption
+        local warp_id = assert(element.parent).caption
         Warps.teleport_player(warp_id, player)
 
         -- Reset the warp cooldown if the player does not have unlimited warps
@@ -226,7 +226,7 @@ local warp_label = Gui.define("warp_label")
         horizontally_stretchable = true,
     }
     :on_click(function(def, player, element)
-        local warp_id = element.parent.caption
+        local warp_id = assert(element.parent).caption
         local warp = Warps.get_warp(warp_id)
         player.set_controller{ type = defines.controllers.remote, position = warp.position, surface = warp.surface }
     end)
@@ -271,9 +271,9 @@ local warp_textfield = Gui.define("warp_textfield")
         right_margin = 2,
     }
     :on_confirmed(function(def, player, element)
-        local warp_id = element.parent.caption
+        local warp_id = assert(element.parent).caption
         local warp_name = element.text
-        local warp_icon = element.parent.parent["icon-" .. warp_id][warp_icon_editing.name].elem_value --[[@as SignalID]]
+        local warp_icon = assert(element.parent).parent["icon-" .. warp_id][warp_icon_editing.name].elem_value --[[@as SignalID]]
         if warp_icon.type == nil then warp_icon.type = "item" end
         Warps.set_editing(warp_id, player.name)
         Warps.update_warp(warp_id, warp_name, warp_icon, player.name)
@@ -315,7 +315,7 @@ local cancel_edit_button = Gui.define("cancel_edit_button")
     }
     :style(Styles.sprite22)
     :on_click(function(def, player, element)
-        local warp_id = element.parent.caption
+        local warp_id = assert(element.parent).caption
         -- Check if this is the first edit, if so remove the warp.
         local warp = Warps.get_warp(warp_id)
         if warp.updates == 1 then
@@ -337,7 +337,7 @@ local remove_warp_button = Gui.define("remove_warp_button")
     }
     :style(Styles.sprite22)
     :on_click(function(def, player, element)
-        local warp_id = element.parent.caption
+        local warp_id = assert(element.parent).caption
         Warps.remove_warp(warp_id)
     end)
 
@@ -353,7 +353,7 @@ local edit_warp_button = Gui.define("edit_warp_button")
     }
     :style(Styles.sprite22)
     :on_click(function(def, player, element)
-        local warp_id = element.parent.caption
+        local warp_id = assert(element.parent).caption
         Warps.set_editing(warp_id, player.name, true)
     end)
 
@@ -433,8 +433,8 @@ local function update_warp_elements(element, warp, warp_player_is_on, on_cooldow
     -- Check if button element is valid
     if not element or not element.valid then return end
 
-    local label_style = element.parent.parent["name-" .. warp.warp_id][warp_label.name].style
-    local warp_status_element = element.parent.parent["name-" .. warp.warp_id][warp_status.name]
+    local label_style = assert(element.parent).parent["name-" .. warp.warp_id][warp_label.name].style
+    local warp_status_element = assert(element.parent).parent["name-" .. warp.warp_id][warp_status.name]
 
     -- If player is not on a warp
     if not warp_player_is_on then

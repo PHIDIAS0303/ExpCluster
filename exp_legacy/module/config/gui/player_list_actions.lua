@@ -15,7 +15,8 @@ local Colors = require("modules/exp_util/include/color")
 local format_player_name = ExpUtil.format_player_name_locale
 
 --- Accessors injected by the gui so the actions can read the selected player and set the selected action
-local get_selected_player, set_selected_action
+local get_selected_player --- @type fun(player: LuaPlayer): LuaPlayer
+local set_selected_action --- @type fun(player: LuaPlayer, action: string?)
 local function set_accessors(player_getter, action_setter)
     get_selected_player, set_selected_action = player_getter, action_setter
 end

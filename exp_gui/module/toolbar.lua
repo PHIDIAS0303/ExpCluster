@@ -335,9 +335,10 @@ Below here is the toolbar settings GUI and its associated functions
 --- @param dst LuaGuiElement
 local function copy_style(src, dst)
     dst.style = src.style.name
-    dst.style.height = toolbar_button_small
-    dst.style.width = toolbar_button_small
-    dst.style.padding = -2
+    local style = dst.style --[[@as LuaStyle]]
+    style.height = toolbar_button_small
+    style.width = toolbar_button_small
+    style.padding = -2
 end
 
 --- Reorder the buttons relative to each other, this will update the datastore
@@ -365,7 +366,7 @@ local function move_toolbar_button(player, item, offset)
         local other_element = Gui.get_left_element(other_left_element, player)
         local left_index = element.get_index_in_parent()
         local other_index = other_element.get_index_in_parent()
-        element.parent.swap_children(left_index, other_index)
+        assert(element.parent).swap_children(left_index, other_index)
     end
 
     -- If we are moving in/out of first/last place we need to update the move buttons
@@ -620,7 +621,7 @@ elements.move_item_up = Gui.define("move_item_up")
         size = toolbar_button_small,
     })
     :on_click(function(def, player, element)
-        local item = assert(element.parent.parent)
+        local item = assert(assert(element.parent).parent)
         move_toolbar_button(player, item, -1)
     end)
 
@@ -635,7 +636,7 @@ elements.move_item_down = Gui.define("move_item_down")
         size = toolbar_button_small,
     })
     :on_click(function(def, player, element)
-        local item = assert(element.parent.parent)
+        local item = assert(assert(element.parent).parent)
         move_toolbar_button(player, item, 1)
     end)
 
