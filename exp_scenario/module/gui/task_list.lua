@@ -252,7 +252,7 @@ Elements.task_list = Gui.define("task_list/task_list")
 --- @param task_list LuaGuiElement
 --- @param task ExpGui_TaskList.Task
 function Elements.task_list.add_task(task_list, task)
-    local container = assert(task_list.parent.parent.parent)
+    local container = assert(assert(assert(task_list.parent).parent).parent)
     local view_task_buttons = Elements.task_list.data[task_list]
     view_task_buttons[task.id] = Elements.view_task_button(task_list, task, container)
 end
@@ -532,7 +532,7 @@ Elements.task_message_textfield = Gui.define("task_list/task_message_textfield")
     }
     :on_text_changed(function(def, player, task_message_textfield)
         --- @cast def ExpGui_TaskList.elements.task_message_textfield
-        local confirm_task_button = def.data[task_message_textfield].confirm_task_button
+        local confirm_task_button = assert(def.data[task_message_textfield].confirm_task_button)
         confirm_task_button.enabled = string.len(task_message_textfield.text) > 5
     end) --[[@as any]]
 
@@ -549,7 +549,7 @@ end
 function Elements.task_message_textfield.refresh(task_message_textfield, task)
     local elements = Elements.task_message_textfield.data[task_message_textfield]
     local message = task.new and "" or task.title .. "\n" .. task.body
-    elements.confirm_task_button.enabled = string.len(message) > 5
+    assert(elements.confirm_task_button).enabled = string.len(message) > 5
     task_message_textfield.text = message
     task_message_textfield.focus()
 end
@@ -755,9 +755,14 @@ end
 --- @field view_task_footer LuaGuiElement
 --- @field edit_task_footer LuaGuiElement
 
+--- @class ExpGui_TaskList.elements.container.data
+--- @field global_data { next_task_id: number }
+--- @field [LuaGuiElement] ExpGui_TaskList.elements.container.elements
+--- @field [LuaForce] ExpGui_TaskList.Task[]
+
 --- Container added to the left gui flow
 --- @class ExpGui_TaskList.elements.container: ExpElement
---- @field data table<LuaForce, ExpGui_TaskList.Task[]> | table<LuaGuiElement, ExpGui_TaskList.elements.container.elements> | table<"global_data", { next_task_id: number }>
+--- @field data ExpGui_TaskList.elements.container.data
 Elements.container = Gui.define("task_list/container")
     :track_all_elements()
     :draw(function(def, parent)
