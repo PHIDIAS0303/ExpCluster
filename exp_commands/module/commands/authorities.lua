@@ -28,13 +28,13 @@ end)
 --- Allow a player access to system commands, use for debug purposes only
 --- @param player_name string? The name of the player to give access to, default is the current player
 function Commands.unlock_system_commands(player_name)
-    system_players[player_name or game.player.name] = true
+    system_players[player_name or assert(game.player).name] = true
 end
 
 --- Remove access from system commands for a player, use for debug purposes only
 --- @param player_name string? The name of the player to give access to, default is the current player
 function Commands.lock_system_commands(player_name)
-    system_players[player_name or game.player.name] = nil
+    system_players[player_name or assert(game.player).name] = nil
 end
 
 --- Get a list of all players who have system commands unlocked

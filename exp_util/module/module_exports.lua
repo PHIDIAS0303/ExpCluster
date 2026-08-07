@@ -319,15 +319,15 @@ function ExpUtil.extract_time_units(ticks, units)
 
     -- Remove units that are not requested
     if not units.days then
-        rtn.hours = rtn.hours + rtn.days * 24
+        rtn.hours = assert(rtn.hours) + assert(rtn.days) * 24
         rtn.days = nil
     end
     if not units.hours then
-        rtn.minutes = rtn.minutes + rtn.hours * 60
+        rtn.minutes = assert(rtn.minutes) + assert(rtn.hours) * 60
         rtn.hours = nil
     end
     if not units.minutes then
-        rtn.seconds = rtn.seconds + rtn.minutes * 60
+        rtn.seconds = assert(rtn.seconds) + assert(rtn.minutes) * 60
         rtn.minutes = nil
     end
     if not units.seconds then
@@ -487,7 +487,7 @@ function ExpUtil.get_storage_for_stack(options)
     -- Find a valid entity from the search results
     local current, count, entities = cache.current, cache.count, cache.entities
     for i = 1, cache.count do
-        local entity = entities[((current + i - 1) % count) + 1]
+        local entity = assert(entities[((current + i - 1) % count) + 1])
         if entity.can_insert(item) then
             cache.current = current + 1
             return entity
@@ -551,7 +551,7 @@ function ExpUtil.move_items_to_surface(options)
             options.item = item
             entity = ExpUtil.get_storage_for_stack(options)
             entity.insert(options.item)
-            options.item.clear()
+            assert(options.item).clear()
         end
     end
     return entity
@@ -604,6 +604,7 @@ end
 --- @return string
 function ExpUtil.comma_value(n) -- credit http://richard.warburton.it
     local left, num, right = string.match(n, "^([^%d]*%d)(%d*)(.-)$")
+    assert(left and num and right)
     return left .. (num:reverse():gsub("(%d%d%d)", "%1, "):reverse()) .. right
 end
 
