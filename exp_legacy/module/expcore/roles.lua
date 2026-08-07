@@ -117,6 +117,7 @@ local Groups = require("modules.exp_legacy.expcore.permission_groups")
 local Colours = ExpUtil.color
 local write_json = ExpUtil.write_json
 
+
 --- @class Roles.Role
 --- @field name string
 --- @field short_hand string
@@ -131,12 +132,13 @@ local write_json = ExpUtil.write_json
 --- @field parent string?
 --- @field block_auto_assign boolean?
 --- @field auto_assign_condition function?
+--- @field set_allow_all fun(self: Roles.Role, state: boolean?): Roles.Role Defined on Roles._prototype
 
 local Roles = {
     _prototype = {},
     config = {
-        order = {}, -- Contains the order of the roles, lower index is better
-        roles = {}, -- Contains the raw info for the roles, indexed by role name
+        order = {}, --- @type string[] Contains the order of the roles, lower index is better
+        roles = {}, --- @type table<string, Roles.Role> Contains the raw info for the roles, indexed by role name
         flags = {}, -- Contains functions that run when a flag is added/removed from a player
         internal = {}, -- Contains all internally accessed roles, such as root, default
         players = {}, -- Contains the roles that players have
@@ -214,7 +216,7 @@ game.player.print(Roles.debug())
 function Roles.debug()
     local output = ""
     for index, role_name in ipairs(Roles.config.order) do
-        local role = Roles.config.roles[role_name]
+        local role = assert(Roles.config.roles[role_name])
         local color = (role.custom_color or Colours.white) --[[@as Color.struct]]
         local color_str = string.format("[color=%d, %d, %d]", color.r, color.g, color.b)
         output = output .. string.format("\n%s %s) %s[/color]", color_str, index, serpent.line(role))
@@ -302,6 +304,7 @@ local role = Roles.get_role_by_name(2)
 ]]
 function Roles.get_role_by_order(index)
     local name = Roles.config.order[index]
+    if not name then return end
     return Roles.config.roles[name]
 end
 
@@ -412,7 +415,7 @@ function Roles.assign_player(player, roles, by_player_name, skip_checks, silent)
 
     -- If the player has a role that needs to defer the role changes, save the roles that need to be assigned later into a table
     if valid_player and Roles.player_has_flag(valid_player, "defer_role_changes") then
-        local assign_later = Roles.config.deferred_roles[valid_player.name] or {}
+        local assign_later = Roles.config.deferred_roles[assert(valid_player).name] or {}
         for _, role in ipairs(role_objects) do
             local role_change = assign_later[role.name]
             if role_change then
@@ -428,7 +431,7 @@ function Roles.assign_player(player, roles, by_player_name, skip_checks, silent)
             end
         end
 
-        Roles.config.deferred_roles[valid_player.name] = assign_later
+        Roles.config.deferred_roles[assert(valid_player).name] = assign_later
         return
     end
 
@@ -475,7 +478,7 @@ function Roles.unassign_player(player, roles, by_player_name, skip_checks, silen
     -- If the player has a role that needs to defer the role changes, save the roles that need to be unassigned later into a table
     local defer_changes = Roles.player_has_flag(player, "defer_role_changes")
     if defer_changes then
-        local assign_later = Roles.config.deferred_roles[valid_player.name] or {}
+        local assign_later = Roles.config.deferred_roles[assert(valid_player).name] or {}
         for _, role in ipairs(role_objects) do
             local role_change = assign_later[role.name]
             if role_change then
@@ -491,7 +494,7 @@ function Roles.unassign_player(player, roles, by_player_name, skip_checks, silen
             end
         end
 
-        Roles.config.deferred_roles[valid_player.name] = assign_later
+        Roles.config.deferred_roles[assert(valid_player).name] = assign_later
     end
 
     -- Remove the player from roles
@@ -671,7 +674,7 @@ function Roles.define_role_order(order)
 
     -- Re-links roles to they parents as this is called at the end of the config
     for index, role_name in pairs(Roles.config.order) do
-        local role = Roles.config.roles[role_name]
+        local role = assert(Roles.config.roles[role_name])
         if not role then
             error("Role with name " .. role_name .. " has not beed defined, either define it or remove it from the order list.", 2)
         end

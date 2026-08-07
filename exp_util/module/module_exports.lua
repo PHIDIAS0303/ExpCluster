@@ -551,7 +551,8 @@ function ExpUtil.move_items_to_surface(options)
             options.item = item
             entity = ExpUtil.get_storage_for_stack(options)
             entity.insert(options.item)
-            assert(options.item).clear()
+            local item_stack = options.item --[[@as LuaItemStack]]
+            item_stack.clear()
         end
     end
     return entity

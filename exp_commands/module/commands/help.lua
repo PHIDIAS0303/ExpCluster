@@ -48,7 +48,7 @@ local function format_as_pages(commands, page_size)
         end
 
         local aliases = #command.aliases > 0 and { "exp-commands_help.aliases", table.concat(command.aliases, ", ") } or ""
-        pages[current_page][page_length] = { "exp-commands_help.format", command.name, description, aliases }
+        assert(pages[current_page])[page_length] = { "exp-commands_help.format", command.name, description, aliases }
     end
 
     return pages, total
@@ -71,7 +71,7 @@ Commands.new("commands", { "exp-commands_help.description" })
             page = as_number
         end
 
-        keyword = keyword:lower()
+        keyword = assert(keyword):lower()
         local pages, found
         if cache and cache.keyword == keyword then
             -- Cached value found, no search is needed
