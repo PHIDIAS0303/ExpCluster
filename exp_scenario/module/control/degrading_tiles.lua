@@ -32,8 +32,9 @@ local function degrade_entity(entity)
 
     local tiles = {}
     local surface = entity.surface
-    local left_top = entity.bounding_box.left_top
-    local right_bottom = entity.bounding_box.right_bottom
+    local bounding_box = entity.bounding_box --[[@as ExpUtil_AABB.Box]]
+    local left_top = bounding_box.left_top
+    local right_bottom = bounding_box.right_bottom
     for x = left_top.x, right_bottom.x do
         for y = left_top.y, right_bottom.y do
             local tile = surface.get_tile(x, y)
@@ -84,7 +85,7 @@ local function on_player_changed_position(event)
     if player.controller_type ~= defines.controllers.character then return end
 
     local surface = player.physical_surface
-    local position = player.physical_position
+    local position = player.physical_position --[[@as MapPosition.struct]]
     local strength = get_tile_strength(surface, position)
     if not strength then return end
 
