@@ -90,7 +90,7 @@ SelectArea:on_selection(function(event)
     local entities --- @type LuaEntity[]
 
     if config.power_on_space and event.surface and event.surface.platform and target == "energy" then
-        if player.force.technologies[config.power_on_space_research.name].level >= config.power_on_space_research.level then
+        if (player.force --[[@as LuaForce]]).technologies[config.power_on_space_research.name].level >= config.power_on_space_research.level then
             entities = event.surface.find_entities_filtered{ area = area, name = "constant-combinator", force = player.force }
         else
             player.print{ "vlayer.power-on-space-research", config.power_on_space_research.name, config.power_on_space_research.level }
@@ -116,7 +116,7 @@ SelectArea:on_selection(function(event)
     local e_pos = { x = string.format("%.1f", e.position.x), y = string.format("%.1f", e.position.y) }
     local e_circ = nil -- e.get_wire_connectors{ or_create = false }
 
-    if e.name and e.name == "steel-chest" and (not e.get_inventory(defines.inventory.chest).is_empty()) then
+    if e.name and e.name == "steel-chest" and (not assert(e.get_inventory(defines.inventory.chest)).is_empty()) then
         player.print{ "vlayer.steel-chest-empty" }
         return
     end
@@ -325,7 +325,9 @@ local function vlayer_gui_list_refresh(player)
         local interface = vlayer.get_interfaces()[vlayer_control_type_list[target]]
 
         for i = 1, vlayer.get_interface_counts()[vlayer_control_type_list[target]], 1 do
-            table.insert(full_list, i .. " X " .. interface[i].position.x .. " Y " .. interface[i].position.y)
+            local entity = assert(interface[i])
+            local entity_position = entity.position --[[@as MapPosition.struct]]
+            table.insert(full_list, i .. " X " .. entity_position.x .. " Y " .. entity_position.y)
         end
 
         disp[vlayer_gui_control_list.name].items = full_list
@@ -379,8 +381,8 @@ local vlayer_gui_control_see = Gui.define("vlayer_gui_control_see")
     }:style{
         width = 200,
     }:on_click(function(def, player, element, event)
-        local target = element.parent[vlayer_gui_control_type.name].selected_index
-        local n = element.parent[vlayer_gui_control_list.name].selected_index
+        local target = assert(assert(element.parent)[vlayer_gui_control_type.name]).selected_index
+        local n = assert(assert(element.parent)[vlayer_gui_control_list.name]).selected_index
         
         if target and vlayer_control_type_list[target] and n > 0 then
             local i = vlayer.get_interfaces()
@@ -423,8 +425,8 @@ local vlayer_gui_control_remove = Gui.define("vlayer_gui_control_remove")
     }:style{
         width = 200,
     }:on_click(function(def, player, element)
-        local target = element.parent[vlayer_gui_control_type.name].selected_index
-        local n = element.parent[vlayer_gui_control_list.name].selected_index
+        local target = assert(assert(element.parent)[vlayer_gui_control_type.name]).selected_index
+        local n = assert(assert(element.parent)[vlayer_gui_control_list.name]).selected_index
 
         if target and vlayer_control_type_list[target] and n > 0 then
             local i = vlayer.get_interfaces()
