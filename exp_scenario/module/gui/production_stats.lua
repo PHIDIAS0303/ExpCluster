@@ -184,7 +184,7 @@ end
 --- @param item_selector LuaGuiElement
 function Elements.production_table.remove_row(production_table, item_selector)
     local rows = Elements.production_table.data[production_table].rows
-    local row = rows[item_selector.index]
+    local row = assert(rows[item_selector.index])
     rows[item_selector.index] = nil
     Gui.destroy_if_valid(item_selector)
     for _, element in pairs(row) do
@@ -197,7 +197,7 @@ end
 --- @param item_selector LuaGuiElement
 function Elements.production_table.reset_row(production_table, item_selector)
     local rows = Elements.production_table.data[production_table].rows
-    local row = rows[item_selector.index]
+    local row = assert(rows[item_selector.index])
     row.production.caption = "0.00"
     row.consumption.caption = "0.00"
     row.net.caption = "0.00"
@@ -210,7 +210,7 @@ end
 --- @param row_data ExpGui_ProductionStats.elements.production_table.row_data
 function Elements.production_table.refresh_row(production_table, item_selector, row_data)
     local rows = Elements.production_table.data[production_table].rows
-    local row = rows[item_selector.index]
+    local row = assert(rows[item_selector.index])
     row.production.caption = row_data.production
     row.consumption.caption = row_data.consumption
     row.net.caption = row_data.net

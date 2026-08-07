@@ -16,7 +16,7 @@ end
 
 --- Replace a tile with the next tile in the degrade chain
 --- @param surface LuaSurface
---- @param position MapPosition
+--- @param position MapPosition.struct
 local function degrade_tile(surface, position)
     local tile = surface.get_tile(position)
     local tile_name = tile.name
@@ -58,7 +58,7 @@ end
 
 --- Gets the average tile strengths around position
 --- @param surface LuaSurface
---- @param position MapPosition
+--- @param position MapPosition.struct
 --- @return number?
 local function get_tile_strength(surface, position)
     local tile = surface.get_tile(position)
