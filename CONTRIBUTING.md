@@ -5,6 +5,7 @@ All are welcome to make bug reports, feature requests, and pull requests for our
 For developers wanting to add features please follow these guidelines:
 
 - All lua code is documented using ldoc.
+- Set `CLUSTERIO` to your clusterio checkout, the lint needs it to resolve `modules/clusterio/*`. emmylua does not normalise `..` in a library path, so it cannot be written relative to this repo.
 - Lua is checked with [emmylua](https://github.com/EmmyLuaLs/emmylua-analyzer-rust), configured by `.emmyrc.json`. Install the EmmyLua extension rather than sumneko, and let the factoriomod-debug extension write your machine local library paths to `.luarc.json`, which is git ignored. Note that an inline cast must be written `--[[@as T]]`, the spaced form is not parsed.
 - Changes should be made on your own fork and merged into `main` through a pull request.
 - Each pull request should be limited to one feature or a few bug fixes and link to the related issue page.

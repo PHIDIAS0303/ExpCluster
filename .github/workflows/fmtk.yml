@@ -6,6 +6,7 @@ on:
 
 env:
   EMMYLUA_CHECK_VERSION: "0.24.0"
+  CLUSTERIO: ${{ github.workspace }}/.clusterio
 
 jobs:
   lint:
@@ -36,9 +37,9 @@ jobs:
       - name: Run Lint Report
         shell: bash
         run: |
-          # Library paths are machine specific, so they are merged in rather than committed
-          jq -n --arg lib "$RUNNER_TEMP/factorio/library" --arg clusterio "$PWD/.clusterio/packages/host" \
-            '{ workspace: { library: [ $lib, $clusterio ], ignoreGlobs: [ ".clusterio/**" ] } }' \
+          # The typedefs are generated per run, clusterio comes from CLUSTERIO above
+          jq -n --arg lib "$RUNNER_TEMP/factorio/library" \
+            '{ workspace: { library: [ $lib ], ignoreGlobs: [ ".clusterio/**" ] } }' \
             > "$RUNNER_TEMP/ci.emmyrc.json"
 
           # Exits non zero on error severity, so the gate below is used instead
