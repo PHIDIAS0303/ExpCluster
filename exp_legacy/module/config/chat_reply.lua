@@ -24,6 +24,7 @@ local afk_time_units = {
 }
 
 return {
+    --- @type table<string, LocalisedString | fun(player: LuaPlayer, is_command: boolean): LocalisedString>
     messages = { --- @setting messages will trigger when ever the word is said
         ["discord"] = { "info.discord" },
         ["expgaming"] = { "info.website" },
@@ -66,6 +67,7 @@ return {
     command_admin_only = false, --- @setting command_admin_only when true will only allow chat commands for admins
     command_permission = "command/chat-commands", --- @setting command_permission the permission used to allow command prefixes
     command_prefix = "!", --- @setting command_prefix prefix used for commands below and to print to all players (if enabled above)
+    --- @type table<string, LocalisedString | fun(player: LuaPlayer, is_command: boolean): LocalisedString>
     commands = { --- @setting commands will trigger only when command prefix is given
         ["dev"] = { "exp_chat-auto-reply.reply-dev" },
         ["magic"] = { "exp_chat-auto-reply.reply-magic" },

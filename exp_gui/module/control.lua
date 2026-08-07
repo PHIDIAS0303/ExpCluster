@@ -47,10 +47,10 @@ end
 function Gui.get_player(input)
     if type(input) == "table" and not input.player_index then
         --- @cast input { element: LuaGuiElement }
-        return assert(game.get_player(input.element.player_index))
+        return (assert(game.get_player(input.element.player_index)))
     end
     --- @cast input LuaGuiElement | { player_index: uint }
-    return assert(game.get_player(input.player_index))
+    return (assert(game.get_player(input.player_index)))
 end
 
 --- Toggle the enable state of an element
@@ -116,7 +116,7 @@ end
 --- @param player LuaPlayer
 --- @return LuaGuiElement
 function Gui.get_top_element(define, player)
-    return assert(assert(player_elements[player.index]).top[define.name], "Element is not on the top flow")
+    return (assert(assert(player_elements[player.index]).top[define.name], "Element is not on the top flow"))
 end
 
 --- Register a element define to be drawn to the left flow on join
@@ -124,7 +124,7 @@ end
 --- @param player LuaPlayer
 --- @return LuaGuiElement
 function Gui.get_left_element(define, player)
-    return assert(assert(player_elements[player.index]).left[define.name], "Element is not on the left flow")
+    return (assert(assert(player_elements[player.index]).left[define.name], "Element is not on the left flow"))
 end
 
 --- Register a element define to be drawn to the relative flow on join
@@ -132,7 +132,7 @@ end
 --- @param player LuaPlayer
 --- @return LuaGuiElement
 function Gui.get_relative_element(define, player)
-    return assert(assert(player_elements[player.index]).relative[define.name], "Element is not on the relative flow")
+    return (assert(assert(player_elements[player.index]).relative[define.name], "Element is not on the relative flow"))
 end
 
 --- Ensure all the correct elements are visible and exist

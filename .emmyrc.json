@@ -22,13 +22,8 @@
         "globals": [ "__DebugAdapter", "__Profiler" ],
         "disable": [
             "assign-type-mismatch",
-            "missing-parameter",
             "param-type-mismatch",
             "preferred-local-alias",
-            "redefined-local",
-            "redundant-parameter",
-            "redundant-return-value",
-            "return-type-mismatch",
             "unnecessary-assert",
             "unnecessary-if",
             "unused"

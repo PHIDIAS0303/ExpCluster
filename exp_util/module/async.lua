@@ -94,7 +94,7 @@ Async.status = {}
 
 --- @class Async.AsyncFunction
 --- @field id string The id of this async function
---- @operator call: Async.AsyncReturn<any>
+--- @overload fun(...: any): Async.AsyncReturn<any>
 Async._function_prototype = {}
 
 Async._function_metatable = {

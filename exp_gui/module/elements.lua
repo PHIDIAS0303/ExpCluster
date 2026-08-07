@@ -52,7 +52,7 @@ Elements.bar = Gui.define("bar")
 
 --- A label which is centered
 --- @class Gui.elements.centered_label: ExpElement
---- @overload fun(parent: LuaGuiElement, width: number, caption: LocalisedString, tooltip: LocalisedString?): LuaGuiElement
+--- @overload fun(parent: LuaGuiElement, width: number, caption: LocalisedString?, tooltip: LocalisedString?): LuaGuiElement
 Elements.centered_label = Gui.define("centered_label")
     :draw{
         type = "label",
@@ -319,7 +319,7 @@ Elements.screen_frame = Gui.define("screen_frame")
 --- @param screen_frame LuaGuiElement
 --- @return LuaGuiElement
 function Elements.screen_frame.get_button_flow(screen_frame)
-    return assert(Elements.screen_frame.data[screen_frame.parent], "Screen frame has no button flow")
+    return (assert(Elements.screen_frame.data[screen_frame.parent], "Screen frame has no button flow"))
 end
 
 --- Get the root element of a screen frame

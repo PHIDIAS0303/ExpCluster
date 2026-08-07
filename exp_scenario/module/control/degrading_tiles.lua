@@ -18,7 +18,7 @@ end
 --- @param surface LuaSurface
 --- @param position MapPosition.struct
 local function degrade_tile(surface, position)
-    local tile = surface.get_tile(position)
+    local tile = surface.get_tile(position.x, position.y)
     local tile_name = tile.name
     local degrade_tile_name = config.degrade_order[tile_name]
     if not degrade_tile_name then return end
@@ -61,7 +61,7 @@ end
 --- @param position MapPosition.struct
 --- @return number?
 local function get_tile_strength(surface, position)
-    local tile = surface.get_tile(position)
+    local tile = surface.get_tile(position.x, position.y)
     local tile_name = tile.name
     local strength = config.strengths[tile_name]
     if not strength then return end
