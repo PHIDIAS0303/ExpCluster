@@ -22,18 +22,13 @@
         "globals": [ "__DebugAdapter", "__Profiler" ],
         "disable": [
             "assign-type-mismatch",
-            "await-in-sync",
-            "invert-if",
             "missing-parameter",
-            "missing-return-value",
             "param-type-mismatch",
             "preferred-local-alias",
             "redefined-local",
             "redundant-parameter",
             "redundant-return-value",
             "return-type-mismatch",
-            "unbalanced-assignments",
-            "undefined-doc-param",
             "unnecessary-assert",
             "unnecessary-if",
             "unused"
