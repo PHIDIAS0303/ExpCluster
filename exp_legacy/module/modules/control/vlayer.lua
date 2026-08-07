@@ -28,10 +28,10 @@ local vlayer_data = {
         capacity = 0,
     },
     storage = {
-        items = {},
-        power_items = {},
+        items = {}, --- @type table<string, number>
+        power_items = {}, --- @type table<string, { value: number, count: number }>
         energy = 0,
-        unallocated = {},
+        unallocated = {}, --- @type table<string, number>
     },
     surface = table.deep_copy(config.surface),
 }
@@ -45,7 +45,7 @@ for name, properties in pairs(config.allowed_items) do
 
     if properties.power then
         vlayer_data.storage.power_items[name] = {
-            value = properties.fuel_value * 1000000,
+            value = assert(properties.fuel_value) * 1000000,
             count = 0,
         }
     end
@@ -291,7 +291,7 @@ function vlayer.remove_item(item_name, count)
 
     if not config.unlimited_surface_area and item_properties.required_area and item_properties.required_area > 0 then
         -- Remove from the unallocated storage first
-        remove_unallocated = math.min(count, vlayer_data.storage.unallocated[item_name])
+        remove_unallocated = math.min(count, assert(vlayer_data.storage.unallocated[item_name]))
 
         if remove_unallocated > 0 then
             vlayer_data.storage.items[item_name] = vlayer_data.storage.items[item_name] - count
@@ -361,7 +361,7 @@ local function handle_input_interfaces()
         if not interface.valid then
             vlayer_data.entity_interfaces.storage_input[index] = nil
         else
-            local inventory = interface.get_inventory(defines.inventory.chest)
+            local inventory = assert(interface.get_inventory(defines.inventory.chest))
 
             for _, v in pairs(inventory.get_contents()) do
                 if config.allowed_items[v.name] then
@@ -384,8 +384,9 @@ local function handle_input_interfaces()
 
                     if count_deduct and count_add then
                         if config.allowed_items[v.name].modded then
+                            local modded_item = assert(config.modded_items[v.name])
                             if config.modded_auto_downgrade then
-                                vlayer.insert_item(config.modded_items[v.name].base_game_equivalent, count_add * config.modded_items[v.name].multiplier)
+                                vlayer.insert_item(modded_item.base_game_equivalent, count_add * modded_item.multiplier)
                             else
                                 vlayer.insert_item(v.name, count_add)
                             end
@@ -439,14 +440,14 @@ local function handle_output_interfaces()
         if not interface.valid then
             vlayer_data.entity_interfaces.storage_output[index] = nil
         else
-            local inventory = interface.get_inventory(defines.inventory.chest)
-            local inventory_request_sections = interface.get_logistic_sections().sections
+            local inventory = assert(interface.get_inventory(defines.inventory.chest))
+            local inventory_request_sections = assert(interface.get_logistic_sections()).sections
 
             for i = 1, #inventory_request_sections do
                 for _, v in pairs(inventory_request_sections[i].filters) do
                     if v.value and config.allowed_items[v.value.name] then
                         local current_amount = inventory.get_item_count(v.value.name)
-                        local request_amount = math.min(v.min - current_amount, vlayer_data.storage.items[v.value.name])
+                        local request_amount = math.min(assert(v.min) - current_amount, vlayer_data.storage.items[v.value.name])
 
                         if request_amount > 0 and inventory.can_insert{ name = v.value.name, count = request_amount } then
                             local removed_item_count = vlayer.remove_item(v.value.name, request_amount)
@@ -586,7 +587,7 @@ local function handle_circuit_interfaces()
             if control.sections_count == 0 then
                 control.add_section()
             end
-            local circuit_oc = control.sections[1]
+            local circuit_oc = assert(control.sections[1])
             local signal_index = 1
             local circuit = vlayer.get_circuits()
 
