@@ -92,7 +92,7 @@ local assert_argument_fmt = "Bad argument #%d to %s; %s expected to be of type %
 function ExpUtil.assert_argument_type(arg_value, type_name, arg_index, arg_name)
     local failed, actual_type = check_type(arg_value, type_name)
     if failed then
-        local func_name = getinfo(2, "n").name or "<anonymous>"
+        local func_name = assert(getinfo(2, "n")).name or "<anonymous>"
         error(assert_argument_fmt:format(arg_index, func_name, arg_name or "Argument", type_name, actual_type), 2)
     end
 end
@@ -136,7 +136,7 @@ end
 --- @param level number? The level of the stack to get the file of, a value of 1 is the caller of this function
 --- @return string # The relative filepath of the given stack frame
 function ExpUtil.safe_file_path(level)
-    local debug_info = getinfo((level or 1) + 1, "Sn")
+    local debug_info = assert(getinfo((level or 1) + 1, "Sn"))
     local safe_source = debug_info.source:find("@__level__")
     return safe_source == 1 and debug_info.short_src:sub(10, -5) or debug_info.source
 end
@@ -145,7 +145,7 @@ end
 --- @param level number? The level of the stack to get the module of, a value of 1 is the caller of this function
 --- @return string # The name of the module at the given stack frame
 function ExpUtil.get_module_name(level)
-    local file_within_module = getinfo((level or 1) + 1, "S").short_src:sub(19, -5)
+    local file_within_module = assert(getinfo((level or 1) + 1, "S")).short_src:sub(19, -5)
     local next_slash = file_within_module:find("/")
     if next_slash then
         return file_within_module:sub(1, next_slash - 1)
@@ -159,7 +159,7 @@ end
 --- @param raw boolean? When true there will not be any < > around the name
 --- @return string # The name of the function at the given stack frame or provided as an argument
 function ExpUtil.get_function_name(func, raw)
-    local debug_info = getinfo(func, "Sn")
+    local debug_info = assert(getinfo(func, "Sn"))
     local safe_source = debug_info.source:find("@__level__")
     local file_name = safe_source == 1 and debug_info.source:sub(12, -5) or debug_info.source
     local func_name = debug_info.name or debug_info.linedefined
@@ -172,7 +172,7 @@ end
 --- @param raw boolean? When true there will not be any < > around the name
 --- @return string # The relative filepath of the given stack frame
 function ExpUtil.get_current_line(level, raw)
-    local debug_info = getinfo((level or 1) + 1, "Snl")
+    local debug_info = assert(getinfo((level or 1) + 1, "Snl"))
     local safe_source = debug_info.source:find("@__level__")
     local file_path = safe_source == 1 and debug_info.short_src:sub(10, -5) or debug_info.source
     if raw then return file_path .. ":" .. debug_info.currentline end
