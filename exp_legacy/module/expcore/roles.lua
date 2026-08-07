@@ -117,6 +117,21 @@ local Groups = require("modules.exp_legacy.expcore.permission_groups")
 local Colours = ExpUtil.color
 local write_json = ExpUtil.write_json
 
+--- @class Roles.Role
+--- @field name string
+--- @field short_hand string
+--- @field index number Position within the role order
+--- @field allowed_actions table<string, boolean>
+--- @field allow_all_actions boolean
+--- @field flags table<string, boolean>
+--- @field disallowed_actions table<string, boolean>?
+--- @field permission_group ([boolean, string] | string)?
+--- @field custom_tag string?
+--- @field custom_color Color?
+--- @field parent string?
+--- @field block_auto_assign boolean?
+--- @field auto_assign_condition function?
+
 local Roles = {
     _prototype = {},
     config = {
@@ -348,6 +363,7 @@ end
 local role = Roles.get_player_highest_role(game.player)
 
 ]]
+--- @return Roles.Role
 function Roles.get_player_highest_role(player)
     local roles = Roles.get_player_roles(player)
     local highest
@@ -357,7 +373,7 @@ function Roles.get_player_highest_role(player)
         end
     end
 
-    return highest
+    return assert(highest, "Player has no roles")
 end
 
 --- Assignment.
