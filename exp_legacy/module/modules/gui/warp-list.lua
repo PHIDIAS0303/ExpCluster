@@ -673,7 +673,7 @@ warp_list_container = Gui.define("warp_list_container")
         -- Draw the scroll table for the warps
         local scroll_table = Gui.elements.scroll_table(container, 250, 3, "scroll")
         -- Set the scroll panel to always show the scrollbar (not doing this will result in a changing gui size)
-        scroll_table.parent.vertical_scroll_policy = "always"
+        assert(scroll_table.parent).vertical_scroll_policy = "always"
 
         -- Change the style of the scroll table
         local scroll_table_style = scroll_table.style
@@ -874,7 +874,7 @@ local function role_update_event(event)
     -- Check if user has permission to add warps
     local allow_add_warp = check_player_permissions(player, "allow_add_warp")
     -- Update container size depending on whether the player is allowed to add warps
-    frame.parent.style.width = allow_add_warp and 268 or 220
+    assert(frame.parent).style.width = allow_add_warp and 268 or 220
 
     -- Update the warps, in case the user can now edit them
     local scroll_table = frame.scroll.table

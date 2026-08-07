@@ -106,7 +106,7 @@ Elements.reason_confirm = Gui.define("player_list/reason_confirm")
             if reason == nil or not reason:find("%S") then reason = "no reason given" end
             button_data.reason_callback(player, reason)
         end
-        element.parent.entry.text = ""
+        assert(assert(element.parent).entry).text = ""
         Elements.container.set_selected_player(player, nil)
         Elements.player_table.refresh_player(player)
     end) --[[@as any]]

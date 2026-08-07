@@ -34,7 +34,7 @@ for _, config_key in ipairs{ "always_protected_names", "always_protected_types",
 end
 
 -- Require roles if a permission is assigned in the config
-local Roles
+local Roles --- @type table<string, any>
 if config.ignore_permission then
     Roles = require("modules.exp_legacy.expcore.roles") --- @dep expcore.roles
 end

@@ -14,7 +14,8 @@ end
 
 ]]
 
-local ext, var
+local ext --- @type table<string, any>
+local var --- @type table<string, any>
 local concat = table.concat
 
 local External = {}
@@ -29,12 +30,13 @@ end
 
 ]]
 function External.valid()
-    if storage.ext == nil then return false end
-    if ext == storage.ext and var == ext.var then
+    local stored = storage.ext
+    if stored == nil then return false end
+    if ext == stored and var == ext.var then
         return var ~= nil
     else
-        ext = storage.ext
-        var = ext.var
+        ext = stored
+        var = stored.var
         return var ~= nil
     end
 end

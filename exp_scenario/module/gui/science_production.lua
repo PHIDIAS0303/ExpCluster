@@ -193,7 +193,8 @@ Elements.science_table = Gui.define("science_production/science_table")
         local science_table = Gui.elements.scroll_table(parent, 190, 4)
         local no_production_label = Elements.no_production_label(science_table)
         Elements.no_production_label.refresh(no_production_label)
-        (science_table.style --[[@as LuaStyle]]).column_alignments[3] = "right"
+        local science_table_style = science_table.style --[[@as LuaStyle]]
+        science_table_style.column_alignments[3] = "right"
         return science_table
     end) 
     :element_data{} --[[@as any]]
@@ -280,7 +281,8 @@ function Elements.science_table.add_row(science_table, row_data)
         column_count = 2,
     }
     delta_table.style.padding = 0
-    (delta_table.style --[[@as LuaStyle]]).column_alignments[1] = "right"
+    local delta_table_style = delta_table.style --[[@as LuaStyle]]
+    delta_table_style.column_alignments[1] = "right"
 
     -- Draw the net production label
     local net = Elements.production_label(science_table, row_data.net)
@@ -429,8 +431,10 @@ do local _display_data = {} --- @type table<string, Elements.eta_label.display_d
         -- Update the eta labels
         for player, eta_label in Elements.eta_label:online_elements() do
             local display_data = _display_data[player.force.name]
-            eta_label.caption = display_data.caption
-            eta_label.tooltip = display_data.tooltip
+            if display_data then
+                eta_label.caption = display_data.caption
+                eta_label.tooltip = display_data.tooltip
+            end
         end
     end
 end

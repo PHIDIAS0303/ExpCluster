@@ -71,7 +71,7 @@ Commands.new("commands", { "exp-commands_help.description" })
             page = as_number
         end
 
-        keyword = assert(keyword):lower()
+        keyword = tostring(keyword):lower()
         local pages, found
         if cache and cache.keyword == keyword then
             -- Cached value found, no search is needed

@@ -149,11 +149,13 @@ local function create_entities(surface, offset)
         local pos = apply_offset({ entity_details[2], entity_details[3] }, offset)
         local entity = surface.create_entity{ name = entity_details[1], position = pos, force = "neutral" }
 
-        if entity and config.entities.protected then
-            protect_entity(entity)
-        end
+        if entity then
+            if config.entities.protected then
+                protect_entity(entity)
+            end
 
-        entity.operable = config.entities.operable
+            entity.operable = config.entities.operable
+        end
     end
 end
 
@@ -276,7 +278,8 @@ local function on_player_created(event)
     if config.resource_patches.enabled then create_resource_patches(surface, offset) end
     if config.turrets.enabled then update_turrets() end
 
-    (player.force --[[@as LuaForce]]).set_spawn_position(offset, surface)
+    local force = player.force --[[@as LuaForce]]
+    force.set_spawn_position(offset, surface)
     player.teleport(offset, surface)
 end
 
