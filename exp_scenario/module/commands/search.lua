@@ -91,7 +91,7 @@ local function sort_results(results, func)
         end
     end
 
-    return sorted
+    return sorted --[[@as SearchResult[] ]]
 end
 
 local display_players_time_format = ExpUtil.format_time_factory_locale{ format = "short", hours = true, minutes = true }

@@ -612,7 +612,7 @@ function Elements.confirm_task_button.parse(message)
     -- Trim the spaces of the string
     local trimmed = string.gsub(message, "^%s*(.-)%s*$", "%1")
     local title, body = string.match(trimmed, "(.-)\n(.*)")
-    local parsed = { title = title, body = body }
+    local parsed = { title = title, body = body } --[[@as { title: string, body: string }]]
     if not title then
         -- If it doesn't match the pattern return the str as a title
         parsed.title = trimmed

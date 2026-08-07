@@ -291,7 +291,7 @@ function vlayer.remove_item(item_name, count)
 
     if not config.unlimited_surface_area and item_properties.required_area and item_properties.required_area > 0 then
         -- Remove from the unallocated storage first
-        remove_unallocated = math.min(count, assert(vlayer_data.storage.unallocated[item_name]))
+        remove_unallocated = math.min(count, vlayer_data.storage.unallocated[item_name])
 
         if remove_unallocated > 0 then
             vlayer_data.storage.items[item_name] = vlayer_data.storage.items[item_name] - count

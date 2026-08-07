@@ -43,6 +43,8 @@ ExpElement.events = {}
 --- @field _force_data ExpElement.PostDrawCallback?
 --- @field _global_data ExpElement.PostDrawCallback?
 --- @field _events table<defines.events, ExpElement.EventHandler<EventData>[]>
+--- @field _has_handlers boolean
+--- @field _track_elements boolean
 --- @overload fun(parent: LuaGuiElement, ...: any): LuaGuiElement
 ExpElement._prototype = {
     _track_elements = false,
@@ -166,7 +168,8 @@ end
 --- @param name string
 --- @return ExpElement
 function ExpElement.get(name)
-    return (assert(ExpElement._elements[name], "ExpElement is not defined: " .. tostring(name)))
+    local value = assert(ExpElement._elements[name], "ExpElement is not defined: " .. tostring(name))
+    return value
 end
 
 --- Create a new instance of this element definition

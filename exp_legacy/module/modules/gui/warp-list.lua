@@ -294,10 +294,10 @@ local confirm_edit_button = Gui.define("confirm_edit_button")
         local parent = assert(element.parent)
         local grandparent = assert(parent.parent)
         local warp_id = parent.caption --[[@as string]]
-        local name_flow = assert(grandparent["name-" .. warp_id])
-        local icon_flow = assert(grandparent["icon-" .. warp_id])
-        local warp_name = assert(name_flow[warp_textfield.name]).text
-        local warp_icon = assert(icon_flow[warp_icon_editing.name]).elem_value --[[@as SignalID]]
+        local name_flow = grandparent["name-" .. warp_id]
+        local icon_flow = grandparent["icon-" .. warp_id]
+        local warp_name = name_flow[warp_textfield.name].text
+        local warp_icon = icon_flow[warp_icon_editing.name].elem_value --[[@as SignalID]]
         if warp_icon.type == nil then warp_icon.type = "item" end
         Warps.set_editing(warp_id, player.name)
         Warps.update_warp(warp_id, warp_name, warp_icon, player.name)

@@ -270,10 +270,9 @@ Elements.container = Gui.define("research_milestones/container")
         local milestone_table = Elements.milestone_table(container)
         Elements.clock_label(header)
 
-        local force = Gui.get_player(parent).force
+        local force = Gui.get_player(parent).force --[[@as LuaForce]]
         def.data[force] = def.data[force] or {} -- used by start index and row data
 
-        local force = Gui.get_player(parent).force --[[@as LuaForce]]
         local start_index = Elements.container.calculate_starting_research_index(force)
         for research_index = start_index, start_index + display_size - 1 do
             local row_data = Elements.milestone_table.calculate_row_data(force, research_index)
@@ -297,7 +296,7 @@ end
 --- @param research_index number
 --- @return number
 function Elements.container.get_achieved_time(force, research_index)
-    return Elements.container.data[force][research_index]
+    return assert(Elements.container.data[force][research_index])
 end
 
 --- Calculate the starting research index for a force

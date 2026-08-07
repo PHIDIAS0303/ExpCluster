@@ -284,7 +284,7 @@ function ExpUtil.format_any(value, options)
         end
         return inspect(value, { depth = options.depth or 5, indent = "", newline = "", process = ExpUtil.safe_value })
     end
-    return formatted
+    return formatted --[[@as LocalisedString]]
 end
 
 --- @alias Common.format_time_param_format "short" | "long" | "clock"
@@ -522,7 +522,7 @@ end
 
 --- Insert a copy of the given items into the found entities. If no entities are found then they will be created if possible.
 --- @param options Common.copy_items_to_surface_param
---- @return LuaEntity # The last entity inserted into
+--- @return LuaEntity? # The last entity inserted into, nil if there were no items
 function ExpUtil.copy_items_to_surface(options)
     local entity
     for item_index = 1, #options.items do
@@ -542,7 +542,7 @@ end
 
 --- Insert a copy of the given items into the found entities. If no entities are found then they will be created if possible.
 --- @param options Common.move_items_to_surface_param
---- @return LuaEntity # The last entity inserted into
+--- @return LuaEntity? # The last entity inserted into, nil if there were no items
 function ExpUtil.move_items_to_surface(options)
     local entity
     for item_index = 1, #options.items do
@@ -564,7 +564,7 @@ end
 
 --- Move the given inventory into the found entities. If no entities are found then they will be created if possible.
 --- @param options Common.transfer_inventory_to_surface_param
---- @return LuaEntity # The last entity inserted into
+--- @return LuaEntity? # The last entity inserted into, nil if there were no items
 function ExpUtil.transfer_inventory_to_surface(options)
     options.items = options.inventory
     local entity = ExpUtil.copy_items_to_surface(options)

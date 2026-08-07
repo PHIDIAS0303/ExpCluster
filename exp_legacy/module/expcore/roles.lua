@@ -216,7 +216,7 @@ game.player.print(Roles.debug())
 function Roles.debug()
     local output = ""
     for index, role_name in ipairs(Roles.config.order) do
-        local role = assert(Roles.config.roles[role_name])
+        local role = Roles.config.roles[role_name]
         local color = (role.custom_color or Colours.white) --[[@as Color.struct]]
         local color_str = string.format("[color=%d, %d, %d]", color.r, color.g, color.b)
         output = output .. string.format("\n%s %s) %s[/color]", color_str, index, serpent.line(role))
@@ -369,14 +369,15 @@ local role = Roles.get_player_highest_role(game.player)
 --- @return Roles.Role
 function Roles.get_player_highest_role(player)
     local roles = Roles.get_player_roles(player)
-    local highest
+    local highest --- @type Roles.Role?
     for _, role in ipairs(roles) do
         if not highest or role.index < highest.index then
             highest = role
         end
     end
 
-    return (assert(highest, "Player has no roles"))
+    local value = assert(highest, "Player has no roles")
+    return value
 end
 
 --- Assignment.
@@ -415,7 +416,7 @@ function Roles.assign_player(player, roles, by_player_name, skip_checks, silent)
 
     -- If the player has a role that needs to defer the role changes, save the roles that need to be assigned later into a table
     if valid_player and Roles.player_has_flag(valid_player, "defer_role_changes") then
-        local assign_later = Roles.config.deferred_roles[assert(valid_player).name] or {}
+        local assign_later = Roles.config.deferred_roles[valid_player.name] or {}
         for _, role in ipairs(role_objects) do
             local role_change = assign_later[role.name]
             if role_change then
@@ -431,7 +432,7 @@ function Roles.assign_player(player, roles, by_player_name, skip_checks, silent)
             end
         end
 
-        Roles.config.deferred_roles[assert(valid_player).name] = assign_later
+        Roles.config.deferred_roles[valid_player.name] = assign_later
         return
     end
 
@@ -477,8 +478,8 @@ function Roles.unassign_player(player, roles, by_player_name, skip_checks, silen
 
     -- If the player has a role that needs to defer the role changes, save the roles that need to be unassigned later into a table
     local defer_changes = Roles.player_has_flag(player, "defer_role_changes")
-    if defer_changes then
-        local assign_later = Roles.config.deferred_roles[assert(valid_player).name] or {}
+    if defer_changes and valid_player then
+        local assign_later = Roles.config.deferred_roles[valid_player.name] or {}
         for _, role in ipairs(role_objects) do
             local role_change = assign_later[role.name]
             if role_change then
@@ -494,7 +495,7 @@ function Roles.unassign_player(player, roles, by_player_name, skip_checks, silen
             end
         end
 
-        Roles.config.deferred_roles[assert(valid_player).name] = assign_later
+        Roles.config.deferred_roles[valid_player.name] = assign_later
     end
 
     -- Remove the player from roles
@@ -674,7 +675,7 @@ function Roles.define_role_order(order)
 
     -- Re-links roles to they parents as this is called at the end of the config
     for index, role_name in pairs(Roles.config.order) do
-        local role = assert(Roles.config.roles[role_name])
+        local role = Roles.config.roles[role_name]
         if not role then
             error("Role with name " .. role_name .. " has not beed defined, either define it or remove it from the order list.", 2)
         end

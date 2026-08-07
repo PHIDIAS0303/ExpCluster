@@ -32,7 +32,7 @@ end
 
 --- Get the player name from an event
 --- @param event { player_index: uint, by_player_name: string? }
---- @return string, string
+--- @return string, string?
 local function get_player_name(event)
     local player = game.players[event.player_index]
     return player.name, event.by_player_name

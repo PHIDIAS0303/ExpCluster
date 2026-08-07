@@ -170,7 +170,8 @@ Commands.server = setmetatable({
 --- @param msg LocalisedString? An optional message to be included when a command completes (only has an effect in command callbacks)
 --- @return Commands.Status, LocalisedString # Should be returned directly without modification
 function Commands.status.success(msg)
-    return Commands.status.success, msg == nil and { "exp-commands.success" } or msg
+    if msg == nil then return Commands.status.success, { "exp-commands.success" } end
+    return Commands.status.success, msg
 end
 
 --- Used to signal an error has occurred in a command, data type parser, or permission authority
@@ -178,7 +179,8 @@ end
 --- @param msg LocalisedString? An optional error message to be included in the output, a generic message is used if not provided
 --- @return Commands.Status, LocalisedString # Should be returned directly without modification
 function Commands.status.error(msg)
-    return Commands.status.error, { "exp-commands.error", msg == nil and { "exp-commands.error-default" } or msg }
+    if msg == nil then msg = { "exp-commands.error-default" } end
+    return Commands.status.error, { "exp-commands.error", msg }
 end
 
 --- Used to signal the player is unauthorised to use a command, primarily used by permission authorities but can be used in a command callback
@@ -186,7 +188,8 @@ end
 --- @param msg LocalisedString? An optional error message to be included in the output, a generic message is used if not provided
 --- @return Commands.Status, LocalisedString # Should be returned directly without modification
 function Commands.status.unauthorised(msg)
-    return Commands.status.unauthorised, { "exp-commands.unauthorized", msg == nil and { "exp-commands.unauthorized-default" } or msg }
+    if msg == nil then msg = { "exp-commands.unauthorized-default" } end
+    return Commands.status.unauthorised, { "exp-commands.unauthorized", msg }
 end
 
 --- Used to signal the player provided invalid input to an command, primarily used by data type parsers but can be used in a command callback
@@ -194,15 +197,16 @@ end
 --- @param msg LocalisedString? An optional error message to be included in the output, a generic message is used if not provided
 --- @return Commands.Status, LocalisedString # Should be returned directly without modification
 function Commands.status.invalid_input(msg)
-    return Commands.status.invalid_input, msg == nil and { "exp-commands.invalid-input" } or msg
+    if msg == nil then return Commands.status.invalid_input, { "exp-commands.invalid-input" } end
+    return Commands.status.invalid_input, msg
 end
 
 --- Used to signal an internal error has occurred, this is reserved for internal use only
---- @param msg LocalisedString A message detailing the error which has occurred, will be logged and outputted
+--- @param msg LocalisedString? A message detailing the error which has occurred, will be logged and outputted
 --- @return Commands.Status, LocalisedString # Should be returned directly without modification
 --- @package
 function Commands.status.internal_error(msg)
-    return Commands.status.internal_error, { "exp-commands.internal-error", msg }
+    return Commands.status.internal_error, { "exp-commands.internal-error", msg or "" }
 end
 
 --- @type table<Commands.Status, string>

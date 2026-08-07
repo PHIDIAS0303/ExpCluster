@@ -116,7 +116,8 @@ end
 --- @param player LuaPlayer
 --- @return LuaGuiElement
 function Gui.get_top_element(define, player)
-    return (assert(assert(player_elements[player.index]).top[define.name], "Element is not on the top flow"))
+    local value = assert(assert(player_elements[player.index]).top[define.name], "Element is not on the top flow")
+    return value
 end
 
 --- Register a element define to be drawn to the left flow on join
@@ -124,7 +125,8 @@ end
 --- @param player LuaPlayer
 --- @return LuaGuiElement
 function Gui.get_left_element(define, player)
-    return (assert(assert(player_elements[player.index]).left[define.name], "Element is not on the left flow"))
+    local value = assert(assert(player_elements[player.index]).left[define.name], "Element is not on the left flow")
+    return value
 end
 
 --- Register a element define to be drawn to the relative flow on join
@@ -132,7 +134,8 @@ end
 --- @param player LuaPlayer
 --- @return LuaGuiElement
 function Gui.get_relative_element(define, player)
-    return (assert(assert(player_elements[player.index]).relative[define.name], "Element is not on the relative flow"))
+    local value = assert(assert(player_elements[player.index]).relative[define.name], "Element is not on the relative flow")
+    return value
 end
 
 --- Ensure all the correct elements are visible and exist

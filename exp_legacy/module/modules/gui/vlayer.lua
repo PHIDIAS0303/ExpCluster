@@ -381,14 +381,13 @@ local vlayer_gui_control_see = Gui.define("vlayer_gui_control_see")
     }:style{
         width = 200,
     }:on_click(function(def, player, element, event)
-        local target = assert(assert(element.parent)[vlayer_gui_control_type.name]).selected_index
-        local n = assert(assert(element.parent)[vlayer_gui_control_list.name]).selected_index
+        local target = assert(element.parent)[vlayer_gui_control_type.name].selected_index
+        local n = assert(element.parent)[vlayer_gui_control_list.name].selected_index
         
         if target and vlayer_control_type_list[target] and n > 0 then
             local i = vlayer.get_interfaces()
             local entity = i[vlayer_control_type_list[target]][n]
             if entity and entity.valid then
-                local player = Gui.get_player(event)
                 player.set_controller{ type = defines.controllers.remote, position = entity.position, surface = entity.surface }
                 player.print{ "vlayer.result-interface-location", { "vlayer.control-type-" .. vlayer_control_type_list[target]:gsub("_", "-") }, pos_to_gps_string(entity.position, entity.surface.name) }
             end
@@ -425,8 +424,8 @@ local vlayer_gui_control_remove = Gui.define("vlayer_gui_control_remove")
     }:style{
         width = 200,
     }:on_click(function(def, player, element)
-        local target = assert(assert(element.parent)[vlayer_gui_control_type.name]).selected_index
-        local n = assert(assert(element.parent)[vlayer_gui_control_list.name]).selected_index
+        local target = assert(element.parent)[vlayer_gui_control_type.name].selected_index
+        local n = assert(element.parent)[vlayer_gui_control_list.name].selected_index
 
         if target and vlayer_control_type_list[target] and n > 0 then
             local i = vlayer.get_interfaces()

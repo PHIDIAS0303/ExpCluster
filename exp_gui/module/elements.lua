@@ -165,7 +165,7 @@ Elements.container = Gui.define("container")
 --- @param container LuaGuiElement
 --- @return LuaGuiElement
 function Elements.container.get_root_element(container)
-    return container.parent
+    return assert(container.parent)
 end
 
 --- A frame within a container
@@ -319,14 +319,15 @@ Elements.screen_frame = Gui.define("screen_frame")
 --- @param screen_frame LuaGuiElement
 --- @return LuaGuiElement
 function Elements.screen_frame.get_button_flow(screen_frame)
-    return (assert(Elements.screen_frame.data[screen_frame.parent], "Screen frame has no button flow"))
+    local value = assert(Elements.screen_frame.data[assert(screen_frame.parent)], "Screen frame has no button flow")
+    return value
 end
 
 --- Get the root element of a screen frame
 --- @param screen_frame LuaGuiElement
 --- @return LuaGuiElement
 function Elements.screen_frame.get_root_element(screen_frame)
-    return screen_frame.parent
+    return assert(screen_frame.parent)
 end
 
 return Elements

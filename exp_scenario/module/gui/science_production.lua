@@ -109,7 +109,7 @@ function Elements.production_label.calculate_display_data(tooltip, value, cutoff
     end
 
     local suffix, caption = format_number(value)
-    display_data = display_data or {}
+    display_data = display_data or {} --[[@as Elements.production_label.display_data]]
     display_data.caption = caption
     display_data.suffix = suffix
     display_data.tooltip = tooltip
@@ -221,7 +221,7 @@ function Elements.science_table.calculate_row_data(force, science_pack, row_data
     end
 
     -- Return the pack data
-    row_data = row_data or {}
+    row_data = row_data or {} --[[@as ExpGui_ScienceProduction.elements.science_table.row_data]]
     row_data.visible = production.total.made > 0
     row_data.science_pack = science_pack
     row_data.icon_style = icon_style
