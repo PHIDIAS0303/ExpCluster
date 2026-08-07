@@ -719,7 +719,7 @@ local role = Roles.new_role('Moderator', 'Mod')
 ]]
 function Roles.new_role(name, short_hand)
     ExpUtil.assert_not_runtime()
-    if Roles.config.roles[name] then return error("Role name is non unique") end
+    if Roles.config.roles[name] then error("Role name is non unique") end
     local role = setmetatable({
         name = name,
         short_hand = short_hand or name,
@@ -896,8 +896,7 @@ function Roles._prototype:set_permission_group(name, use_factorio_api)
     if use_factorio_api then
         self.permission_group = { true, name } --[[@as [boolean, string] ]]
     else
-        local group = Groups.get_group_by_name(name)
-        if not group then return end
+        assert(Groups.get_group_by_name(name), "Permission group not found: " .. name)
         self.permission_group = name
     end
     return self

@@ -68,12 +68,13 @@ local function try_deconstruct_output_chest(entity)
     end
 
     -- Get all adjacent mining drills and inserters
+    local target_position = target.position --[[@as MapPosition.struct]]
     local entities = target.surface.find_entities_filtered{
         type = { "mining-drill", "inserter" },
         to_be_deconstructed = false,
         area = {
-            { target.position.x - 1, target.position.y - 1 },
-            { target.position.x + 1, target.position.y + 1 }
+            { target_position.x - 1, target_position.y - 1 },
+            { target_position.x + 1, target_position.y + 1 }
         },
     }
 
@@ -159,14 +160,14 @@ local function try_deconstruct_miner(entity)
     end
 
     -- Build pipes if the miner used fluid
-    local position = entity.position
+    local position = entity.position --[[@as MapPosition.struct]]
     local create_entity_position = { x = position.x, y = position.y }
     local create_entity_param = { name = "entity-ghost", inner_name = "pipe", force = entity.force, position = create_entity_position }
     local create_entity = surface.create_entity
     create_entity(create_entity_param)
 
     -- Find all the entities to connect to
-    local bounding_box = entity.bounding_box
+    local bounding_box = entity.bounding_box --[[@as ExpUtil_AABB.Box]]
     local search_area = {
         { bounding_box.left_top.x - 1, bounding_box.left_top.y - 1 },
         { bounding_box.right_bottom.x + 1, bounding_box.right_bottom.y + 1 },
@@ -246,7 +247,7 @@ local function on_resource_depleted(event)
     end
 
     -- Find all mining drills within the area
-    local position = resource.position
+    local position = resource.position --[[@as MapPosition.struct]]
     local drills = resource.surface.find_entities_filtered{
         type = "mining-drill",
         area = {
@@ -258,8 +259,9 @@ local function on_resource_depleted(event)
     -- Check which could have reached this resource
     for _, drill in pairs(drills) do
         local radius = drill.prototype.mining_drill_radius
-        local dx = math.abs(drill.position.x - position.x)
-        local dy = math.abs(drill.position.y - position.y)
+        local drill_position = drill.position --[[@as MapPosition.struct]]
+        local dx = math.abs(drill_position.x - position.x)
+        local dy = math.abs(drill_position.y - position.y)
         if dx <= radius and dy <= radius then
             try_deconstruct_miner(drill)
         end
