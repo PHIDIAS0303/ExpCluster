@@ -57,7 +57,7 @@ local function rename_station(event)
         -- Find the closest resource
         local icon = ""
         local item_name = ""
-        local bounding_box = entity.bounding_box
+        local bounding_box = entity.bounding_box --[[@as ExpUtil_AABB.Box]]
         local resources = entity.surface.find_entities_filtered{ position = entity.position, radius = 250, type = "resource" }
         if #resources > 0 then
             local closest_recourse --- @type LuaEntity?
@@ -66,8 +66,9 @@ local function rename_station(event)
 
             -- Check which recourse is closest
             for _, resource in ipairs(resources) do
-                local dx = px - resource.bounding_box.left_top.x
-                local dy = py - resource.bounding_box.left_top.y
+                local resource_box = resource.bounding_box --[[@as ExpUtil_AABB.Box]]
+                local dx = px - resource_box.left_top.x
+                local dy = py - resource_box.left_top.y
                 local distance = (dx * dx) + (dy * dy)
                 if distance < closest_distance then
                     closest_distance = distance
@@ -78,7 +79,8 @@ local function rename_station(event)
             -- Set the item name and icon
             if closest_recourse then
                 item_name = closest_recourse.name:gsub("^%l", string.upper):gsub("-", " ") -- remove dashes and making first letter capital
-                local product = closest_recourse.prototype.mineable_properties.products[1]
+                local products = assert(closest_recourse.prototype.mineable_properties.products)
+                local product = assert(products[1])
                 icon = string.format("[img=%s.%s]", product.type, product.name)
             end
         end
