@@ -432,7 +432,8 @@ local vlayer_gui_control_remove = Gui.define("vlayer_gui_control_remove")
             local i = vlayer.get_interfaces()
 
             if i and i[vlayer_control_type_list[target]] then
-                local interface_type, interface_surface, interface_position = vlayer.remove_interface(i[vlayer_control_type_list[target]][n].surface, i[vlayer_control_type_list[target]][n].position)
+                local entity = assert(i[vlayer_control_type_list[target]][n])
+                local interface_type, interface_surface, interface_position = vlayer.remove_interface(entity.surface, entity.position)
 
                 if interface_type then
                     game.print{ "vlayer.interface-result", player.name, pos_to_gps_string(interface_position, interface_surface.name), { "vlayer.result-remove" }, { "vlayer.control-type-" .. interface_type } }
