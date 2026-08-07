@@ -177,7 +177,7 @@ end
 --- @param machine_selector LuaGuiElement
 function Elements.module_table.remove_row(module_table, machine_selector)
     local rows = Elements.module_table.data[module_table]
-    local row = rows[machine_selector.index]
+    local row = assert(rows[machine_selector.index])
     rows[machine_selector.index] = nil
     Gui.destroy_if_valid(machine_selector)
     for _, separator in pairs(row.row_separators) do
@@ -193,7 +193,7 @@ end
 --- @param machine_selector LuaGuiElement
 function Elements.module_table.reset_row(module_table, machine_selector)
     local rows = Elements.module_table.data[module_table]
-    local row = rows[machine_selector.index]
+    local row = assert(rows[machine_selector.index])
 
     for _, separator in pairs(row.row_separators) do
         separator.visible = false
@@ -211,9 +211,9 @@ end
 --- @param machine_name string
 function Elements.module_table.refresh_row(module_table, machine_selector, machine_name)
     local rows = Elements.module_table.data[module_table]
-    local row = rows[machine_selector.index]
+    local row = assert(rows[machine_selector.index])
 
-    local active_module_count = prototypes.entity[machine_name].module_inventory_size
+    local active_module_count = assert(prototypes.entity[machine_name].module_inventory_size)
     local visible_row_count = math.ceil(active_module_count / config.module_slots_per_row)
     local visible_module_count = visible_row_count * config.module_slots_per_row
     local module_elem_value = { name = config.machines[machine_name].module }
@@ -348,7 +348,7 @@ SelectArea:on_selection(function(event, module_table)
 
         -- Get all the modules selected
         for i = 1, entity_prototype.module_inventory_size do
-            local module_selector = module_selectors[i]
+            local module_selector = assert(module_selectors[i])
             local module = module_selector.elem_value --[[@as { name: string, quality: string }?]]
             if module then
                 -- Module selected, add it the module arrays
@@ -427,7 +427,7 @@ local function on_entity_settings_pasted(event)
         -- Attempt to rotate a machine to match the source machine
         if (source.name == destination.name or source.prototype.fast_replaceable_group == destination.prototype.fast_replaceable_group) then
             if source.supports_direction and destination.supports_direction and source.type ~= "transport-belt" then
-                local destination_box = destination.bounding_box
+                local destination_box = destination.bounding_box --[[@as ExpUtil_AABB.Box]]
 
                 local ltx = destination_box.left_top.x
                 local lty = destination_box.left_top.y
