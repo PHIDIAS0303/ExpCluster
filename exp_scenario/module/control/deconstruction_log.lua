@@ -42,7 +42,7 @@ local function format_position(pos)
 end
 
 --- Convert an area to a string
---- @param area BoundingBox
+--- @param area ExpUtil_AABB.Box
 --- @return string
 local function format_area(area)
     return format_string("%.1f,%.1f,%.1f,%.1f", area.left_top.x, area.left_top.y, area.right_bottom.x, area.right_bottom.y)
