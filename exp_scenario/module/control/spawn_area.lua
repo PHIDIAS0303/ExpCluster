@@ -10,8 +10,8 @@ local config = require("modules.exp_legacy.config.spawn_area")
 --- @return MapPosition.struct
 local function apply_offset(position, offset)
     return {
-        x = assert(position.x or position[1]) + assert(offset.x or offset[1]),
-        y = assert(position.y or position[2]) + assert(offset.y or offset[2])
+        x = position.x + offset.x,
+        y = position.y + offset.y,
     }
 end
 
@@ -21,8 +21,8 @@ end
 --- @param x_index number
 --- @param y_index number
 local function apply_offset_to_array(positions, offset, x_index, y_index)
-    local x = assert(offset.x or offset[1])
-    local y = assert(offset.y or offset[2])
+    local x = offset.x
+    local y = offset.y
     for _, position in ipairs(positions) do
         position[x_index] = position[x_index] + x
         position[y_index] = position[y_index] + y

@@ -73,8 +73,8 @@ local function try_deconstruct_output_chest(entity)
         type = { "mining-drill", "inserter" },
         to_be_deconstructed = false,
         area = {
-            { target_position.x - 1, target_position.y - 1 },
-            { target_position.x + 1, target_position.y + 1 }
+            left_top = { x = target_position.x - 1, y = target_position.y - 1 },
+            right_bottom = { x = target_position.x + 1, y = target_position.y + 1 },
         },
     }
 
@@ -251,8 +251,8 @@ local function on_resource_depleted(event)
     local drills = resource.surface.find_entities_filtered{
         type = "mining-drill",
         area = {
-            { position.x - max_mining_radius, position.y - max_mining_radius },
-            { position.x + max_mining_radius, position.y + max_mining_radius },
+            left_top = { x = position.x - max_mining_radius, y = position.y - max_mining_radius },
+            right_bottom = { x = position.x + max_mining_radius, y = position.y + max_mining_radius },
         },
     }
 

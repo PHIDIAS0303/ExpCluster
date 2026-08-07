@@ -188,7 +188,7 @@ return {
                 amount = 4000,
                 size = { 26, 27 },
                 -- offset = {-64,-32}
-                offset = { -64, -64 },
+                offset = { x = -64, y = -64 },
             },
             {
                 enabled = false,
@@ -196,7 +196,7 @@ return {
                 amount = 4000,
                 size = { 26, 27 },
                 -- offset = {-64, 0}
-                offset = { 64, -64 },
+                offset = { x = 64, y = -64 },
             },
             {
                 enabled = false,
@@ -204,7 +204,7 @@ return {
                 amount = 4000,
                 size = { 22, 20 },
                 -- offset = {-64, 32}
-                offset = { -64, 64 },
+                offset = { x = -64, y = 64 },
             },
             {
                 enabled = false,
@@ -212,7 +212,7 @@ return {
                 amount = 4000,
                 size = { 22, 20 },
                 -- offset = {-64, -64}
-                offset = { 64, 64 },
+                offset = { x = 64, y = 64 },
             },
             {
                 enabled = false,
@@ -220,7 +220,7 @@ return {
                 amount = 4000,
                 size = { 22, 20 },
                 -- offset = {-64, -96}
-                offset = { 0, 64 },
+                offset = { x = 0, y = 64 },
             },
         },
     },
@@ -233,7 +233,7 @@ return {
                 num_patches = 4,
                 amount = 4000000,
                 -- offset = {-80, -12},
-                offset = { -12, 64 },
+                offset = { x = -12, y = 64 },
                 -- offset_next = {0, 6}
                 offset_next = { 6, 0 },
             },
