@@ -172,7 +172,7 @@ local function on_object_destroyed(event)
     for _, scope in pairs(registered_scopes) do
         local data = scope._raw.element_data
         local player_elements = data and data[player_index]
-        if player_elements then
+        if data and player_elements then
             player_elements[element_index] = nil
             if not next(player_elements) then
                 data[player_index] = nil
