@@ -204,7 +204,7 @@ end
 --- @param row_index number
 --- @param row_data ExpGui_ResearchMilestones.elements.milestone_table.row_data
 function Elements.milestone_table.refresh_row(milestone_table, row_index, row_data)
-    local row = Elements.milestone_table.data[milestone_table][row_index]
+    local row = assert(Elements.milestone_table.data[milestone_table][row_index])
     row.name.caption = row_data.name
     row.target.caption = row_data.target
     row.achieved.caption = row_data.achieved

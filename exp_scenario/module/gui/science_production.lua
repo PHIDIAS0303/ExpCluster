@@ -193,7 +193,7 @@ Elements.science_table = Gui.define("science_production/science_table")
         local science_table = Gui.elements.scroll_table(parent, 190, 4)
         local no_production_label = Elements.no_production_label(science_table)
         Elements.no_production_label.refresh(no_production_label)
-        science_table.style.column_alignments[3] = "right"
+        (science_table.style --[[@as LuaStyle]]).column_alignments[3] = "right"
         return science_table
     end) 
     :element_data{} --[[@as any]]
@@ -280,7 +280,7 @@ function Elements.science_table.add_row(science_table, row_data)
         column_count = 2,
     }
     delta_table.style.padding = 0
-    delta_table.style.column_alignments[1] = "right"
+    (delta_table.style --[[@as LuaStyle]]).column_alignments[1] = "right"
 
     -- Draw the net production label
     local net = Elements.production_label(science_table, row_data.net)

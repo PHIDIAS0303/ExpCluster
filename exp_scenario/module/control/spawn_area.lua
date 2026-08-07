@@ -276,7 +276,7 @@ local function on_player_created(event)
     if config.resource_patches.enabled then create_resource_patches(surface, offset) end
     if config.turrets.enabled then update_turrets() end
 
-    player.force.set_spawn_position(offset, surface)
+    (player.force --[[@as LuaForce]]).set_spawn_position(offset, surface)
     player.teleport(offset, surface)
 end
 

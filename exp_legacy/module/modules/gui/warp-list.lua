@@ -799,7 +799,7 @@ Event.on_nth_tick(math.floor(60 / config.update_smoothing), function()
                 end
 
                 -- Check if the player is within range
-                local warp_pos = warp.position
+                local warp_pos = warp.position --[[@as MapPosition.struct]]
                 if warp.surface == surface then
                     local dx, dy = px - warp_pos.x, py - warp_pos.y
                     local dist = (dx * dx) + (dy * dy)
@@ -842,7 +842,7 @@ end)
 Event.add(defines.events.on_player_created, function(event)
     -- If the force has no spawn then make a spawn warp
     local player = game.players[event.player_index]
-    local force = player.force
+    local force = player.force --[[@as LuaForce]]
     local spawn_id = Warps.get_spawn_warp_id(force.name)
     if not spawn_id then
         local spawn_position = force.get_spawn_position(player.surface)
