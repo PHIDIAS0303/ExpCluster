@@ -167,7 +167,7 @@ local function try_deconstruct_miner(entity)
     create_entity(create_entity_param)
 
     -- Find all the entities to connect to
-    local bounding_box = entity.bounding_box --[[@as ExpUtil_AABB.Box]]
+    local bounding_box = entity.bounding_box
     local search_area = {
         { bounding_box.left_top.x - 1, bounding_box.left_top.y - 1 },
         { bounding_box.right_bottom.x + 1, bounding_box.right_bottom.y + 1 },

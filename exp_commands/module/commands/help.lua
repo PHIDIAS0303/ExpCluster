@@ -25,18 +25,18 @@ end)
 --- @param page_size number The number of requests to show per page
 --- @return LocalisedString[][], number
 local function format_as_pages(commands, page_size)
-    local pages = { {} }
+    local current_page = {}
+    local pages = { current_page }
     local page_length = 0
-    local current_page = 1
     local total = 0
 
     for _, command in pairs(commands) do
         total = total + 1
         page_length = page_length + 1
         if page_length > page_size then
-            current_page = current_page + 1
-            pages[current_page] = {}
             page_length = 1
+            current_page = {}
+            pages[#pages + 1] = current_page
         end
 
         local description
@@ -48,7 +48,7 @@ local function format_as_pages(commands, page_size)
         end
 
         local aliases = #command.aliases > 0 and { "exp-commands_help.aliases", table.concat(command.aliases, ", ") } or ""
-        assert(pages[current_page])[page_length] = { "exp-commands_help.format", command.name, description, aliases }
+        current_page[page_length] = { "exp-commands_help.format", command.name, description, aliases }
     end
 
     return pages, total

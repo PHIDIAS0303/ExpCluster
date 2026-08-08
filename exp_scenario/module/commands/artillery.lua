@@ -15,7 +15,7 @@ local abs = math.abs
 local commands = {}
 
 --- @param player LuaPlayer
---- @param area ExpUtil_AABB.Box
+--- @param area BoundingBox.struct
 --- @return boolean
 local function location_break(player, area)
     local surface = player.surface -- Allow remote view

@@ -32,7 +32,7 @@ local function degrade_entity(entity)
 
     local tiles = {}
     local surface = entity.surface
-    local bounding_box = entity.bounding_box --[[@as ExpUtil_AABB.Box]]
+    local bounding_box = entity.bounding_box
     local left_top = bounding_box.left_top
     local right_bottom = bounding_box.right_bottom
     for x = left_top.x, right_bottom.x do

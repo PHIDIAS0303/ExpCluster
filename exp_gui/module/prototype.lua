@@ -168,8 +168,7 @@ end
 --- @param name string
 --- @return ExpElement
 function ExpElement.get(name)
-    local value = assert(ExpElement._elements[name], "ExpElement is not defined: " .. tostring(name))
-    return value
+    return (assert(ExpElement._elements[name], "ExpElement is not defined: " .. tostring(name)))
 end
 
 --- Create a new instance of this element definition

@@ -55,8 +55,7 @@ Commands.new("get-roles", { "exp-commands_roles.description-get" })
         end
 
         local last = #roles_formatted
-        --- @diagnostic disable-next-line: need-check-nil
-        roles_formatted[last] = roles_formatted[last][2]
+        roles_formatted[last] = assert(roles_formatted[last])[2]
 
         return Commands.status.success(response)
     end)

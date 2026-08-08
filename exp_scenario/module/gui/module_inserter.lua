@@ -427,7 +427,7 @@ local function on_entity_settings_pasted(event)
         -- Attempt to rotate a machine to match the source machine
         if (source.name == destination.name or source.prototype.fast_replaceable_group == destination.prototype.fast_replaceable_group) then
             if source.supports_direction and destination.supports_direction and source.type ~= "transport-belt" then
-                local destination_box = destination.bounding_box --[[@as ExpUtil_AABB.Box]]
+                local destination_box = destination.bounding_box
 
                 local ltx = destination_box.left_top.x
                 local lty = destination_box.left_top.y

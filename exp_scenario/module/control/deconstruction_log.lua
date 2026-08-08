@@ -42,7 +42,7 @@ local function format_position(pos)
 end
 
 --- Convert an area to a string
---- @param area ExpUtil_AABB.Box
+--- @param area BoundingBox.struct
 --- @return string
 local function format_area(area)
     return format_string("%.1f,%.1f,%.1f,%.1f", area.left_top.x, area.left_top.y, area.right_bottom.x, area.right_bottom.y)
@@ -137,8 +137,7 @@ local function on_player_ammo_inventory_changed(event)
     if not player or not player.character then return end
 
     local character_ammo = assert(player.get_inventory(defines.inventory.character_ammo))
-    local gun_index = player.character.selected_gun_index
-    --- @cast gun_index uint
+    local gun_index = player.character.selected_gun_index --[[@as uint]]
     local item = character_ammo[gun_index]
     if not item or not item.valid or not item.valid_for_read then
         return

@@ -150,6 +150,8 @@ local Storage = require("modules/exp_util/storage")
 
 local DatastoreManager = {}
 local Datastores = {} --- @type table<string, Datastore>
+local Data = {}
+
 --- @class Datastore
 --- @field name string
 --- @field value_name string
@@ -163,7 +165,7 @@ local Datastores = {} --- @type table<string, Datastore>
 --- @field events table<string, function[]>
 --- @field data table
 local Datastore = {}
-local Data = {}
+
 local copy = table.deep_copy
 local trace = debug.traceback
 local table_to_json = helpers.table_to_json

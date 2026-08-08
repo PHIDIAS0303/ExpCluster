@@ -376,8 +376,7 @@ function Roles.get_player_highest_role(player)
         end
     end
 
-    local value = assert(highest, "Player has no roles")
-    return value
+    return (assert(highest, "Player has no roles"))
 end
 
 --- Assignment.

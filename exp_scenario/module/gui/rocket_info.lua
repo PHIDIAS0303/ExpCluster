@@ -433,8 +433,7 @@ function Elements.progress_table.add_row(progress_table, row_data)
     progress.style.padding = { 0, 2 }
     progress.style.font_color = row_data.color
 
-    local unit_number = row_data.entity.unit_number
-    --- @cast unit_number uint
+    local unit_number = row_data.entity.unit_number --[[@as uint]]
     rows[unit_number] = { x = x, y = y, progress = progress }
 end
 
@@ -457,8 +456,7 @@ end
 --- @param row_data ExpGui_RocketInfo.elements.progress_table.row_data
 function Elements.progress_table.refresh_row(progress_table, row_data)
     local element_data = Elements.progress_table.data[progress_table]
-    local unit_number = row_data.entity.unit_number
-    --- @cast unit_number uint
+    local unit_number = row_data.entity.unit_number --[[@as uint]]
     local row = element_data.rows[unit_number]
     row.x.caption = row_data.x
     row.y.caption = row_data.y
@@ -624,8 +622,7 @@ end
 function Elements.container.add_silo(entity)
     local force = entity.force --[[@as LuaForce]]
     local silos = Elements.container._get_force_data(force).silos
-    local unit_number = entity.unit_number
-    --- @cast unit_number uint
+    local unit_number = entity.unit_number --[[@as uint]]
     silos[unit_number] = {
         entity = entity,
         launched = 0,
@@ -661,9 +658,8 @@ Gui.toolbar.create_button{
 --- Record the launch and update the stats when a cargo pod finishes ascending
 --- @param event EventData.on_cargo_pod_finished_ascending
 local function on_cargo_pod_finished_ascending(event)
-    local force = event.cargo_pod.force
-    --- @cast force LuaForce
-    local rockets_launched = force.rockets_launched
+    local force = event.cargo_pod.force --[[@as LuaForce]]
+    local rockets_launched = force.rockets_launched --[[@as number]]
 
     -- Update the launch stats for the force
     local stats = Elements.container.get_stats(force)
@@ -678,7 +674,6 @@ local function on_cargo_pod_finished_ascending(event)
 
     -- Append the launch tick into the times array
     local times = Elements.container.get_launch_times(force)
-    --- @cast rockets_launched uint
     times[rockets_launched] = event.tick
 
     -- Discard the launch time that is no longer needed by any rolling average unless it is a milestone

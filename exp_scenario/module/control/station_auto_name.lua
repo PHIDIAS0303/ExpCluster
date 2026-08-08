@@ -57,7 +57,7 @@ local function rename_station(event)
         -- Find the closest resource
         local icon = ""
         local item_name = ""
-        local bounding_box = entity.bounding_box --[[@as ExpUtil_AABB.Box]]
+        local bounding_box = entity.bounding_box
         local resources = entity.surface.find_entities_filtered{ position = entity.position, radius = 250, type = "resource" }
         if #resources > 0 then
             local closest_recourse --- @type LuaEntity?
@@ -66,7 +66,7 @@ local function rename_station(event)
 
             -- Check which recourse is closest
             for _, resource in ipairs(resources) do
-                local resource_box = resource.bounding_box --[[@as ExpUtil_AABB.Box]]
+                local resource_box = resource.bounding_box
                 local dx = px - resource_box.left_top.x
                 local dy = py - resource_box.left_top.y
                 local distance = (dx * dx) + (dy * dy)
