@@ -326,7 +326,7 @@ local function vlayer_gui_list_refresh(player)
 
         for i = 1, vlayer.get_interface_counts()[vlayer_control_type_list[target]], 1 do
             local entity = assert(interface[i])
-            local entity_position = entity.position --[[@as MapPosition.struct]]
+            local entity_position = entity.position
             table.insert(full_list, i .. " X " .. entity_position.x .. " Y " .. entity_position.y)
         end
 

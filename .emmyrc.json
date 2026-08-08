@@ -9,7 +9,7 @@
         "$comment-library": "clusterio is outside this repo, set CLUSTERIO to your checkout. The factorio typedefs come from .luarc.json, which the factoriomod-debug extension manages",
         "library": [ "$CLUSTERIO/packages/host" ],
         "ignoreDir": [ ".github", "web", "dist", "factorio" ],
-        "ignoreGlobs": [ "**/node_modules/**", "**/dist/**" ],
+        "ignoreGlobs": [ "**/node_modules/**", "**/dist/**", "**/campaigns/**" ],
         "moduleMap": [
             { "pattern": "^([^.]+)\\.module\\.module_exports$", "replace": "modules.$1" },
             { "pattern": "^([^.]+)\\.module\\.(.+)$", "replace": "modules.$1.$2" }

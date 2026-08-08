@@ -130,7 +130,7 @@ Elements.production_table = Gui.define("production_stats/production_table")
     :track_all_elements()
     :draw(function(def, parent)
         local scroll_table = Gui.elements.scroll_table(parent, 304, 4)
-        local display_alignments = scroll_table.style.column_alignments
+        local display_alignments = assert(scroll_table.style.column_alignments)
         for i = 2, 4 do
             display_alignments[i] = "right"
         end

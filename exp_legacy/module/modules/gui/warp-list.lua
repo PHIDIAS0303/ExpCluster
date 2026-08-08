@@ -799,7 +799,7 @@ Event.on_nth_tick(math.floor(60 / config.update_smoothing), function()
                 end
 
                 -- Check if the player is within range
-                local warp_pos = warp.position --[[@as MapPosition.struct]]
+                local warp_pos = warp.position
                 if warp.surface == surface then
                     local dx, dy = px - warp_pos.x, py - warp_pos.y
                     local dist = (dx * dx) + (dy * dy)

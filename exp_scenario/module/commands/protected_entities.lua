@@ -51,7 +51,7 @@ local function show_protected_entity(player, entity)
     if renders[player.index][key] then return end
     local selection_box = entity.selection_box --[[@as ExpUtil_AABB.Box]]
     local rb = selection_box.right_bottom
-    local position = entity.position --[[@as MapPosition.struct]]
+    local position = entity.position
     renders[player.index][key] = rendering.draw_sprite{
         sprite = "utility/notification",
         target = entity,

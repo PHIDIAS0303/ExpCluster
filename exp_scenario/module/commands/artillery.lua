@@ -67,7 +67,7 @@ SelectArea:on_selection(function(event)
     for _, entity in ipairs(entities) do
         local skip = false
 
-        local entity_position = entity.position --[[@as MapPosition.struct]]
+        local entity_position = entity.position
         for _, pos in ipairs(hits) do
             local x = abs(entity_position.x - pos.x)
             local y = abs(entity_position.y - pos.y)

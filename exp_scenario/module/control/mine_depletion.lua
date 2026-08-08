@@ -68,7 +68,7 @@ local function try_deconstruct_output_chest(entity)
     end
 
     -- Get all adjacent mining drills and inserters
-    local target_position = target.position --[[@as MapPosition.struct]]
+    local target_position = target.position
     local entities = target.surface.find_entities_filtered{
         type = { "mining-drill", "inserter" },
         to_be_deconstructed = false,
@@ -160,7 +160,7 @@ local function try_deconstruct_miner(entity)
     end
 
     -- Build pipes if the miner used fluid
-    local position = entity.position --[[@as MapPosition.struct]]
+    local position = entity.position
     local create_entity_position = { x = position.x, y = position.y }
     local create_entity_param = { name = "entity-ghost", inner_name = "pipe", force = entity.force, position = create_entity_position }
     local create_entity = surface.create_entity
@@ -247,7 +247,7 @@ local function on_resource_depleted(event)
     end
 
     -- Find all mining drills within the area
-    local position = resource.position --[[@as MapPosition.struct]]
+    local position = resource.position
     local drills = resource.surface.find_entities_filtered{
         type = "mining-drill",
         area = {
@@ -259,7 +259,7 @@ local function on_resource_depleted(event)
     -- Check which could have reached this resource
     for _, drill in pairs(drills) do
         local radius = drill.prototype.mining_drill_radius
-        local drill_position = drill.position --[[@as MapPosition.struct]]
+        local drill_position = drill.position
         local dx = math.abs(drill_position.x - position.x)
         local dy = math.abs(drill_position.y - position.y)
         if dx <= radius and dy <= radius then

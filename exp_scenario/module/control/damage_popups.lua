@@ -26,7 +26,7 @@ local function on_entity_damaged(event)
 
     -- Outputs the message as floating text
     if message then
-        local entity_position = entity.position --[[@as MapPosition.struct]]
+        local entity_position = entity.position
         local entity_radius = max(1, entity.get_radius())
         local offset = (random() - 0.5) * entity_radius * config.damage_location_variance
         local position = { x = entity_position.x + offset, y = entity_position.y - entity_radius }
