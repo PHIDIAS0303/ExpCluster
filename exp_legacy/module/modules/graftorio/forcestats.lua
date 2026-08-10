@@ -126,19 +126,19 @@ lib.collect_loginet = function()
                 end
 
                 if config.modules.logistorage then
-                    for name, v in pairs(network.get_contents()) do
-                        stats.items[name] = (stats.items[name] or 0) + v
+                    for _, item in pairs(network.get_contents()) do
+                        stats.items[item.name] = (stats.items[item.name] or 0) + item.count
                     end
 
                     -- pickups and deliveries of items
                     for _, point_list in pairs{ network.provider_points, network.requester_points, network.storage_points } do
                         for _, point in pairs(point_list) do
-                            for name, qty in pairs(point.targeted_items_pickup) do
-                                stats.pickups[name] = (stats.pickups[name] or 0) + qty
+                            for _, item in pairs(point.targeted_items_pickup) do
+                                stats.pickups[item.name] = (stats.pickups[item.name] or 0) + item.count
                             end
 
-                            for name, qty in pairs(point.targeted_items_deliver) do
-                                stats.deliveries[name] = (stats.deliveries[name] or 0) + qty
+                            for _, item in pairs(point.targeted_items_deliver) do
+                                stats.deliveries[item.name] = (stats.deliveries[item.name] or 0) + item.count
                             end
                         end
                     end

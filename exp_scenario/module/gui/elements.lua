@@ -22,11 +22,10 @@ Elements.online_player_dropdown = Gui.define("player_dropdown")
     end)
     :style{
         height = 24,
-    } --[[ @as any ]]
+    } --[[@as any]]
 
 --- To help with caching and avoid context changes the player list from the previous update is remembered
---- @type (string?)[]
-do local _player_names = {}
+do local _player_names = {} --- @type (string?)[]
     --- Updates the player name list after a join or leave
     --- @return (string?)[]
     function Elements.online_player_dropdown._update_player_names()

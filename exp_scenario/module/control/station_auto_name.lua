@@ -66,8 +66,9 @@ local function rename_station(event)
 
             -- Check which recourse is closest
             for _, resource in ipairs(resources) do
-                local dx = px - resource.bounding_box.left_top.x
-                local dy = py - resource.bounding_box.left_top.y
+                local resource_box = resource.bounding_box
+                local dx = px - resource_box.left_top.x
+                local dy = py - resource_box.left_top.y
                 local distance = (dx * dx) + (dy * dy)
                 if distance < closest_distance then
                     closest_distance = distance
@@ -78,7 +79,8 @@ local function rename_station(event)
             -- Set the item name and icon
             if closest_recourse then
                 item_name = closest_recourse.name:gsub("^%l", string.upper):gsub("-", " ") -- remove dashes and making first letter capital
-                local product = closest_recourse.prototype.mineable_properties.products[1]
+                local products = assert(closest_recourse.prototype.mineable_properties.products)
+                local product = assert(products[1])
                 icon = string.format("[img=%s.%s]", product.type, product.name)
             end
         end

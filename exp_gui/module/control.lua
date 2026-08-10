@@ -16,7 +16,7 @@ Storage.register(player_elements, function(tbl)
     player_elements = tbl
 end)
 
---- @class Gui
+--- @class (partial) Gui
 local Gui = {
     define = ExpElement.new,
     from_argument = ExpElement.from_argument,
@@ -46,9 +46,11 @@ end
 --- @return LuaPlayer
 function Gui.get_player(input)
     if type(input) == "table" and not input.player_index then
-        return assert(game.get_player(input.element.player_index))
+        --- @cast input { element: LuaGuiElement }
+        return (assert(game.get_player(input.element.player_index)))
     end
-    return assert(game.get_player(input.player_index))
+    --- @cast input LuaGuiElement | { player_index: uint }
+    return (assert(game.get_player(input.player_index)))
 end
 
 --- Toggle the enable state of an element
@@ -88,7 +90,7 @@ end
 --- @param define ExpElement
 --- @param visible Gui.VisibleCallback | boolean | nil
 function Gui.add_top_element(define, visible)
-    assert(Gui.top_elements[define.name] == nil, "Element is already added to the top flow")
+    assert(Gui.top_elements[define] == nil, "Element is already added to the top flow")
     Gui.top_elements[define] = visible or false
 end
 
@@ -96,7 +98,7 @@ end
 --- @param define ExpElement
 --- @param visible Gui.VisibleCallback | boolean | nil
 function Gui.add_left_element(define, visible)
-    assert(Gui.left_elements[define.name] == nil, "Element is already added to the left flow")
+    assert(Gui.left_elements[define] == nil, "Element is already added to the left flow")
     Gui.left_elements[define] = visible or false
 
 end
@@ -105,7 +107,7 @@ end
 --- @param define ExpElement
 --- @param visible Gui.VisibleCallback | boolean | nil
 function Gui.add_relative_element(define, visible)
-    assert(Gui.relative_elements[define.name] == nil, "Element is already added to the relative flow")
+    assert(Gui.relative_elements[define] == nil, "Element is already added to the relative flow")
     Gui.relative_elements[define] = visible or false
 end
 
@@ -114,7 +116,8 @@ end
 --- @param player LuaPlayer
 --- @return LuaGuiElement
 function Gui.get_top_element(define, player)
-    return assert(player_elements[player.index].top[define.name], "Element is not on the top flow")
+    local elements = assert(player_elements[player.index])
+    return (assert(elements.top[define.name], "Element is not on the top flow"))
 end
 
 --- Register a element define to be drawn to the left flow on join
@@ -122,7 +125,8 @@ end
 --- @param player LuaPlayer
 --- @return LuaGuiElement
 function Gui.get_left_element(define, player)
-    return assert(player_elements[player.index].left[define.name], "Element is not on the left flow")
+    local elements = assert(player_elements[player.index])
+    return (assert(elements.left[define.name], "Element is not on the left flow"))
 end
 
 --- Register a element define to be drawn to the relative flow on join
@@ -130,7 +134,8 @@ end
 --- @param player LuaPlayer
 --- @return LuaGuiElement
 function Gui.get_relative_element(define, player)
-    return assert(player_elements[player.index].relative[define.name], "Element is not on the relative flow")
+    local elements = assert(player_elements[player.index])
+    return (assert(elements.relative[define.name], "Element is not on the relative flow"))
 end
 
 --- Ensure all the correct elements are visible and exist
@@ -188,9 +193,9 @@ function Gui._ensure_consistency(event)
 
     -- This check isn't needed, but allows the toolbar file to be deleted without modifying any lib code
     if Gui.toolbar then
-        --- @diagnostic disable-next-line invisible
+        --- @diagnostic disable-next-line: access-invisible
         Gui.toolbar._create_elements(player)
-        --- @diagnostic disable-next-line invisible
+        --- @diagnostic disable-next-line: access-invisible
         Gui.toolbar._ensure_consistency(player)
     end
 end
@@ -211,7 +216,7 @@ local function on_gui_opened(event)
 
         if visible then
             event.element = element
-            --- @diagnostic disable-next-line invisible
+            --- @diagnostic disable-next-line: access-invisible
             define:raise_event(event)
         end
     end

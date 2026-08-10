@@ -62,6 +62,7 @@ local GuiData = {
 --- @field player_data table<uint, any>
 --- @field force_data table<uint, any>
 --- @field global_data table
+--- @field [DataKey] any
 -- This class has no prototype methods
 -- Same as raw but __index ensures the values exist
 
@@ -89,13 +90,16 @@ function GuiData._metatable.__index(self, key)
     assert(type(key) == "userdata", "Index type '" .. ExpUtil.get_class_name(key) .. "' given to GuiData. Must be of type userdata.")
     local object_name = key.object_name --- @diagnostic disable-line assign-type-mismatch
     if object_name == "LuaGuiElement" then
+        --- @cast key LuaGuiElement
         local data = self._raw.element_data
         local player_elements = data and data[key.player_index]
         return player_elements and player_elements[key.index]
     elseif object_name == "LuaPlayer" then
+        --- @cast key LuaPlayer
         local data = self._raw.player_data
         return data and data[key.index]
     elseif object_name == "LuaForce" then
+        --- @cast key LuaForce
         local data = self._raw.force_data
         return data and data[key.index]
     else
@@ -153,7 +157,7 @@ end
 --- @param scope string
 --- @return GuiData
 function GuiData.get(scope)
-    return GuiData._scopes[scope] --[[ @as GuiData ]]
+    return GuiData._scopes[scope] --[[@as GuiData]]
 end
 
 --- Used to clean up data from destroyed elements
@@ -168,7 +172,7 @@ local function on_object_destroyed(event)
     for _, scope in pairs(registered_scopes) do
         local data = scope._raw.element_data
         local player_elements = data and data[player_index]
-        if player_elements then
+        if data and player_elements then
             player_elements[element_index] = nil
             if not next(player_elements) then
                 data[player_index] = nil

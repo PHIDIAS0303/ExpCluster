@@ -92,7 +92,7 @@ local assert_argument_fmt = "Bad argument #%d to %s; %s expected to be of type %
 function ExpUtil.assert_argument_type(arg_value, type_name, arg_index, arg_name)
     local failed, actual_type = check_type(arg_value, type_name)
     if failed then
-        local func_name = getinfo(2, "n").name or "<anonymous>"
+        local func_name = assert(getinfo(2, "n")).name or "<anonymous>"
         error(assert_argument_fmt:format(arg_index, func_name, arg_name or "Argument", type_name, actual_type), 2)
     end
 end
@@ -136,7 +136,7 @@ end
 --- @param level number? The level of the stack to get the file of, a value of 1 is the caller of this function
 --- @return string # The relative filepath of the given stack frame
 function ExpUtil.safe_file_path(level)
-    local debug_info = getinfo((level or 1) + 1, "Sn")
+    local debug_info = assert(getinfo((level or 1) + 1, "Sn"))
     local safe_source = debug_info.source:find("@__level__")
     return safe_source == 1 and debug_info.short_src:sub(10, -5) or debug_info.source
 end
@@ -145,7 +145,7 @@ end
 --- @param level number? The level of the stack to get the module of, a value of 1 is the caller of this function
 --- @return string # The name of the module at the given stack frame
 function ExpUtil.get_module_name(level)
-    local file_within_module = getinfo((level or 1) + 1, "S").short_src:sub(19, -5)
+    local file_within_module = assert(getinfo((level or 1) + 1, "S")).short_src:sub(19, -5)
     local next_slash = file_within_module:find("/")
     if next_slash then
         return file_within_module:sub(1, next_slash - 1)
@@ -159,7 +159,7 @@ end
 --- @param raw boolean? When true there will not be any < > around the name
 --- @return string # The name of the function at the given stack frame or provided as an argument
 function ExpUtil.get_function_name(func, raw)
-    local debug_info = getinfo(func, "Sn")
+    local debug_info = assert(getinfo(func, "Sn"))
     local safe_source = debug_info.source:find("@__level__")
     local file_name = safe_source == 1 and debug_info.source:sub(12, -5) or debug_info.source
     local func_name = debug_info.name or debug_info.linedefined
@@ -172,7 +172,7 @@ end
 --- @param raw boolean? When true there will not be any < > around the name
 --- @return string # The relative filepath of the given stack frame
 function ExpUtil.get_current_line(level, raw)
-    local debug_info = getinfo((level or 1) + 1, "Snl")
+    local debug_info = assert(getinfo((level or 1) + 1, "Snl"))
     local safe_source = debug_info.source:find("@__level__")
     local file_path = safe_source == 1 and debug_info.short_src:sub(10, -5) or debug_info.source
     if raw then return file_path .. ":" .. debug_info.currentline end
@@ -207,7 +207,7 @@ end
 function ExpUtil.auto_complete(options, input, use_key, rtn_key, use_pattern)
     input = input:lower()
     local plain = use_pattern ~= true
-    local found = {} --- @type { length: number, index: number, start: boolean, value: any }
+    local found = {} --- @type { length: number?, index: number?, start: boolean?, value: any }
     for k, v in pairs(options) do
         local str = use_key and k or v
         local index = str:lower():find(input, nil, plain)
@@ -284,7 +284,7 @@ function ExpUtil.format_any(value, options)
         end
         return inspect(value, { depth = options.depth or 5, indent = "", newline = "", process = ExpUtil.safe_value })
     end
-    return formatted
+    return formatted --[[@as LocalisedString]]
 end
 
 --- @alias Common.format_time_param_format "short" | "long" | "clock"
@@ -319,15 +319,15 @@ function ExpUtil.extract_time_units(ticks, units)
 
     -- Remove units that are not requested
     if not units.days then
-        rtn.hours = rtn.hours + rtn.days * 24
+        rtn.hours = assert(rtn.hours) + assert(rtn.days) * 24
         rtn.days = nil
     end
     if not units.hours then
-        rtn.minutes = rtn.minutes + rtn.hours * 60
+        rtn.minutes = assert(rtn.minutes) + assert(rtn.hours) * 60
         rtn.hours = nil
     end
     if not units.minutes then
-        rtn.seconds = rtn.seconds + rtn.minutes * 60
+        rtn.seconds = assert(rtn.seconds) + assert(rtn.minutes) * 60
         rtn.minutes = nil
     end
     if not units.seconds then
@@ -487,7 +487,7 @@ function ExpUtil.get_storage_for_stack(options)
     -- Find a valid entity from the search results
     local current, count, entities = cache.current, cache.count, cache.entities
     for i = 1, cache.count do
-        local entity = entities[((current + i - 1) % count) + 1]
+        local entity = assert(entities[((current + i - 1) % count) + 1])
         if entity.can_insert(item) then
             cache.current = current + 1
             return entity
@@ -522,7 +522,7 @@ end
 
 --- Insert a copy of the given items into the found entities. If no entities are found then they will be created if possible.
 --- @param options Common.copy_items_to_surface_param
---- @return LuaEntity # The last entity inserted into
+--- @return LuaEntity? # The last entity inserted into, nil if there were no items
 function ExpUtil.copy_items_to_surface(options)
     local entity
     for item_index = 1, #options.items do
@@ -542,7 +542,7 @@ end
 
 --- Insert a copy of the given items into the found entities. If no entities are found then they will be created if possible.
 --- @param options Common.move_items_to_surface_param
---- @return LuaEntity # The last entity inserted into
+--- @return LuaEntity? # The last entity inserted into, nil if there were no items
 function ExpUtil.move_items_to_surface(options)
     local entity
     for item_index = 1, #options.items do
@@ -551,7 +551,8 @@ function ExpUtil.move_items_to_surface(options)
             options.item = item
             entity = ExpUtil.get_storage_for_stack(options)
             entity.insert(options.item)
-            options.item.clear()
+            local item_stack = options.item --[[@as LuaItemStack]]
+            item_stack.clear()
         end
     end
     return entity
@@ -563,7 +564,7 @@ end
 
 --- Move the given inventory into the found entities. If no entities are found then they will be created if possible.
 --- @param options Common.transfer_inventory_to_surface_param
---- @return LuaEntity # The last entity inserted into
+--- @return LuaEntity? # The last entity inserted into, nil if there were no items
 function ExpUtil.transfer_inventory_to_surface(options)
     options.items = options.inventory
     local entity = ExpUtil.copy_items_to_surface(options)
@@ -604,6 +605,7 @@ end
 --- @return string
 function ExpUtil.comma_value(n) -- credit http://richard.warburton.it
     local left, num, right = string.match(n, "^([^%d]*%d)(%d*)(.-)$")
+    assert(left and num and right)
     return left .. (num:reverse():gsub("(%d%d%d)", "%1, "):reverse()) .. right
 end
 

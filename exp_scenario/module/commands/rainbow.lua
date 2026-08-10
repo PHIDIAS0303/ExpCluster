@@ -6,6 +6,12 @@ local Commands = require("modules/exp_commands")
 local format_player_name = Commands.format_player_name_locale
 local format_text = Commands.format_rich_text_color
 
+--- A colour with every channel set, Color.struct leaves them optional
+--- @class ExpCommands_Rainbow.Color
+--- @field r number
+--- @field g number
+--- @field b number
+
 --- Wraps one component into the next
 --- @param c1 number
 --- @param c2 number
@@ -21,8 +27,8 @@ local function step_component(c1, c2)
 end
 
 --- Wraps all components of a colour ensuring it remains valid
---- @param color Color
---- @return Color
+--- @param color ExpCommands_Rainbow.Color
+--- @return ExpCommands_Rainbow.Color
 local function step_color(color)
     color.r, color.g = step_component(color.r, color.g)
     color.g, color.b = step_component(color.g, color.b)
@@ -32,9 +38,9 @@ local function step_color(color)
 end
 
 --- Get the next colour in the rainbow by the given step
---- @param color Color
+--- @param color ExpCommands_Rainbow.Color
 --- @param step number
---- @return Color
+--- @return ExpCommands_Rainbow.Color
 local function next_color(color, step)
     step = step or 0.1
     local new_color = { r = 0, g = 0, b = 0 }

@@ -15,11 +15,11 @@ local abs = math.abs
 local commands = {}
 
 --- @param player LuaPlayer
---- @param area BoundingBox
+--- @param area BoundingBox.struct
 --- @return boolean
 local function location_break(player, area)
     local surface = player.surface -- Allow remote view
-    local is_charted = player.force.is_chunk_charted
+    local is_charted = (player.force --[[@as LuaForce]]).is_chunk_charted
     if is_charted(surface, { x = floor(area.left_top.x / 32), y = floor(area.left_top.y / 32) }) then
         return true
     elseif is_charted(surface, { x = floor(area.left_top.x / 32), y = floor(area.right_bottom.y / 32) }) then
@@ -43,7 +43,7 @@ commands.artillery = Commands.new("artillery", { "exp-commands_artillery.descrip
         end
         SelectArea:start(player)
         return Commands.status.success{ "exp-commands_artillery.enter" }
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- when an area is selected to add protection to the area
 SelectArea:on_selection(function(event)
@@ -63,13 +63,14 @@ SelectArea:on_selection(function(event)
     }
 
     local count = 0
-    local hits = {} --- @type MapPosition[]
+    local hits = {} --- @type MapPosition.struct[]
     for _, entity in ipairs(entities) do
         local skip = false
 
+        local entity_position = entity.position
         for _, pos in ipairs(hits) do
-            local x = abs(entity.position.x - pos.x)
-            local y = abs(entity.position.y - pos.y)
+            local x = abs(entity_position.x - pos.x)
+            local y = abs(entity_position.y - pos.y)
             if x * x + y * y < 36 then
                 skip = true
                 break

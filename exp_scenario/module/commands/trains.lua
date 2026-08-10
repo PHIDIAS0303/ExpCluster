@@ -10,7 +10,7 @@ local format_number = require("util").format_number
 local commands = {}
 
 --- Set all trains to automatic
---- @class ExpCommand_Artillery.commands.artillery: ExpCommand
+--- @class ExpCommand_Trains.commands.set_trains_to_automatic: ExpCommand
 --- @overload fun(player: LuaPlayer, surface: LuaSurface?, force: LuaForce?)
 commands.set_trains_to_automatic = Commands.new("set-trains-to-automatic", { "exp-commands_trains.description" })
     :optional("surface", { "exp-commands_trains.arg-surface" }, Commands.types.surface)
@@ -32,7 +32,7 @@ commands.set_trains_to_automatic = Commands.new("set-trains-to-automatic", { "ex
         end
 
         game.print{ "exp-commands_trains.response", format_player_name(player), format_number(#trains, false) }
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 return {
     commands = commands,

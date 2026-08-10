@@ -90,7 +90,7 @@ Elements.toggle_section_button = Gui.define("rocket_info/toggle_section_button")
             element.sprite = "utility/expand"
             element.tooltip = { "exp-gui_rocket-info.tooltip-toggle-section-expand" }
         end
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- A clickable coordinate label which opens the silo location on the map when pressed
 --- @class ExpGui_RocketInfo.elements.position_label: ExpElement
@@ -114,7 +114,7 @@ Elements.position_label = Gui.define("rocket_info/position_label")
         local entity = def.data[element]
         if not entity or not entity.valid then return end
         player.set_controller{ type = defines.controllers.remote, position = entity.position, surface = entity.surface }
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- Data table showing the launch statistics for a force
 --- @class ExpGui_RocketInfo.elements.stats_table: ExpElement
@@ -125,7 +125,7 @@ Elements.stats_table = Gui.define("rocket_info/stats_table")
     :element_data{}
     :draw(function(def, parent)
         return Gui.elements.scroll_table(parent, 215, 2)
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- @class ExpGui_RocketInfo.elements.stats_table.row_data
 --- @field key string Unique key used to look up the value label
@@ -218,7 +218,7 @@ end
 --- Refresh the stats table for a player, adding any rows that do not yet exist
 --- @param player LuaPlayer
 function Elements.stats_table.refresh_player(player)
-    local force = player.force --[[ @as LuaForce ]]
+    local force = player.force --[[@as LuaForce]]
     local row_data = Elements.stats_table.calculate_row_data(force)
     for _, stats_table in Elements.stats_table:online_elements(player) do
         Elements.stats_table.refresh(stats_table, row_data)
@@ -243,7 +243,7 @@ Elements.milestones_table = Gui.define("rocket_info/milestones_table")
     :element_data{}
     :draw(function(def, parent)
         return Gui.elements.scroll_table(parent, 215, 2)
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- @class ExpGui_RocketInfo.elements.milestones_table.row_data
 --- @field milestone number The milestone this row represents
@@ -315,7 +315,7 @@ end
 --- Refresh the milestones table for a player, adding rows as new milestones become visible
 --- @param player LuaPlayer
 function Elements.milestones_table.refresh_player(player)
-    local force = player.force --[[ @as LuaForce ]]
+    local force = player.force --[[@as LuaForce]]
     local row_data = Elements.stats_table.calculate_row_data(force)
     for _, stats_table in Elements.stats_table:online_elements(player) do
         Elements.stats_table.refresh(stats_table, row_data)
@@ -359,7 +359,7 @@ Elements.progress_table = Gui.define("rocket_info/progress_table")
 
         def.data[progress_table] = { rows = {}, no_silos = no_silos }
         return progress_table
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- @class ExpGui_RocketInfo.elements.progress_table.row_data
 --- @field entity LuaEntity
@@ -404,9 +404,9 @@ end
 --- @return ExpGui_RocketInfo.elements.progress_table.row_data[]
 function Elements.progress_table.calculate_row_data_all(silo_data)
     local row_data = {}
-    for unit_number, silo_data in pairs(silo_data) do
-        if silo_data.entity.valid then
-            row_data[unit_number] = Elements.progress_table.calculate_row_data(silo_data)
+    for unit_number, silo in pairs(silo_data) do
+        if silo.entity.valid then
+            row_data[unit_number] = Elements.progress_table.calculate_row_data(silo)
         else
             -- Prune silos that are no longer valid
             silo_data[unit_number] = nil
@@ -433,7 +433,8 @@ function Elements.progress_table.add_row(progress_table, row_data)
     progress.style.padding = { 0, 2 }
     progress.style.font_color = row_data.color
 
-    rows[row_data.entity.unit_number] = { x = x, y = y, progress = progress }
+    local unit_number = row_data.entity.unit_number --[[@as uint]]
+    rows[unit_number] = { x = x, y = y, progress = progress }
 end
 
 --- Remove a silo row from the progress table
@@ -455,7 +456,8 @@ end
 --- @param row_data ExpGui_RocketInfo.elements.progress_table.row_data
 function Elements.progress_table.refresh_row(progress_table, row_data)
     local element_data = Elements.progress_table.data[progress_table]
-    local row = element_data.rows[row_data.entity.unit_number]
+    local unit_number = row_data.entity.unit_number --[[@as uint]]
+    local row = element_data.rows[unit_number]
     row.x.caption = row_data.x
     row.y.caption = row_data.y
     row.progress.caption = row_data.caption
@@ -496,7 +498,7 @@ end
 --- Refresh the progress table for a player, reconciling rows with the current set of silos
 --- @param player LuaPlayer
 function Elements.progress_table.refresh_player(player)
-    local force = player.force --[[ @as LuaForce ]]
+    local force = player.force --[[@as LuaForce]]
     local silos = Elements.container.get_silos(force)
     local row_data = Elements.progress_table.calculate_row_data_all(silos)
     for _, progress_table in Elements.progress_table:online_elements(player) do
@@ -539,7 +541,7 @@ Elements.container = Gui.define("rocket_info/container")
         container.style.padding = 0
 
         local player = Gui.get_player(parent)
-        local force = player.force --[[ @as LuaForce ]]
+        local force = player.force --[[@as LuaForce]]
         local force_data = def._get_force_data(force)
 
         if config.stats.show_stats then
@@ -618,9 +620,10 @@ end
 --- Add a silo to the list of current silos for a force
 --- @param entity LuaEntity
 function Elements.container.add_silo(entity)
-    local force = entity.force --[[ @as LuaForce ]]
+    local force = entity.force --[[@as LuaForce]]
     local silos = Elements.container._get_force_data(force).silos
-    silos[entity.unit_number] = {
+    local unit_number = entity.unit_number --[[@as uint]]
+    silos[unit_number] = {
         entity = entity,
         launched = 0,
         awaiting_reset = false,
@@ -630,9 +633,11 @@ end
 --- Increment the launch count for a silo
 --- @param entity LuaEntity
 function Elements.container.increment_silo(entity)
-    local force = entity.force --[[ @as LuaForce ]]
+    local force = entity.force --[[@as LuaForce]]
     local silos = Elements.container._get_force_data(force).silos
-    local silo_data = silos[entity.unit_number]
+    local unit_number = entity.unit_number
+    --- @cast unit_number uint
+    local silo_data = silos[unit_number]
     if not silo_data then return end
     silo_data.launched = silo_data.launched + 1
     silo_data.awaiting_reset = true
@@ -653,8 +658,8 @@ Gui.toolbar.create_button{
 --- Record the launch and update the stats when a cargo pod finishes ascending
 --- @param event EventData.on_cargo_pod_finished_ascending
 local function on_cargo_pod_finished_ascending(event)
-    local force = event.cargo_pod.force --[[ @as LuaForce ]]
-    local rockets_launched = force.rockets_launched
+    local force = event.cargo_pod.force --[[@as LuaForce]]
+    local rockets_launched = force.rockets_launched --[[@as number]]
 
     -- Update the launch stats for the force
     local stats = Elements.container.get_stats(force)
@@ -686,7 +691,7 @@ end
 --- @param event EventData.on_rocket_launch_ordered
 local function on_rocket_launch_ordered(event)
     Elements.container.increment_silo(event.rocket_silo)
-    Elements.progress_table.refresh_force(event.rocket_silo.force --[[ @as LuaForce ]])
+    Elements.progress_table.refresh_force(event.rocket_silo.force --[[@as LuaForce]])
 end
 
 --- Refresh the gui when a player joins the game as it may be outdated
@@ -704,7 +709,7 @@ local function on_built(event)
     local entity = event.entity
     if not entity.valid or entity.name ~= "rocket-silo" then return end
     Elements.container.add_silo(entity)
-    Elements.progress_table.refresh_force(entity.force --[[ @as LuaForce ]])
+    Elements.progress_table.refresh_force(entity.force --[[@as LuaForce]])
 end
 
 --- Refresh the progress for all forces that own at least one silo

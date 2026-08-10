@@ -14,7 +14,8 @@ end
 
 ]]
 
-local ext, var
+local ext --- @type table<string, any>
+local var --- @type table<string, any>
 local concat = table.concat
 
 local External = {}
@@ -29,12 +30,13 @@ end
 
 ]]
 function External.valid()
-    if storage.ext == nil then return false end
-    if ext == storage.ext and var == ext.var then
+    local stored = storage.ext
+    if stored == nil then return false end
+    if ext == stored and var == ext.var then
         return var ~= nil
     else
-        ext = storage.ext
-        var = ext.var
+        ext = stored
+        var = stored.var
         return var ~= nil
     end
 end
@@ -48,7 +50,7 @@ local servers = External.get_servers()
 ]]
 function External.get_servers()
     assert(ext, "No external data was found, use External.valid() to ensure external data exists.")
-    return assert(ext.servers, "No server list was found, please ensure that the external service is running")
+    return (assert(ext.servers, "No server list was found, please ensure that the external service is running"))
 end
 
 --[[-- Gets a table of all the servers filtered by name, key is the server id, value is the server details
@@ -83,7 +85,7 @@ function External.get_current_server()
     assert(ext, "No external data was found, use External.valid() to ensure external data exists.")
     local servers = assert(ext.servers, "No server list was found, please ensure that the external service is running")
     local server_id = assert(ext.current, "No current id was found, please ensure that the external service is running")
-    return assert(servers[server_id], "No details found for server with id: " .. tostring(server_id))
+    return (assert(servers[server_id], "No details found for server with id: " .. tostring(server_id)))
 end
 
 --[[-- Gets the details of the given server
@@ -97,7 +99,7 @@ local server = External.get_server_details('eu-01')
 function External.get_server_details(server_id)
     assert(ext, "No external data was found, use External.valid() to ensure external data exists.")
     local servers = assert(ext.servers, "No server list was found, please ensure that the external service is running")
-    return assert(servers[server_id], "No details found for server with id: " .. tostring(server_id))
+    return (assert(servers[server_id], "No details found for server with id: " .. tostring(server_id)))
 end
 
 --[[-- Gets the status of the given server

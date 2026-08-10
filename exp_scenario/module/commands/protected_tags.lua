@@ -7,7 +7,7 @@ local Storage = require("modules/exp_util/storage")
 
 --- Storage variables
 local active_players = {} --- @type table<number, boolean> Stores all players in in protected mode
-local map_tags = {} --- @type table<number, boolean> Stores all protected map tags
+local map_tags = {} --- @type table<string, boolean> Stores all protected map tags
 
 Storage.register({
     active_players = active_players,

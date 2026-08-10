@@ -36,7 +36,7 @@ commands.waterfill = Commands.new("waterfill", { "exp-commands_waterfill.descrip
             SelectArea:start(player)
             return Commands.status.success{ "exp-commands_waterfill.enter" }
         end
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- When an area is selected to be converted to water
 SelectArea:on_selection(function(event)
@@ -70,7 +70,7 @@ SelectArea:on_selection(function(event)
     if #chests > 0 then
         for _, chest in pairs(chests) do
             tile_count = tile_count + 1
-            if chest.get_inventory(defines.inventory.chest).is_empty() and tile_count <= item_count_total then
+            if assert(chest.get_inventory(defines.inventory.chest)).is_empty() and tile_count <= item_count_total then
                 tiles_to_make[tile_count] = { name = tile_to_apply, position = { chest.position.x, chest.position.y } }
                 chest.destroy()
             else

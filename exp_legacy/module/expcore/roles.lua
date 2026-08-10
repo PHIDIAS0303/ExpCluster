@@ -117,11 +117,28 @@ local Groups = require("modules.exp_legacy.expcore.permission_groups")
 local Colours = ExpUtil.color
 local write_json = ExpUtil.write_json
 
+
+--- @class Roles.Role
+--- @field name string
+--- @field short_hand string
+--- @field index number Position within the role order
+--- @field allowed_actions table<string, boolean>
+--- @field allow_all_actions boolean
+--- @field flags table<string, boolean>
+--- @field disallowed_actions table<string, boolean>?
+--- @field permission_group ([boolean, string] | string)?
+--- @field custom_tag string?
+--- @field custom_color Color?
+--- @field parent string?
+--- @field block_auto_assign boolean?
+--- @field auto_assign_condition function?
+--- @field set_allow_all fun(self: Roles.Role, state: boolean?): Roles.Role Defined on Roles._prototype
+
 local Roles = {
     _prototype = {},
     config = {
-        order = {}, -- Contains the order of the roles, lower index is better
-        roles = {}, -- Contains the raw info for the roles, indexed by role name
+        order = {}, --- @type string[] Contains the order of the roles, lower index is better
+        roles = {}, --- @type table<string, Roles.Role> Contains the raw info for the roles, indexed by role name
         flags = {}, -- Contains functions that run when a flag is added/removed from a player
         internal = {}, -- Contains all internally accessed roles, such as root, default
         players = {}, -- Contains the roles that players have
@@ -200,7 +217,7 @@ function Roles.debug()
     local output = ""
     for index, role_name in ipairs(Roles.config.order) do
         local role = Roles.config.roles[role_name]
-        local color = role.custom_color or Colours.white
+        local color = (role.custom_color or Colours.white) --[[@as Color.struct]]
         local color_str = string.format("[color=%d, %d, %d]", color.r, color.g, color.b)
         output = output .. string.format("\n%s %s) %s[/color]", color_str, index, serpent.line(role))
     end
@@ -287,6 +304,7 @@ local role = Roles.get_role_by_name(2)
 ]]
 function Roles.get_role_by_order(index)
     local name = Roles.config.order[index]
+    if not name then return end
     return Roles.config.roles[name]
 end
 
@@ -348,16 +366,17 @@ end
 local role = Roles.get_player_highest_role(game.player)
 
 ]]
+--- @return Roles.Role
 function Roles.get_player_highest_role(player)
     local roles = Roles.get_player_roles(player)
-    local highest
+    local highest --- @type Roles.Role?
     for _, role in ipairs(roles) do
         if not highest or role.index < highest.index then
             highest = role
         end
     end
 
-    return highest
+    return (assert(highest, "Player has no roles"))
 end
 
 --- Assignment.
@@ -458,7 +477,7 @@ function Roles.unassign_player(player, roles, by_player_name, skip_checks, silen
 
     -- If the player has a role that needs to defer the role changes, save the roles that need to be unassigned later into a table
     local defer_changes = Roles.player_has_flag(player, "defer_role_changes")
-    if defer_changes then
+    if defer_changes and valid_player then
         local assign_later = Roles.config.deferred_roles[valid_player.name] or {}
         for _, role in ipairs(role_objects) do
             local role_change = assign_later[role.name]
@@ -719,7 +738,7 @@ local role = Roles.new_role('Moderator', 'Mod')
 ]]
 function Roles.new_role(name, short_hand)
     ExpUtil.assert_not_runtime()
-    if Roles.config.roles[name] then return error("Role name is non unique") end
+    if Roles.config.roles[name] then error("Role name is non unique") end
     local role = setmetatable({
         name = name,
         short_hand = short_hand or name,
@@ -894,10 +913,9 @@ role:set_permission_group('Admin')
 function Roles._prototype:set_permission_group(name, use_factorio_api)
     ExpUtil.assert_not_runtime()
     if use_factorio_api then
-        self.permission_group = { true, name }
+        self.permission_group = { true, name } --[[@as [boolean, string] ]]
     else
-        local group = Groups.get_group_by_name(name)
-        if not group then return end
+        assert(Groups.get_group_by_name(name), "Permission group not found: " .. name)
         self.permission_group = name
     end
     return self
@@ -1115,8 +1133,9 @@ local function role_update(event)
     -- Updates the players permission group
     local highest = Roles.get_player_highest_role(player)
     if highest.permission_group then
-        if highest.permission_group[1] then
-            local group = game.permissions.get_group(highest.permission_group[2])
+        local permission_group = highest.permission_group --[[@as [boolean, string] ]]
+        if permission_group[1] then
+            local group = game.permissions.get_group(permission_group[2])
             if group then
                 Groups.add_to_permission_group_async(group, player)
             end

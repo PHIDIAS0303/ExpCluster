@@ -31,15 +31,15 @@ local function append_playtime(player_name)
 end
 
 --- Get the player name from an event
---- @param event { player_index: number, by_player_name: string? }
---- @return string, string
+--- @param event { player_index: uint, by_player_name: string? }
+--- @return string, string?
 local function get_player_name(event)
     local player = game.players[event.player_index]
     return player.name, event.by_player_name
 end
 
 --- Convert a colour value into hex
---- @param color Color.0
+--- @param color Color.struct
 --- @return string
 local function to_hex(color)
     local hex_digits = "0123456789ABCDEF"
@@ -53,7 +53,7 @@ local function to_hex(color)
 end
 
 --- Emit the requires json to file for the given event arguments
---- @param opts { title: string?, color: (Color.0 | string)?, description: string?, tick: number?, fields: { name: string, value: string, inline: boolean? }[] }
+--- @param opts { title: string?, color: (Color.struct | string)?, description: string?, tick: number?, fields: { name: string, value: string, inline: boolean? }[] }
 local function emit_event(opts)
     local admins_online = 0
     local players_online = 0

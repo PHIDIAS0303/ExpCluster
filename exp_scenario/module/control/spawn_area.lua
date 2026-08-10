@@ -7,11 +7,11 @@ local config = require("modules.exp_legacy.config.spawn_area")
 --- Apply an offset to a LuaPosition
 --- @param position MapPosition
 --- @param offset MapPosition
---- @return MapPosition.0
+--- @return MapPosition.struct
 local function apply_offset(position, offset)
     return {
-        x = (position.x or position[1]) + (offset.x or offset[1]),
-        y = (position.y or position[2]) + (offset.y or offset[2])
+        x = position.x + offset.x,
+        y = position.y + offset.y,
     }
 end
 
@@ -21,8 +21,8 @@ end
 --- @param x_index number
 --- @param y_index number
 local function apply_offset_to_array(positions, offset, x_index, y_index)
-    local x = (offset.x or offset[1])
-    local y = (offset.y or offset[2])
+    local x = offset.x
+    local y = offset.y
     for _, position in ipairs(positions) do
         position[x_index] = position[x_index] + x
         position[y_index] = position[y_index] + y
@@ -149,11 +149,13 @@ local function create_entities(surface, offset)
         local pos = apply_offset({ entity_details[2], entity_details[3] }, offset)
         local entity = surface.create_entity{ name = entity_details[1], position = pos, force = "neutral" }
 
-        if entity and config.entities.protected then
-            protect_entity(entity)
-        end
+        if entity then
+            if config.entities.protected then
+                protect_entity(entity)
+            end
 
-        entity.operable = config.entities.operable
+            entity.operable = config.entities.operable
+        end
     end
 end
 
@@ -164,8 +166,7 @@ local function clear_spawn_area(surface, offset)
     local get_tile = surface.get_tile
 
     -- Make sure a non water tile is used for filling
-    --- @diagnostic disable-next-line Incorrect Api Type: https://forums.factorio.com/viewtopic.php?f=233&t=109145&p=593761&hilit=get_tile#p593761
-    local starting_tile = get_tile(offset)
+    local starting_tile = get_tile(offset.x, offset.y)
     local fill_tile = starting_tile.collides_with("player") and "landfill" or starting_tile.name
     local fill_radius = config.spawn_area.landfill_radius
     local fill_radius_sqr = fill_radius ^ 2
@@ -185,8 +186,7 @@ local function clear_spawn_area(surface, offset)
             if dst < tile_radius_sqr then
                 -- If it is inside the decon radius always set the tile
                 tiles_to_make[#tiles_to_make + 1] = { name = decon_tile, position = pos }
-                --- @diagnostic disable-next-line Incorrect Api Type: https://forums.factorio.com/viewtopic.php?f=233&t=109145&p=593761&hilit=get_tile#p593761
-            elseif dst < fill_radius_sqr and get_tile(pos).collides_with("player") then
+            elseif dst < fill_radius_sqr and get_tile(pos.x, pos.y).collides_with("player") then
                 -- If it is inside the fill radius only set the tile if it is water
                 tiles_to_make[#tiles_to_make + 1] = { name = fill_tile, position = pos }
             end
@@ -278,7 +278,8 @@ local function on_player_created(event)
     if config.resource_patches.enabled then create_resource_patches(surface, offset) end
     if config.turrets.enabled then update_turrets() end
 
-    player.force.set_spawn_position(offset, surface)
+    local force = player.force --[[@as LuaForce]]
+    force.set_spawn_position(offset, surface)
     player.teleport(offset, surface)
 end
 

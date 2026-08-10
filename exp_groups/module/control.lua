@@ -3,7 +3,7 @@ Adds permission group syncing to clusterio
 ]]
 
 local clusterio_api = require("modules/clusterio/api")
-local compat = require("modules/clusterio/compat")
+local compat = require("modules/clusterio/compat") --[[@as LibCompat]]
 
 --- Top level module table, contains event handlers and public methods
 --- @class ExpGroups

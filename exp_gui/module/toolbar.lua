@@ -1,5 +1,5 @@
 
---- @class Gui
+--- @class (partial) Gui
 local Gui = require("modules/exp_gui")
 local ExpElement = require("modules/exp_gui/prototype")
 local mod_gui = require("mod-gui")
@@ -29,7 +29,7 @@ Toolbar.on_gui_button_toggled = script.generate_event_name()
 --- @class _ExpElement._prototype
 --- @field on_button_toggled ExpElement.OnEventAdder<EventData.on_gui_button_toggled>
 
---- @diagnostic disable-next-line: invisible, inject-field
+--- @diagnostic disable-next-line: access-invisible, inject-field
 function ExpElement._prototype.on_button_toggled(self, handler)
     return self:on_event(Toolbar.on_gui_button_toggled, handler)
 end
@@ -85,7 +85,7 @@ function Toolbar.set_button_toggled_state(define, player, state, _from_left)
         button.style = state and toolbar_button_active_style or toolbar_button_default_style
 
         -- Make the extra required adjustments
-        local style = button.style
+        local style = button.style --[[@as LuaStyle]]
         style.minimal_width = original_width
         style.maximal_height = original_height
         if button.type == "sprite-button" then
@@ -335,9 +335,10 @@ Below here is the toolbar settings GUI and its associated functions
 --- @param dst LuaGuiElement
 local function copy_style(src, dst)
     dst.style = src.style.name
-    dst.style.height = toolbar_button_small
-    dst.style.width = toolbar_button_small
-    dst.style.padding = -2
+    local style = dst.style --[[@as LuaStyle]]
+    style.height = toolbar_button_small
+    style.width = toolbar_button_small
+    style.padding = -2
 end
 
 --- Reorder the buttons relative to each other, this will update the datastore
@@ -350,7 +351,7 @@ local function move_toolbar_button(player, item, offset)
 
     -- Swap the position in the list
     local list = assert(item.parent)
-    local other_item = list.children[new_index]
+    local other_item = assert(list.children[new_index])
     list.swap_children(old_index, new_index)
 
     -- Swap the position in the top flow, offset by 1 because of settings button
@@ -365,7 +366,7 @@ local function move_toolbar_button(player, item, offset)
         local other_element = Gui.get_left_element(other_left_element, player)
         local left_index = element.get_index_in_parent()
         local other_index = other_element.get_index_in_parent()
-        element.parent.swap_children(left_index, other_index)
+        assert(element.parent).swap_children(left_index, other_index)
     end
 
     -- If we are moving in/out of first/last place we need to update the move buttons
@@ -393,7 +394,7 @@ end
 --- @param player LuaPlayer
 --- @param order Gui.ToolbarOrder
 function Toolbar.set_order(player, order)
-    local list = elements.toolbar_settings.data[player] --[[ @as LuaGuiElement ]]
+    local list = elements.toolbar_settings.data[player] --[[@as LuaGuiElement]]
     local left_flow = Gui.get_left_flow(player)
     local top_flow = Gui.get_top_flow(player)
 
@@ -466,7 +467,7 @@ end
 function Toolbar.get_state(player)
     -- Get the order of toolbar buttons
     local order = {}
-    local list = elements.toolbar_settings.data[player] --[[ @as LuaGuiElement ]]
+    local list = elements.toolbar_settings.data[player] --[[@as LuaGuiElement]]
     for index, item in pairs(list.children) do
         order[index] = { name = item.name, favourite = elements.toolbar_list_item.data[item].set_favourite.state }
     end
@@ -487,7 +488,7 @@ end
 --- @param player LuaPlayer
 function Toolbar._create_elements(player)
     -- Add any missing items to the gui
-    local toolbar_list = elements.toolbar_settings.data[player] --[[ @as LuaGuiElement ]]
+    local toolbar_list = elements.toolbar_settings.data[player] --[[@as LuaGuiElement]]
     local previous_last_index = #toolbar_list.children_names
     for define in pairs(Gui.top_elements) do
         if define ~= elements.close_toolbar and toolbar_list[define.name] == nil then
@@ -499,7 +500,8 @@ function Toolbar._create_elements(player)
     -- Reset the state of the previous last child
     local children = toolbar_list.children
     if previous_last_index > 0 then
-        elements.toolbar_list_item.data[children[previous_last_index]].move_item_down.enabled = true
+        local previous_last = assert(children[previous_last_index])
+        elements.toolbar_list_item.data[previous_last].move_item_down.enabled = true
     end
 
     -- Set the state of the move buttons for the first and last element
@@ -513,7 +515,7 @@ end
 --- @param player LuaPlayer
 function Toolbar._ensure_consistency(player)
     -- Update the toolbar buttons
-    local list = elements.toolbar_settings.data[player] --[[ @as LuaGuiElement ]]
+    local list = elements.toolbar_settings.data[player] --[[@as LuaGuiElement]]
     for _, button in ipairs(toolbar_buttons) do
         -- Update the visible state based on if the player is allowed the button
         local element = Gui.get_top_element(button, player)
@@ -619,7 +621,7 @@ elements.move_item_up = Gui.define("move_item_up")
         size = toolbar_button_small,
     })
     :on_click(function(def, player, element)
-        local item = assert(element.parent.parent)
+        local item = assert(assert(element.parent).parent)
         move_toolbar_button(player, item, -1)
     end)
 
@@ -634,7 +636,7 @@ elements.move_item_down = Gui.define("move_item_down")
         size = toolbar_button_small,
     })
     :on_click(function(def, player, element)
-        local item = assert(element.parent.parent)
+        local item = assert(assert(element.parent).parent)
         move_toolbar_button(player, item, 1)
     end)
 
@@ -658,7 +660,7 @@ elements.set_favourite = Gui.define("set_favourite")
         width = 180,
     }
     :on_checked_state_changed(function(def, player, element)
-        local define = ExpElement.get(element.tags.element_name --[[ @as string ]])
+        local define = ExpElement.get(element.tags.element_name --[[@as string]])
         local top_element = Gui.get_top_element(define, player)
         local had_visible = Toolbar.has_visible_buttons(player)
         top_element.visible = element.state

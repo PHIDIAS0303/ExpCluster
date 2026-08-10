@@ -25,7 +25,7 @@ Elements.player_dropdown = Gui.define("surveillance/player_dropdown")
         local camera = def.data[element]
         local target_player = assert(ElementsExtra.online_player_dropdown.get_selected(element))
         Elements.camera.set_target_player(camera, target_player)
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- Button which sets the target of a camera to the current location
 --- @class ExpGui_Surveillance.elements.set_location_button: ExpElement
@@ -48,7 +48,7 @@ Elements.set_location_button = Gui.define("surveillance/set_location_button")
         --- @cast def ExpGui_Surveillance.elements.set_location_button
         local camera = def.data[element]
         Elements.camera.set_target_position(camera, player.physical_surface_index, player.physical_position)
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- @class ExpGui_Surveillance.elements.type_dropdown.data
 --- @field player_dropdown LuaGuiElement
@@ -87,7 +87,7 @@ Elements.type_dropdown = Gui.define("surveillance/type_dropdown")
             local target_player = ElementsExtra.online_player_dropdown.get_selected(element_data.player_dropdown)
             Elements.camera.set_target_player(element_data.camera, target_player)
         end
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- Refresh all online type dropdowns by cycling the associated player dropdown
 function Elements.type_dropdown.refresh_online()
@@ -131,7 +131,7 @@ Elements.zoom_out_button = Gui.define("surveillance/zoom_out_button")
         if camera.zoom > 0.2 then
             camera.zoom = camera.zoom - 0.05
         end
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- Buttons which increases zoom by 5%
 --- @class ExpGui_Surveillance.elements.zoom_in_button: ExpElement
@@ -156,7 +156,7 @@ Elements.zoom_in_button = Gui.define("surveillance/zoom_in_button")
         if camera.zoom < 2.0 then
             camera.zoom = camera.zoom + 0.05
         end
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- Camera which tracks a target with a physical_position and surface_index
 --- @class ExpGui_Surveillance.elements.camera: ExpElement
@@ -176,7 +176,7 @@ Elements.camera = Gui.define("surveillance/camera")
     }
     :element_data(
         Gui.from_argument(1)
-    ) --[[ @as any ]]
+    ) --[[@as any]]
 
 --- Set the target player for the camera
 --- @param camera LuaGuiElement

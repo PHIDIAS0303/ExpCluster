@@ -72,7 +72,7 @@ Elements.clock_label = Gui.define("research_milestones/clock_label")
         type = "label",
         caption = research_time_format_nil,
         style = "heading_2_label",
-    } --[[ @as any ]]
+    } --[[@as any]]
 
 --- Update the clock label for all online players
 function Elements.clock_label.refresh_online()
@@ -95,7 +95,7 @@ Elements.milestone_table_label = Gui.define("research_milestones/table_label")
         minimal_width = Gui.from_argument(2, 70),
         horizontal_align = Gui.from_argument(3, "right"),
         font_color = font_color.neutral,
-    } --[[ @as any ]]
+    } --[[@as any]]
 
 --- @class ExpGui_ResearchMilestones.elements.milestone_table.row_elements
 --- @field name LuaGuiElement
@@ -124,10 +124,11 @@ Elements.milestone_table = Gui.define("research_milestones/milestone_table")
         Elements.milestone_table_label(milestone_table, { "exp-gui_research-milestones.caption-difference" })
         return milestone_table
     end) 
-    :element_data{} --[[ @as any ]]
+    :element_data{} --[[@as any]]
 
 do local _row_data = {}
     --- @type ExpGui_ResearchMilestones.elements.milestone_table.row_data
+    --- @diagnostic disable-next-line: missing-fields
     local empty_row_data = { color = font_color.positive }
 
     --- Get the row data for a force and research
@@ -203,7 +204,7 @@ end
 --- @param row_index number
 --- @param row_data ExpGui_ResearchMilestones.elements.milestone_table.row_data
 function Elements.milestone_table.refresh_row(milestone_table, row_index, row_data)
-    local row = Elements.milestone_table.data[milestone_table][row_index]
+    local row = assert(Elements.milestone_table.data[milestone_table][row_index])
     row.name.caption = row_data.name
     row.target.caption = row_data.target
     row.achieved.caption = row_data.achieved
@@ -224,7 +225,7 @@ end
 --- Refresh all the labels on the table
 --- @param milestone_table LuaGuiElement
 function Elements.milestone_table.refresh(milestone_table)
-    local force = Gui.get_player(milestone_table).force --[[ @as LuaForce ]]
+    local force = Gui.get_player(milestone_table).force --[[@as LuaForce]]
     local start_index = Elements.container.calculate_starting_research_index(force)
     for row_index = 1, display_size do
         local row_data = Elements.milestone_table.calculate_row_data(force, start_index + row_index - 1)
@@ -234,7 +235,7 @@ end
 
 --- Refresh all tables for a player
 function Elements.milestone_table.refresh_player(player)
-    local force = player.force --[[ @as LuaForce ]]
+    local force = player.force --[[@as LuaForce]]
     local start_index = Elements.container.calculate_starting_research_index(force)
     for _, milestone_table in Elements.milestone_table:online_elements(player) do
         for row_index = 1, display_size do
@@ -269,10 +270,9 @@ Elements.container = Gui.define("research_milestones/container")
         local milestone_table = Elements.milestone_table(container)
         Elements.clock_label(header)
 
-        local force = Gui.get_player(parent).force
+        local force = Gui.get_player(parent).force --[[@as LuaForce]]
         def.data[force] = def.data[force] or {} -- used by start index and row data
 
-        local force = Gui.get_player(parent).force --[[ @as LuaForce ]]
         local start_index = Elements.container.calculate_starting_research_index(force)
         for research_index = start_index, start_index + display_size - 1 do
             local row_data = Elements.milestone_table.calculate_row_data(force, research_index)
@@ -296,7 +296,7 @@ end
 --- @param research_index number
 --- @return number
 function Elements.container.get_achieved_time(force, research_index)
-    return Elements.container.data[force][research_index]
+    return assert(Elements.container.data[force][research_index])
 end
 
 --- Calculate the starting research index for a force

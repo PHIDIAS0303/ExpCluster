@@ -3,7 +3,7 @@ local Search = {}
 local Storage = require("modules/exp_util/storage")
 
 --- Setup the storage to contain the pending translations and the completed ones
-local pending = {} --- @type { [1]: string, [2]: string }[]
+local pending = {} --- @type table<uint, [string, string]>
 local translations = {} --- @type table<string, table<string, string>>
 Storage.register({
     pending,
@@ -50,6 +50,7 @@ function Search.prepare(custom_commands)
             name = name,
             description = locale_desc,
             help_text = locale_desc,
+            usage = locale_desc,
             aliases = {},
         }
     end
@@ -65,7 +66,7 @@ function Search.on_player_locale_changed(event)
         local ids = player.request_translations(required_translations)
         assert(ids, "Translation ids was nil")
         for i, command_name in ipairs(command_names) do
-            pending[ids[i]] = { locale, command_name }
+            pending[assert(ids[i])] = { locale, command_name }
         end
     end
 end

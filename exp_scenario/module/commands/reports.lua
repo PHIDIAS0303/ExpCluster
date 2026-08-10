@@ -11,7 +11,10 @@ local player_has_flag = Roles.player_has_flag
 
 local Reports = require("modules.exp_legacy.modules.control.reports") --- @dep modules.control.reports
 
---- @type Commands.InputParser
+--- @param input string
+--- @param player LuaPlayer
+--- @return Commands.Status
+--- @return LuaPlayer | LocalisedString
 local function reportable_player(input, player)
     local success, status, result = parse_input(input, player, Commands.types.player)
     if not success then return status, result end
@@ -40,11 +43,11 @@ Commands.new("create-report", { "exp-commands_reports.description-create" })
         if Reports.report_player(other_player, player.name, reason) then
             local user_message = { "exp-commands_reports.response", other_player_name, reason }
             local admin_message = { "exp-commands_reports.response-admin", other_player_name, player_name, reason }
-            for _, player in ipairs(game.connected_players) do
-                if player.admin then
-                    player.print(admin_message)
+            for _, connected_player in ipairs(game.connected_players) do
+                if connected_player.admin then
+                    connected_player.print(admin_message)
                 else
-                    player.print(user_message)
+                    connected_player.print(user_message)
                 end
             end
         else

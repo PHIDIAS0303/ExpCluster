@@ -149,9 +149,23 @@ PlayerData.Statistics:combine('JoinCount')
 local Storage = require("modules/exp_util/storage")
 
 local DatastoreManager = {}
-local Datastores = {}
-local Datastore = {}
+local Datastores = {} --- @type table<string, Datastore>
 local Data = {}
+
+--- @class Datastore
+--- @field name string
+--- @field value_name string
+--- @field auto_save boolean
+--- @field save_to_disk boolean
+--- @field propagate_changes boolean
+--- @field serializer function | false
+--- @field parent Datastore | false
+--- @field children table<string, Datastore>
+--- @field metadata table
+--- @field events table<string, function[]>
+--- @field data table
+local Datastore = {}
+
 local copy = table.deep_copy
 local trace = debug.traceback
 local table_to_json = helpers.table_to_json

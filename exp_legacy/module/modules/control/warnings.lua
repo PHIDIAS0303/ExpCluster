@@ -107,7 +107,7 @@ function Warnings.add_warning(player, by_player_name, reason)
 
     reason = reason or "None given."
 
-    local warning_count
+    local warning_count --- @type number
     PlayerWarnings:update(player.name, function(_, warnings)
         local warning = {
             by_player_name = by_player_name,

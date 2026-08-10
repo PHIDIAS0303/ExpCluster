@@ -42,7 +42,7 @@ Commands.new("get-roles", { "exp-commands_roles.description-get" })
         --- @cast other_player LuaPlayer?
         local roles = get_roles_ordered()
         local roles_formatted = { "" } --- @type LocalisedString
-        local response = { "exp-commands_roles.list-roles", roles_formatted }
+        local response = { "exp-commands_roles.list-roles", roles_formatted } --[[@as LocalisedString]]
         if other_player then
             roles = get_player_roles(other_player)
             response[1] = "exp-commands_roles.list-player"
@@ -55,8 +55,7 @@ Commands.new("get-roles", { "exp-commands_roles.description-get" })
         end
 
         local last = #roles_formatted
-        --- @diagnostic disable-next-line nil-check
-        roles_formatted[last] = roles_formatted[last][2]
+        roles_formatted[last] = assert(roles_formatted[last])[2]
 
         return Commands.status.success(response)
     end)

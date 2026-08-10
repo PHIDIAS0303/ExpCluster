@@ -4,7 +4,7 @@ local Gui = require("modules/exp_gui")
 local Event = require("modules/exp_legacy/utils/event") --- @dep utils.event
 
 ----- Locals -----
-local follow_label -- Gui constructor
+local follow_label --- @type ExpElement Gui constructor
 local following = {}
 local spectating = {}
 local Public = {}

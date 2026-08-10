@@ -16,10 +16,9 @@ end
 
 --- Replace a tile with the next tile in the degrade chain
 --- @param surface LuaSurface
---- @param position MapPosition
+--- @param position MapPosition.struct
 local function degrade_tile(surface, position)
-    --- @diagnostic disable-next-line Incorrect Api Type: https://forums.factorio.com/viewtopic.php?f=233&t=109145&p=593761&hilit=get_tile#p593761
-    local tile = surface.get_tile(position)
+    local tile = surface.get_tile(position.x, position.y)
     local tile_name = tile.name
     local degrade_tile_name = config.degrade_order[tile_name]
     if not degrade_tile_name then return end
@@ -33,8 +32,9 @@ local function degrade_entity(entity)
 
     local tiles = {}
     local surface = entity.surface
-    local left_top = entity.bounding_box.left_top
-    local right_bottom = entity.bounding_box.right_bottom
+    local bounding_box = entity.bounding_box
+    local left_top = bounding_box.left_top
+    local right_bottom = bounding_box.right_bottom
     for x = left_top.x, right_bottom.x do
         for y = left_top.y, right_bottom.y do
             local tile = surface.get_tile(x, y)
@@ -58,11 +58,10 @@ end
 
 --- Gets the average tile strengths around position
 --- @param surface LuaSurface
---- @param position MapPosition
+--- @param position MapPosition.struct
 --- @return number?
 local function get_tile_strength(surface, position)
-    --- @diagnostic disable-next-line Incorrect Api Type: https://forums.factorio.com/viewtopic.php?f=233&t=109145&p=593761&hilit=get_tile#p593761
-    local tile = surface.get_tile(position)
+    local tile = surface.get_tile(position.x, position.y)
     local tile_name = tile.name
     local strength = config.strengths[tile_name]
     if not strength then return end
