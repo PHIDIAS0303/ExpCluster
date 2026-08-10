@@ -29,7 +29,7 @@ jobs:
       - name: Generate Factorio typedefs
         run: |
           pnpm install factoriomod-debug
-          pnpm exec fmtk luals-addon "$RUNNER_TEMP/factorio"
+          pnpm exec fmtk luals-addon "$RUNNER_TEMP"
       - name: Install emmylua_check
         run: |
           curl -fsSL "https://github.com/EmmyLuaLs/emmylua-analyzer-rust/releases/download/${EMMYLUA_CHECK_VERSION}/emmylua_check-linux-x64.tar.gz" \
