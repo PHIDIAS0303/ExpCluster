@@ -29,7 +29,7 @@ Commands.new("ratio", { "exp-commands_ratio.description" })
         
         local amount_of_machines = 1
         if items_per_second then
-            amount_of_machines = math.ceil(products[1].amount * crafts_per_second)
+            amount_of_machines = math.ceil(assert(assert(products[1]).amount) * crafts_per_second)
         end
 
         for _, ingredient in ipairs(ingredients) do
@@ -43,7 +43,7 @@ Commands.new("ratio", { "exp-commands_ratio.description" })
         for i, product in ipairs(products) do
             Commands.print{
                 product.type == "item" and "exp-commands_ratio.item-out" or "exp-commands_ratio.fluid-out",
-                math.round(product.amount * crafts_per_second, 3),
+                math.round(assert(product.amount) * crafts_per_second, 3),
                 product.name
             }
         end

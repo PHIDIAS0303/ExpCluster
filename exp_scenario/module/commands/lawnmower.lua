@@ -22,7 +22,7 @@ commands.lawnmower = Commands.new("lawnmower", { "exp-commands_lawnmower.descrip
 
         SelectArea:start(player)
         return Commands.status.success{ "exp-commands_lawnmower.enter" }
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- When an area is selected to be handled
 SelectArea:on_selection(function(event)

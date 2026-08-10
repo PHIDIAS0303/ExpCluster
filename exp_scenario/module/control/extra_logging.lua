@@ -23,7 +23,7 @@ end
 --- @param event EventData.on_cargo_pod_finished_ascending
 local function on_cargo_pod_finished_ascending(event)
     if event.launched_by_rocket then
-        local force = event.cargo_pod.force
+        local force = event.cargo_pod.force --[[@as LuaForce]]
         if force.rockets_launched >= config.rocket_launch_display_rate and force.rockets_launched % config.rocket_launch_display_rate == 0 then
             add_log_line("[ROCKET]", force.rockets_launched, "rockets launched")
         elseif config.rocket_launch_display[force.rockets_launched] then
@@ -38,7 +38,7 @@ local function on_pre_player_died(event)
     local cause = event.cause
     if cause then
         if cause.type == "character" then
-            add_log_line("[DEATH]", player.name, "died because of", cause.player.name)
+            add_log_line("[DEATH]", player.name, "died because of", assert(cause.player).name)
         else
             add_log_line("[DEATH]", player.name, "died because of", cause.name)
         end

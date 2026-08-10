@@ -27,7 +27,7 @@ function Public.show(container)
     local left_panel_style = left_panel.style
     left_panel_style.width = 300
 
-    --- @diagnostic disable-next-line invisible
+    --- @diagnostic disable-next-line: access-invisible
     for element_name in pairs(ExpElement._elements) do
         local header = left_panel.add{ type = "flow" }.add{ type = "label", name = header_name, caption = element_name }
         Gui.set_data(header, element_name)
@@ -92,18 +92,18 @@ Gui.on_click(
         input_text_box.text = concat{ "ExpElement._elements[\"", element_name, "\"]" }
         input_text_box.style.font_color = Color.black
 
-        --- @diagnostic disable-next-line invisible
+        --- @diagnostic disable-next-line: access-invisible
         local define = ExpElement._elements[element_name]
         local content = dump({
-            --- @diagnostic disable-next-line invisible
+            --- @diagnostic disable-next-line: access-invisible
             debug = define._debug,
-            --- @diagnostic disable-next-line invisible
+            --- @diagnostic disable-next-line: access-invisible
             has_handlers = define._has_handlers,
-            --- @diagnostic disable-next-line invisible
+            --- @diagnostic disable-next-line: access-invisible
             track_elements = define._track_elements,
-            --- @diagnostic disable-next-line invisible
+            --- @diagnostic disable-next-line: access-invisible
             elements = ExpIter._scopes[element_name],
-            --- @diagnostic disable-next-line invisible
+            --- @diagnostic disable-next-line: access-invisible
             data = ExpData._scopes[element_name]._raw,
         }) or "nil"
         right_panel.text = content

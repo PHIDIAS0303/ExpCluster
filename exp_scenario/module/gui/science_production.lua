@@ -79,7 +79,7 @@ Elements.production_label = Gui.define("science_production/production_label")
 
         def.data[label] = suffix
         return label
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- @class Elements.production_label.display_data
 --- @field caption LocalisedString
@@ -109,7 +109,7 @@ function Elements.production_label.calculate_display_data(tooltip, value, cutoff
     end
 
     local suffix, caption = format_number(value)
-    display_data = display_data or {}
+    display_data = display_data or {} --[[@as Elements.production_label.display_data]]
     display_data.caption = caption
     display_data.suffix = suffix
     display_data.tooltip = tooltip
@@ -144,12 +144,12 @@ Elements.no_production_label = Gui.define("science_production/no_production_labe
         padding = { 2, 4 },
         single_line = false,
         width = 200,
-    } --[[ @as any ]]
+    } --[[@as any]]
 
 --- Refresh a no production label
 --- @param no_production_label LuaGuiElement
 function Elements.no_production_label.refresh(no_production_label)
-    local force = Gui.get_player(no_production_label).force --[[ @as LuaForce ]]
+    local force = Gui.get_player(no_production_label).force --[[@as LuaForce]]
     no_production_label.visible = not Elements.container.has_production(force)
 end
 
@@ -157,7 +157,7 @@ end
 function Elements.no_production_label.refresh_online()
     local force_data = {}
     for player, no_production_label in Elements.no_production_label:online_elements() do
-        local force = player.force --[[ @as LuaForce ]]
+        local force = player.force --[[@as LuaForce]]
         local visible = force_data[force.name]
         if visible == nil then
             visible = not Elements.container.has_production(force)
@@ -193,10 +193,11 @@ Elements.science_table = Gui.define("science_production/science_table")
         local science_table = Gui.elements.scroll_table(parent, 190, 4)
         local no_production_label = Elements.no_production_label(science_table)
         Elements.no_production_label.refresh(no_production_label)
-        science_table.style.column_alignments[3] = "right"
+        local science_table_style = science_table.style --[[@as LuaStyle]]
+        science_table_style.column_alignments[3] = "right"
         return science_table
     end) 
-    :element_data{} --[[ @as any ]]
+    :element_data{} --[[@as any]]
 
 --- Calculate the data needed to add or refresh a row
 --- @param force LuaForce
@@ -220,7 +221,7 @@ function Elements.science_table.calculate_row_data(force, science_pack, row_data
     end
 
     -- Return the pack data
-    row_data = row_data or {}
+    row_data = row_data or {} --[[@as ExpGui_ScienceProduction.elements.science_table.row_data]]
     row_data.visible = production.total.made > 0
     row_data.science_pack = science_pack
     row_data.icon_style = icon_style
@@ -280,7 +281,8 @@ function Elements.science_table.add_row(science_table, row_data)
         column_count = 2,
     }
     delta_table.style.padding = 0
-    delta_table.style.column_alignments[1] = "right"
+    local delta_table_style = delta_table.style --[[@as LuaStyle]]
+    delta_table_style.column_alignments[1] = "right"
 
     -- Draw the net production label
     local net = Elements.production_label(science_table, row_data.net)
@@ -312,7 +314,8 @@ function Elements.science_table.refresh_row(science_table, row_data)
     -- Update the icon
     local icon = row.icon
     icon.style = row_data.icon_style
-    icon.style.height = 55
+    local icon_style = icon.style --[[@as LuaStyle]]
+    icon_style.height = 55
 
     -- Update the element visibility
     row.net_suffix.visible = true
@@ -326,8 +329,7 @@ function Elements.science_table.refresh_row(science_table, row_data)
     Elements.production_label.refresh(row.used, row_data.used)
 end
 
---- @type table<string, { [string]: ExpGui_ScienceProduction.elements.science_table.row_data }>
-do local _row_data = {}
+do local _row_data = {} --- @type table<string, table<number, ExpGui_ScienceProduction.elements.science_table.row_data>>
     --- Refresh the production tables for all online players
     function Elements.science_table.refresh_online()
         -- Refresh the row data for online forces
@@ -361,7 +363,7 @@ Elements.eta_label = Gui.define("science_production/eta_label")
         caption = clock_time_format_nil,
         tooltip = long_time_format_nil,
         style = "frame_title",
-    } --[[ @as any ]]
+    } --[[@as any]]
 
 --- @class Elements.eta_label.display_data
 --- @field caption LocalisedString
@@ -410,14 +412,13 @@ end
 --- Refresh an eta label
 --- @param eta_label LuaGuiElement
 function Elements.eta_label.refresh(eta_label)
-    local force = Gui.get_player(eta_label).force --[[ @as LuaForce ]]
+    local force = Gui.get_player(eta_label).force --[[@as LuaForce]]
     local display_data = Elements.eta_label.calculate_display_data(force)
     eta_label.caption = display_data.caption
     eta_label.tooltip = display_data.tooltip
 end
 
---- @type Elements.eta_label.display_data
-do local _display_data = {}
+do local _display_data = {} --- @type table<string, Elements.eta_label.display_data>
     --- Refresh the eta label for all online players
     function Elements.eta_label.refresh_online()
         -- Refresh the row data for online forces
@@ -430,8 +431,10 @@ do local _display_data = {}
         -- Update the eta labels
         for player, eta_label in Elements.eta_label:online_elements() do
             local display_data = _display_data[player.force.name]
-            eta_label.caption = display_data.caption
-            eta_label.tooltip = display_data.tooltip
+            if display_data then
+                eta_label.caption = display_data.caption
+                eta_label.tooltip = display_data.tooltip
+            end
         end
     end
 end
@@ -443,7 +446,7 @@ Elements.container = Gui.define("science_production/container")
         local container = Gui.elements.container(parent)
         Gui.elements.header(container, { caption = { "exp-gui_science-production.caption-main" } })
 
-        local force = Gui.get_player(parent).force --[[ @as LuaForce ]]
+        local force = Gui.get_player(parent).force --[[@as LuaForce]]
         local science_table = Elements.science_table(container)
         for _, science_pack in ipairs(config) do
             --- @cast science_pack any
@@ -462,7 +465,7 @@ Elements.container = Gui.define("science_production/container")
         end
 
         return Gui.elements.container.get_root_element(container)
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- Cached mostly because they are long names
 local _fp_one_minute = defines.flow_precision_index.one_minute
@@ -477,8 +480,7 @@ local _fp_one_hour = defines.flow_precision_index.one_hour
 --- @field ten_minutes ExpGui_ScienceProduction._item_data
 --- @field one_hour ExpGui_ScienceProduction._item_data
 
---- @type table<string, { [string]: ExpGui_ScienceProduction.item_production_data }>
-do local _production_data = {}
+do local _production_data = {} --- @type table<string, { [string]: ExpGui_ScienceProduction.item_production_data }>
 
     --- Get the production stats for a force
     --- @param flow_stats any

@@ -19,7 +19,7 @@ Commands.new("_sudo", { "exp-commands_sudo.description" })
         --- @cast command ExpCommand
         --- @cast parameter string
 
-        --- @diagnostic disable-next-line: invisible
+        --- @diagnostic disable-next-line: access-invisible
         return Commands._event_handler{
             name = command.name,
             tick = game.tick,

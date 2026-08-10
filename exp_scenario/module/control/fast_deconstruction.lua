@@ -22,7 +22,7 @@ local min = math.min
 --- @field trees LuaEntity[]
 --- @field tree_count number
 --- @field permission "fast" | "allow" | "disallow"
---- @field task Async.AsyncReturn
+--- @field task Async.AsyncReturn<any>
 
 local cache --- @type TreeDeconCache?
 
@@ -77,14 +77,15 @@ local function get_player_cache(player_index)
 
     -- Create a new cache if the previous on is in use
     if not cache or cache.task and not cache.task.completed then
-        cache = {} --[[@as any]]
+        --- @diagnostic disable-next-line: missing-fields
+        cache = {} --[[@as TreeDeconCache]]
     end
 
     local player = assert(game.get_player(player_index))
     cache.tick = game.tick
     cache.player_index = player_index
     cache.player = player
-    cache.force = player.force --[[ @as LuaForce ]]
+    cache.force = player.force --[[@as LuaForce]]
     cache.tree_count = 0
     cache.trees = {}
     cache.permission = get_permission(player)

@@ -6,7 +6,7 @@ local Async = require("modules/exp_util/async")
 local Storage = require("modules/exp_util/storage")
 local config = require("modules.exp_legacy.config.compilatron")
 
---- @type table<string, Async.AsyncReturn>
+--- @type table<string, Async.AsyncReturn<any>>
 local persistent_locations = {}
 Storage.register(persistent_locations, function(tbl)
     persistent_locations = tbl
@@ -55,7 +55,7 @@ local speech_bubble_task =
 --- @param entity LuaEntity the entity which will have messages spawn from it
 --- @param messages LocalisedString[] the messages which should be shown
 --- @param starting_index number? the message index to start at, default 1
---- @return Async.AsyncReturn
+--- @return Async.AsyncReturn<any>
 local function register_entity(entity, messages, starting_index)
     return speech_bubble_task{
         entity = entity,

@@ -25,7 +25,7 @@ Commands.new("kill", { "exp-commands_kill.description" })
             if script.active_mods["space-age"] then
                 other_player.surface.create_entity{ name = "lightning", position = { other_player.position.x, other_player.position.y - 16 }, target = other_player.character }
             end
-            other_player.character.die()
+            assert(other_player.character).die()
         else
             return Commands.status.unauthorised{ "exp-commands_kill.lower-role" }
         end

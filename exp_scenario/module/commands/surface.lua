@@ -69,7 +69,7 @@ commands.clear_blueprints = Commands.new("clear-blueprints", { "exp-commands_sur
 
         SelectArea:start(player)
         return Commands.status.success{ "exp-commands_surface.enter" }
-    end) --[[ @as any ]]
+    end) --[[@as any]]
 
 --- When an area is selected
 SelectArea:on_selection(function(event)

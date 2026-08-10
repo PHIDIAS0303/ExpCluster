@@ -61,7 +61,7 @@ local Search = require("modules/exp_commands/search")
 --- @type LuaPlayer?
 local _print_player
 
---- @class Commands
+--- @class (partial) Commands
 local Commands = {
     color = ExpUtil.color,
     format_rich_text_color = ExpUtil.format_rich_text_color,
@@ -84,7 +84,7 @@ local Commands = {
 --- Contains the different status values a command can return
 Commands.status = {}
 
---- @class Commands.types: table<string, Commands.InputParser | Commands.InputParserFactory>
+--- @class (partial) Commands.types: table<string, Commands.InputParser<any> | Commands.InputParserFactory<any>>
 --- Stores all input parsers and validators for different data types
 Commands.types = {}
 
@@ -103,7 +103,7 @@ end
 --- @class Commands.Argument
 --- @field name string The name of the argument
 --- @field description LocalisedString? The description of the argument
---- @field input_parser Commands.InputParser The input parser for the argument
+--- @field input_parser Commands.InputParser<any> The input parser for the argument
 --- @field optional boolean True when the argument is optional
 --- @field default any? The default value of the argument
 
@@ -159,7 +159,7 @@ Commands.server = setmetatable({
         Commands.error("Command does not support rcon usage, requires LuaPlayer." .. key)
         error("Command does not support rcon usage, requires LuaPlayer." .. key)
     end,
-}) --[[ @as LuaPlayer ]]
+}) --[[@as LuaPlayer]]
 
 --- Status Returns.
 -- Return values used by command callbacks
@@ -170,7 +170,8 @@ Commands.server = setmetatable({
 --- @param msg LocalisedString? An optional message to be included when a command completes (only has an effect in command callbacks)
 --- @return Commands.Status, LocalisedString # Should be returned directly without modification
 function Commands.status.success(msg)
-    return Commands.status.success, msg == nil and { "exp-commands.success" } or msg
+    if msg == nil then return Commands.status.success, { "exp-commands.success" } end
+    return Commands.status.success, msg
 end
 
 --- Used to signal an error has occurred in a command, data type parser, or permission authority
@@ -178,7 +179,8 @@ end
 --- @param msg LocalisedString? An optional error message to be included in the output, a generic message is used if not provided
 --- @return Commands.Status, LocalisedString # Should be returned directly without modification
 function Commands.status.error(msg)
-    return Commands.status.error, { "exp-commands.error", msg == nil and { "exp-commands.error-default" } or msg }
+    if msg == nil then msg = { "exp-commands.error-default" } end
+    return Commands.status.error, { "exp-commands.error", msg }
 end
 
 --- Used to signal the player is unauthorised to use a command, primarily used by permission authorities but can be used in a command callback
@@ -186,7 +188,8 @@ end
 --- @param msg LocalisedString? An optional error message to be included in the output, a generic message is used if not provided
 --- @return Commands.Status, LocalisedString # Should be returned directly without modification
 function Commands.status.unauthorised(msg)
-    return Commands.status.unauthorised, { "exp-commands.unauthorized", msg == nil and { "exp-commands.unauthorized-default" } or msg }
+    if msg == nil then msg = { "exp-commands.unauthorized-default" } end
+    return Commands.status.unauthorised, { "exp-commands.unauthorized", msg }
 end
 
 --- Used to signal the player provided invalid input to an command, primarily used by data type parsers but can be used in a command callback
@@ -194,15 +197,16 @@ end
 --- @param msg LocalisedString? An optional error message to be included in the output, a generic message is used if not provided
 --- @return Commands.Status, LocalisedString # Should be returned directly without modification
 function Commands.status.invalid_input(msg)
-    return Commands.status.invalid_input, msg == nil and { "exp-commands.invalid-input" } or msg
+    if msg == nil then return Commands.status.invalid_input, { "exp-commands.invalid-input" } end
+    return Commands.status.invalid_input, msg
 end
 
 --- Used to signal an internal error has occurred, this is reserved for internal use only
---- @param msg LocalisedString A message detailing the error which has occurred, will be logged and outputted
+--- @param msg LocalisedString? A message detailing the error which has occurred, will be logged and outputted
 --- @return Commands.Status, LocalisedString # Should be returned directly without modification
 --- @package
 function Commands.status.internal_error(msg)
-    return Commands.status.internal_error, { "exp-commands.internal-error", msg }
+    return Commands.status.internal_error, { "exp-commands.internal-error", msg or "" }
 end
 
 --- @type table<Commands.Status, string>
@@ -281,7 +285,7 @@ end
 --- @alias Commands.InputParserFactory<T> fun(...: any): Commands.InputParser<T>
 
 --- Add a new input parser to the command library, this method validates that it does not already exist
---- @generic T : Commands.InputParser | Commands.InputParserFactory
+--- @generic T : Commands.InputParser<any> | Commands.InputParserFactory<any>
 --- @param data_type string The name of the data type the input parser reads in and validates, becomes a key of Commands.types
 --- @param input_parser T The function used to parse and validate the data type
 --- @return T # The function which was provided as the second argument
@@ -295,7 +299,7 @@ function Commands.add_data_type(data_type, input_parser)
 end
 
 --- Remove an input parser for a data type, must be the same string that was passed to add_input_parser
---- @param data_type string | Commands.InputParser | Commands.InputParserFactory The data type or input parser you want to remove the input parser for
+--- @param data_type string | Commands.InputParser<any> | Commands.InputParserFactory<any> The data type or input parser you want to remove the input parser for
 function Commands.remove_data_type(data_type)
     Commands.types[data_type] = nil
     for k, v in pairs(Commands.types) do
@@ -433,7 +437,7 @@ end
 --- Add a new required argument to the command of the given data type
 --- @param name string The name of the argument being added
 --- @param description LocalisedString? The description of the argument being added
---- @param input_parser Commands.InputParser The input parser to be used for the argument
+--- @param input_parser Commands.InputParser<any> The input parser to be used for the argument
 --- @return ExpCommand
 function Commands._prototype:argument(name, description, input_parser)
     assert_command_mutable(self)
@@ -454,7 +458,7 @@ end
 --- Add a new optional argument to the command of the given data type
 --- @param name string The name of the argument being added
 --- @param description LocalisedString? The description of the argument being added
---- @param input_parser Commands.InputParser The input parser to be used for the argument
+--- @param input_parser Commands.InputParser<any> The input parser to be used for the argument
 --- @return ExpCommand
 function Commands._prototype:optional(name, description, input_parser)
     assert_command_mutable(self)

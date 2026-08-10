@@ -1,0 +1,34 @@
+{
+    "$schema": "https://raw.githubusercontent.com/EmmyLuaLs/emmylua-analyzer-rust/refs/heads/main/crates/emmylua_code_analysis/resources/schema.json",
+    "runtime": {
+        "version": "Lua5.2",
+        "requirePattern": [ "?", "?.lua" ]
+    },
+    "workspace": {
+        "$comment-moduleMap": "Replaces the fmtk --clusterio-modules plugin, rewrites each file's own module path rather than the require string",
+        "$comment-library": "clusterio is outside this repo, set CLUSTERIO to your checkout. The factorio typedefs come from .luarc.json, which the factoriomod-debug extension manages",
+        "library": [ "$CLUSTERIO/packages/host" ],
+        "ignoreDir": [ ".github", "web", "dist", "factorio" ],
+        "ignoreGlobs": [ "**/node_modules/**", "**/dist/**", "**/campaigns/**" ],
+        "moduleMap": [
+            { "pattern": "^([^.]+)\\.module\\.module_exports$", "replace": "modules.$1" },
+            { "pattern": "^([^.]+)\\.module\\.(.+)$", "replace": "modules.$1.$2" }
+        ]
+    },
+    "doc": {
+        "privateName": [ "__*" ]
+    },
+    "$comment-disable": "Carried over from the luals config, which had these as editor only rather than checked in ci",
+    "$comment-unnecessary-if": "Disabled by the config fmtk generates for itself, the api union types make it unreliable",
+    "diagnostics": {
+        "globals": [ "__DebugAdapter", "__Profiler" ],
+        "disable": [
+            "assign-type-mismatch",
+            "param-type-mismatch",
+            "preferred-local-alias",
+            "unnecessary-assert",
+            "unnecessary-if",
+            "unused"
+        ]
+    }
+}

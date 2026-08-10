@@ -68,12 +68,13 @@ local function try_deconstruct_output_chest(entity)
     end
 
     -- Get all adjacent mining drills and inserters
+    local target_position = target.position
     local entities = target.surface.find_entities_filtered{
         type = { "mining-drill", "inserter" },
         to_be_deconstructed = false,
         area = {
-            { target.position.x - 1, target.position.y - 1 },
-            { target.position.x + 1, target.position.y + 1 }
+            left_top = { x = target_position.x - 1, y = target_position.y - 1 },
+            right_bottom = { x = target_position.x + 1, y = target_position.y + 1 },
         },
     }
 
@@ -250,16 +251,17 @@ local function on_resource_depleted(event)
     local drills = resource.surface.find_entities_filtered{
         type = "mining-drill",
         area = {
-            { position.x - max_mining_radius, position.y - max_mining_radius },
-            { position.x + max_mining_radius, position.y + max_mining_radius },
+            left_top = { x = position.x - max_mining_radius, y = position.y - max_mining_radius },
+            right_bottom = { x = position.x + max_mining_radius, y = position.y + max_mining_radius },
         },
     }
 
     -- Check which could have reached this resource
     for _, drill in pairs(drills) do
         local radius = drill.prototype.mining_drill_radius
-        local dx = math.abs(drill.position.x - position.x)
-        local dy = math.abs(drill.position.y - position.y)
+        local drill_position = drill.position
+        local dx = math.abs(drill_position.x - position.x)
+        local dy = math.abs(drill_position.y - position.y)
         if dx <= radius and dy <= radius then
             try_deconstruct_miner(drill)
         end

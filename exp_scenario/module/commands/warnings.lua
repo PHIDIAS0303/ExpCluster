@@ -35,7 +35,7 @@ Commands.new("get-warnings", { "exp-commands_warnings.description-get" })
             local warnings = Warnings.get_warnings(player)
             local script_warnings = Warnings.get_script_warnings(player)
             local other_player_name = format_player_name(other_player)
-            Commands.print{ "exp-commands_warnings.player-title", other_player_name, #warnings, #script_warnings, config.temp_warning_limit }
+            Commands.print{ "exp-commands_warnings.player-title", other_player_name, #warnings, #script_warnings, config.script_warning_limit }
             for _, warning in pairs(warnings) do
                 local by_player_name_formatted = format_player_name(warning.by_player_name)
                 Commands.print{ "exp-commands_warnings.list-element-player", by_player_name_formatted, warning.reason }
@@ -47,12 +47,12 @@ Commands.new("get-warnings", { "exp-commands_warnings.description-get" })
             for player_name, player_warnings in pairs(warnings) do
                 local player_name_formatted = format_player_name(player_name)
                 local script_warning_count = script_warnings[player_name] and #script_warnings[player_name] or 0
-                Commands.print{ "exp-commands_warnings.list-element", player_name_formatted, #player_warnings, script_warning_count, config.temp_warning_limit }
+                Commands.print{ "exp-commands_warnings.list-element", player_name_formatted, #player_warnings, script_warning_count, config.script_warning_limit }
             end
             for player_name, player_warnings in pairs(script_warnings) do
                 if not warnings[player_name] then
                     local player_name_formatted = format_player_name(player_name)
-                    Commands.print{ "exp-commands_warnings.list-element", player_name_formatted, 0, #player_warnings, config.temp_warning_limit }
+                    Commands.print{ "exp-commands_warnings.list-element", player_name_formatted, 0, #player_warnings, config.script_warning_limit }
                 end
             end
         end

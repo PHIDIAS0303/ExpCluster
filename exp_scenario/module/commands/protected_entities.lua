@@ -37,7 +37,7 @@ end
 
 --- Get the key used in protected_areas
 --- TODO expose this from EntityProtection
---- @param area BoundingBox
+--- @param area BoundingBox.struct
 --- @return string
 local function get_area_key(area)
     return format_string("%i,%i", floor(area.left_top.x), floor(area.left_top.y))
@@ -49,13 +49,15 @@ end
 local function show_protected_entity(player, entity)
     local key = get_entity_key(entity)
     if renders[player.index][key] then return end
-    local rb = entity.selection_box.right_bottom
+    local selection_box = entity.selection_box
+    local rb = selection_box.right_bottom
+    local position = entity.position
     renders[player.index][key] = rendering.draw_sprite{
         sprite = "utility/notification",
         target = entity,
         target_offset = {
-            (rb.x - entity.position.x) * 0.75,
-            (rb.y - entity.position.y) * 0.75,
+            (rb.x - position.x) * 0.75,
+            (rb.y - position.y) * 0.75,
         },
         x_scale = 2,
         y_scale = 2,
@@ -67,7 +69,7 @@ end
 --- Show a protected area to a player
 --- @param player LuaPlayer
 --- @param surface LuaSurface
---- @param area BoundingBox
+--- @param area BoundingBox.struct
 local function show_protected_area(player, surface, area)
     local key = get_area_key(area)
     if renders[player.index][key] then return end

@@ -22,9 +22,9 @@ local function aabb_align_expand(aabb)
     }
 end
 
-local vlayer_container
-local vlayer_gui_control_type
-local vlayer_gui_control_list
+local vlayer_container --- @type ExpElement
+local vlayer_gui_control_type --- @type ExpElement
+local vlayer_gui_control_list --- @type ExpElement
 
 local vlayer_control_type_list = {
     [1] = "energy",
@@ -87,10 +87,10 @@ SelectArea:on_selection(function(event)
     local container = Gui.get_left_element(vlayer_container, player)
     local disp = container.frame["vlayer_st_2"].disp.table
     local target = vlayer_control_type_list[disp[vlayer_gui_control_type.name].selected_index]
-    local entities
+    local entities --- @type LuaEntity[]
 
     if config.power_on_space and event.surface and event.surface.platform and target == "energy" then
-        if player.force.technologies[config.power_on_space_research.name].level >= config.power_on_space_research.level then
+        if (player.force --[[@as LuaForce]]).technologies[config.power_on_space_research.name].level >= config.power_on_space_research.level then
             entities = event.surface.find_entities_filtered{ area = area, name = "constant-combinator", force = player.force }
         else
             player.print{ "vlayer.power-on-space-research", config.power_on_space_research.name, config.power_on_space_research.level }
@@ -116,7 +116,7 @@ SelectArea:on_selection(function(event)
     local e_pos = { x = string.format("%.1f", e.position.x), y = string.format("%.1f", e.position.y) }
     local e_circ = nil -- e.get_wire_connectors{ or_create = false }
 
-    if e.name and e.name == "steel-chest" and (not e.get_inventory(defines.inventory.chest).is_empty()) then
+    if e.name and e.name == "steel-chest" and (not assert(e.get_inventory(defines.inventory.chest)).is_empty()) then
         player.print{ "vlayer.steel-chest-empty" }
         return
     end
@@ -325,7 +325,9 @@ local function vlayer_gui_list_refresh(player)
         local interface = vlayer.get_interfaces()[vlayer_control_type_list[target]]
 
         for i = 1, vlayer.get_interface_counts()[vlayer_control_type_list[target]], 1 do
-            table.insert(full_list, i .. " X " .. interface[i].position.x .. " Y " .. interface[i].position.y)
+            local entity = assert(interface[i])
+            local entity_position = entity.position
+            table.insert(full_list, i .. " X " .. entity_position.x .. " Y " .. entity_position.y)
         end
 
         disp[vlayer_gui_control_list.name].items = full_list
@@ -379,14 +381,13 @@ local vlayer_gui_control_see = Gui.define("vlayer_gui_control_see")
     }:style{
         width = 200,
     }:on_click(function(def, player, element, event)
-        local target = element.parent[vlayer_gui_control_type.name].selected_index
-        local n = element.parent[vlayer_gui_control_list.name].selected_index
+        local target = assert(element.parent)[vlayer_gui_control_type.name].selected_index
+        local n = assert(element.parent)[vlayer_gui_control_list.name].selected_index
         
         if target and vlayer_control_type_list[target] and n > 0 then
             local i = vlayer.get_interfaces()
             local entity = i[vlayer_control_type_list[target]][n]
             if entity and entity.valid then
-                local player = Gui.get_player(event)
                 player.set_controller{ type = defines.controllers.remote, position = entity.position, surface = entity.surface }
                 player.print{ "vlayer.result-interface-location", { "vlayer.control-type-" .. vlayer_control_type_list[target]:gsub("_", "-") }, pos_to_gps_string(entity.position, entity.surface.name) }
             end
@@ -423,14 +424,15 @@ local vlayer_gui_control_remove = Gui.define("vlayer_gui_control_remove")
     }:style{
         width = 200,
     }:on_click(function(def, player, element)
-        local target = element.parent[vlayer_gui_control_type.name].selected_index
-        local n = element.parent[vlayer_gui_control_list.name].selected_index
+        local target = assert(element.parent)[vlayer_gui_control_type.name].selected_index
+        local n = assert(element.parent)[vlayer_gui_control_list.name].selected_index
 
         if target and vlayer_control_type_list[target] and n > 0 then
             local i = vlayer.get_interfaces()
 
             if i and i[vlayer_control_type_list[target]] then
-                local interface_type, interface_surface, interface_position = vlayer.remove_interface(i[vlayer_control_type_list[target]][n].surface, i[vlayer_control_type_list[target]][n].position)
+                local entity = assert(i[vlayer_control_type_list[target]][n])
+                local interface_type, interface_surface, interface_position = vlayer.remove_interface(entity.surface, entity.position)
 
                 if interface_type then
                     game.print{ "vlayer.interface-result", player.name, pos_to_gps_string(interface_position, interface_surface.name), { "vlayer.result-remove" }, { "vlayer.control-type-" .. interface_type } }

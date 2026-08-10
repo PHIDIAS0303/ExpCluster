@@ -42,12 +42,14 @@ end
 --- @param options FlyingText.create_above_entity_param
 function FlyingText.create_above_entity(options)
     local entity = assert(options.target_entity, "A target entity is required")
-    local size_y = entity.bounding_box.left_top.y - entity.bounding_box.right_bottom.y
+    local bounding_box = entity.bounding_box
+    local size_y = bounding_box.left_top.y - bounding_box.right_bottom.y
+    local position = entity.position
     local offset = options.offset or { x = 0, y = 0 }
 
     options.position = {
-        x = offset.x + entity.position.x,
-        y = offset.y + entity.position.y + size_y * 0.25,
+        x = offset.x + position.x,
+        y = offset.y + position.y + size_y * 0.25,
     }
 
     FlyingText.create(options)
@@ -62,12 +64,14 @@ end
 function FlyingText.create_above_player(options)
     local player = assert(options.target_player, "A target player is required")
     local entity = player.character; if not entity then return end
-    local size_y = entity.bounding_box.left_top.y - entity.bounding_box.right_bottom.y
+    local bounding_box = entity.bounding_box
+    local size_y = bounding_box.left_top.y - bounding_box.right_bottom.y
+    local position = entity.position
     local offset = options.offset or { x = 0, y = 0 }
 
     options.position = {
-        x = offset.x + entity.position.x,
-        y = offset.y + entity.position.y + size_y * 0.25,
+        x = offset.x + position.x,
+        y = offset.y + position.y + size_y * 0.25,
     }
 
     FlyingText.create(options)
@@ -82,13 +86,15 @@ end
 function FlyingText.create_as_player(options)
     local player = assert(options.target_player, "A target player is required")
     local entity = player.character; if not entity then return end
-    local size_y = entity.bounding_box.left_top.y - entity.bounding_box.right_bottom.y
+    local bounding_box = entity.bounding_box
+    local size_y = bounding_box.left_top.y - bounding_box.right_bottom.y
+    local position = entity.position
     local offset = options.offset or { x = 0, y = 0 }
 
     options.color = player.chat_color
     options.position = {
-        x = offset.x + entity.position.x,
-        y = offset.y + entity.position.y + size_y * 0.25,
+        x = offset.x + position.x,
+        y = offset.y + position.y + size_y * 0.25,
     }
 
     FlyingText.create(options)

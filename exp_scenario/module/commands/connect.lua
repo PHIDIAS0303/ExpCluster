@@ -41,7 +41,7 @@ local function get_server_id(server)
         elseif status == "Offline" then
             return false, { "exp-commands_connect.offline", server_details.name }
         end
-        return true, server_id
+        return true, server_id --[[@as string]]
     elseif server_count_before > 0 then
         return false, { "exp-commands_connect.wrong-version", concat(server_names_before, ", ") }
     else

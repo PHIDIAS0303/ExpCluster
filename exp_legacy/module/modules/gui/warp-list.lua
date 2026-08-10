@@ -180,7 +180,7 @@ local warp_icon_button = Gui.define("warp_icon_button")
     :style(Styles.sprite32)
     :on_click(function(def, player, element)
         if element.type == "choose-elem-button" then return end
-        local warp_id = element.parent.caption
+        local warp_id = assert(element.parent).caption
         Warps.teleport_player(warp_id, player)
 
         -- Reset the warp cooldown if the player does not have unlimited warps
@@ -226,7 +226,7 @@ local warp_label = Gui.define("warp_label")
         horizontally_stretchable = true,
     }
     :on_click(function(def, player, element)
-        local warp_id = element.parent.caption
+        local warp_id = assert(element.parent).caption
         local warp = Warps.get_warp(warp_id)
         player.set_controller{ type = defines.controllers.remote, position = warp.position, surface = warp.surface }
     end)
@@ -271,9 +271,9 @@ local warp_textfield = Gui.define("warp_textfield")
         right_margin = 2,
     }
     :on_confirmed(function(def, player, element)
-        local warp_id = element.parent.caption
+        local warp_id = assert(element.parent).caption
         local warp_name = element.text
-        local warp_icon = element.parent.parent["icon-" .. warp_id][warp_icon_editing.name].elem_value --[[ @as SignalID ]]
+        local warp_icon = assert(element.parent).parent["icon-" .. warp_id][warp_icon_editing.name].elem_value --[[@as SignalID]]
         if warp_icon.type == nil then warp_icon.type = "item" end
         Warps.set_editing(warp_id, player.name)
         Warps.update_warp(warp_id, warp_name, warp_icon, player.name)
@@ -291,9 +291,13 @@ local confirm_edit_button = Gui.define("confirm_edit_button")
     }
     :style(Styles.sprite22)
     :on_click(function(def, player, element)
-        local warp_id = element.parent.caption
-        local warp_name = element.parent.parent["name-" .. warp_id][warp_textfield.name].text
-        local warp_icon = element.parent.parent["icon-" .. warp_id][warp_icon_editing.name].elem_value --[[ @as SignalID ]]
+        local parent = assert(element.parent)
+        local grandparent = assert(parent.parent)
+        local warp_id = parent.caption --[[@as string]]
+        local name_flow = grandparent["name-" .. warp_id]
+        local icon_flow = grandparent["icon-" .. warp_id]
+        local warp_name = name_flow[warp_textfield.name].text
+        local warp_icon = icon_flow[warp_icon_editing.name].elem_value --[[@as SignalID]]
         if warp_icon.type == nil then warp_icon.type = "item" end
         Warps.set_editing(warp_id, player.name)
         Warps.update_warp(warp_id, warp_name, warp_icon, player.name)
@@ -311,7 +315,7 @@ local cancel_edit_button = Gui.define("cancel_edit_button")
     }
     :style(Styles.sprite22)
     :on_click(function(def, player, element)
-        local warp_id = element.parent.caption
+        local warp_id = assert(element.parent).caption
         -- Check if this is the first edit, if so remove the warp.
         local warp = Warps.get_warp(warp_id)
         if warp.updates == 1 then
@@ -333,7 +337,7 @@ local remove_warp_button = Gui.define("remove_warp_button")
     }
     :style(Styles.sprite22)
     :on_click(function(def, player, element)
-        local warp_id = element.parent.caption
+        local warp_id = assert(element.parent).caption
         Warps.remove_warp(warp_id)
     end)
 
@@ -349,7 +353,7 @@ local edit_warp_button = Gui.define("edit_warp_button")
     }
     :style(Styles.sprite22)
     :on_click(function(def, player, element)
-        local warp_id = element.parent.caption
+        local warp_id = assert(element.parent).caption
         Warps.set_editing(warp_id, player.name, true)
     end)
 
@@ -429,8 +433,8 @@ local function update_warp_elements(element, warp, warp_player_is_on, on_cooldow
     -- Check if button element is valid
     if not element or not element.valid then return end
 
-    local label_style = element.parent.parent["name-" .. warp.warp_id][warp_label.name].style
-    local warp_status_element = element.parent.parent["name-" .. warp.warp_id][warp_status.name]
+    local label_style = assert(element.parent).parent["name-" .. warp.warp_id][warp_label.name].style
+    local warp_status_element = assert(element.parent).parent["name-" .. warp.warp_id][warp_status.name]
 
     -- If player is not on a warp
     if not warp_player_is_on then
@@ -669,7 +673,7 @@ warp_list_container = Gui.define("warp_list_container")
         -- Draw the scroll table for the warps
         local scroll_table = Gui.elements.scroll_table(container, 250, 3, "scroll")
         -- Set the scroll panel to always show the scrollbar (not doing this will result in a changing gui size)
-        scroll_table.parent.vertical_scroll_policy = "always"
+        assert(scroll_table.parent).vertical_scroll_policy = "always"
 
         -- Change the style of the scroll table
         local scroll_table_style = scroll_table.style
@@ -778,7 +782,7 @@ Event.on_nth_tick(math.floor(60 / config.update_smoothing), function()
         end
 
         -- Check if the force has any warps
-        local closest_warp = nil
+        local closest_warp = nil --- @type { warp_id: string, name: string }?
         local closest_distance = nil
         if #warp_ids > 0 then
             local surface = player.surface
@@ -838,7 +842,7 @@ end)
 Event.add(defines.events.on_player_created, function(event)
     -- If the force has no spawn then make a spawn warp
     local player = game.players[event.player_index]
-    local force = player.force
+    local force = player.force --[[@as LuaForce]]
     local spawn_id = Warps.get_spawn_warp_id(force.name)
     if not spawn_id then
         local spawn_position = force.get_spawn_position(player.surface)
@@ -870,7 +874,7 @@ local function role_update_event(event)
     -- Check if user has permission to add warps
     local allow_add_warp = check_player_permissions(player, "allow_add_warp")
     -- Update container size depending on whether the player is allowed to add warps
-    frame.parent.style.width = allow_add_warp and 268 or 220
+    assert(frame.parent).style.width = allow_add_warp and 268 or 220
 
     -- Update the warps, in case the user can now edit them
     local scroll_table = frame.scroll.table

@@ -12,7 +12,7 @@ local ExpUtil = require("modules/exp_util")
 local Async = require("modules/exp_util/async")
 local Storage = require("modules/exp_util/storage")
 
-local Commands = require("modules/exp_commands") --- @class Commands
+local Commands = require("modules/exp_commands") --- @class (partial) Commands
 
 local rcon_env = {} --- @type table<string, any>
 local rcon_static = {} --- @type table<string, any>
@@ -21,12 +21,10 @@ setmetatable(rcon_static, { __index = _G })
 setmetatable(rcon_env, { __index = rcon_static })
 
 --- Some common static values which can be added now
---- @diagnostic disable: name-style-check
 rcon_static.Async = Async
 rcon_static.ExpUtil = ExpUtil
 rcon_static.Commands = Commands
 rcon_static.print = Commands.print
---- @diagnostic enable: name-style-check
 
 --- Some common callback values which are useful when a player uses the command
 --- @alias ExpCommand.RconDynamic fun(player: LuaPlayer?): any

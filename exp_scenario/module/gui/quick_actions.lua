@@ -43,13 +43,13 @@ local function new_quick_action(command, on_click)
         :style{
             width = 160,
         }
-        :on_click(on_click or function(def, player, element, event)
+        :on_click(on_click or function(_def, player, _element, _event)
             command(player)
         end)
 
     Elements[command_name] = element
     Actions[command_name] = {
-        command = command --[[ @as ExpCommand ]],
+        command = command --[[@as ExpCommand]],
         element = element,
     }
 end

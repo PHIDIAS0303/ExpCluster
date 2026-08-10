@@ -8,7 +8,7 @@ local floor = math.floor
 --- Give a player their starting items
 --- @param player LuaPlayer
 local function give_starting_items(player)
-    local get_prod_stats = player.force.get_item_production_statistics(player.physical_surface)
+    local get_prod_stats = (player.force --[[@as LuaForce]]).get_item_production_statistics(player.physical_surface)
     local get_input_count = get_prod_stats.get_input_count
     local insert_param = { name = "", count = 0 }
     local insert = player.insert

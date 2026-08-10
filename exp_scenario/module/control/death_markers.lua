@@ -31,7 +31,7 @@ local function create_map_tag(corpse_data)
         message = message .. " at " .. time
     end
 
-    corpse_data.tag = player.force.add_chart_tag(corpse_data.corpse.surface, {
+    corpse_data.tag = (player.force --[[@as LuaForce]]).add_chart_tag(corpse_data.corpse.surface, {
         position = corpse_data.corpse.position,
         icon = config.map_icon,
         text = message,

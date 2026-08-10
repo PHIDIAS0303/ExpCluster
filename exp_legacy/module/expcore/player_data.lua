@@ -55,7 +55,7 @@ PlayerData:set_serializer(Datastore.name_serializer) -- use player name
 
 --- Store and enum for the data saving preference
 local DataSavingPreference = PlayerData:combine("DataSavingPreference")
-local PreferenceEnum = { "All", "Statistics", "Settings", "Required" }
+local PreferenceEnum = { "All", "Statistics", "Settings", "Required" } --- @type table<string | number, string | number>
 for k, v in ipairs(PreferenceEnum) do PreferenceEnum[v] = k end
 
 DataSavingPreference:set_default("All")

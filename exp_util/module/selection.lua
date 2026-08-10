@@ -23,7 +23,7 @@ local Selection = {
     --- @field player_index number
     --- @field selection Selection.Active
 
-    --- @type table<string, { [defines.events]: Selection.event_handler[] }>
+    --- @type table<string, { [defines.events]: Selection.event_handler<any>[] }>
     _registered = {},
 
     --- @package
@@ -54,7 +54,7 @@ local selection_tool = { name = "selection-tool" }
 --- @param player LuaPlayer
 --- @return boolean?
 local function has_selection_tool_in_hand(player)
-    return player.cursor_stack and player.cursor_stack.valid_for_read and player.cursor_stack.name == "selection-tool"
+    return assert(player.cursor_stack) and assert(player.cursor_stack).valid_for_read and assert(player.cursor_stack).name == "selection-tool"
 end
 
 --- Give a selection tool to a player if they don't have one
@@ -62,7 +62,7 @@ end
 local function give_selection_tool(player)
     if has_selection_tool_in_hand(player) then return end
     player.clear_cursor()
-    player.cursor_stack.set_stack(selection_tool)
+    assert(player.cursor_stack).set_stack(selection_tool)
 
     -- This does not work for selection planners, will make a feature request for it
     --player.cursor_stack_temporary = true
@@ -84,7 +84,7 @@ end
 local function remove_selection_tool(player, old_character)
     -- Remove the selection tool
     if has_selection_tool_in_hand(player) then
-        player.cursor_stack.clear()
+        assert(player.cursor_stack).clear()
     else
         player.remove_item(selection_tool)
     end

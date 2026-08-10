@@ -35,6 +35,20 @@ return {
         storage_output = 1, -- >0 allows for item teleportation (allowed_items only)
     },
 
+    --- @class Vlayer.ItemProperties
+    --- @field starting_value number
+    --- @field required_area number
+    --- @field production number?
+    --- @field discharge number?
+    --- @field capacity number?
+    --- @field surface_area number?
+    --- @field fuel_value number?
+    --- @field power boolean?
+    --- @field modded boolean? Set when the item is registered from a modded equivalent
+    --- @field base_game_equivalent string?
+    --- @field multiplier number?
+
+    --- @type table<string, Vlayer.ItemProperties>
     allowed_items = { --- @setting allowed_items List of all items allowed in vlayer storage and their properties
         --[[
             Allowed properties:
