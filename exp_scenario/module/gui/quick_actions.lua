@@ -4,7 +4,7 @@ Adds a few buttons for common actions
 
 local Gui = require("modules/exp_gui")
 local Commands = require("modules/exp_commands")
-local Roles = require("modules/exp_legacy/expcore/roles")
+local Roles = require("modules/exp_roles")
 
 local addon_artillery = require("modules/exp_scenario/commands/artillery")
 local addon_trains = require("modules/exp_scenario/commands/trains")
@@ -116,7 +116,7 @@ Gui.toolbar.create_button{
     sprite = "item/repair-pack",
     tooltip = { "exp-gui_quick-actions.tooltip-main" },
     visible = function(player, element)
-        return Roles.player_allowed(player, "gui/tool")
+        return Roles.player_has_permission(player, "exp_scenario.gui.tool")
     end
 }
 
@@ -129,7 +129,6 @@ end
 return {
     elements = Elements,
     events = {
-        [Roles.events.on_role_assigned] = on_role_changed,
-        [Roles.events.on_role_unassigned] = on_role_changed,
+        [Roles.events.on_player_roles_changed] = on_role_changed,
     }
 }

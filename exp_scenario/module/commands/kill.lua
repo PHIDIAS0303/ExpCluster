@@ -4,8 +4,8 @@ Adds a command that allows players to kill themselves and others
 
 local Commands = require("modules/exp_commands")
 
-local Roles = require("modules.exp_legacy.expcore.roles") --- @dep expcore.roles
-local highest_role = Roles.get_player_highest_role
+local Roles = require("modules/exp_roles")
+local player_outranks = Roles.player_outranks
 
 --- Kills yourself or another player.
 Commands.new("kill", { "exp-commands_kill.description" })
@@ -20,7 +20,7 @@ Commands.new("kill", { "exp-commands_kill.description" })
         if other_player == nil then
             -- Can only be nil if the target is the player and they are already dead
             return Commands.status.error{ "exp-commands_kill.already-dead" }
-        elseif (other_player == player) or (highest_role(player).index < highest_role(other_player).index) then
+        elseif other_player == player or player_outranks(player, other_player) then
             -- You can always kill yourself or can kill lower role players
             if script.active_mods["space-age"] then
                 other_player.surface.create_entity{ name = "lightning", position = { other_player.position.x, other_player.position.y - 16 }, target = other_player.character }

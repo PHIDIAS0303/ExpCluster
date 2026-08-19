@@ -14,7 +14,7 @@ local PlayerData = require("modules/exp_legacy/expcore/player_data")
 local UsesServerUps = PlayerData.Settings:combine("UsesServerUps")
 UsesServerUps:set_default(false)
 UsesServerUps:set_metadata{
-    permission = "command/server-ups",
+    permission = "exp_scenario.command.server_ups",
     stringify = function(value) return value and "Visible" or "Hidden" end,
 }
 

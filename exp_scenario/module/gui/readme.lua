@@ -4,7 +4,7 @@ Adds a main gui that contains important information about the server.
 
 local ExpUtil = require("modules/exp_util")
 local Gui = require("modules/exp_gui")
-local Roles = require("modules.exp_legacy.expcore.roles")
+local Roles = require("modules/exp_roles")
 local Commands = require("modules/exp_commands")
 local PlayerData = require("modules.exp_legacy.expcore.player_data")
 local External = require("modules.exp_legacy.expcore.external")
@@ -392,14 +392,16 @@ define_tab(
 
         local done = {}
 
-        -- Fill groups from configured roles
-        for player_name, player_roles in pairs(Roles.config.players) do
-            for _, group in ipairs(groups) do
-                for _, role_name in ipairs(group.roles) do
-                    if table.contains(player_roles, role_name) then
+        -- Fill groups from the players who hold the roles, a player can be in more than one group
+        for _, group in ipairs(groups) do
+            local seen = {}
+            for _, role_name in ipairs(group.roles) do
+                local role = Roles.get_role(role_name)
+                for _, player_name in ipairs(role and role:get_player_names() or {}) do
+                    if not seen[player_name] then
+                        seen[player_name] = true
                         done[player_name] = true
                         group.players[#group.players + 1] = player_name
-                        break
                     end
                 end
             end
@@ -463,7 +465,7 @@ local function render_data_category(opts)
     for name, child in pairs(opts.children) do
         local metadata = child.metadata
 
-        if not metadata.permission or Roles.player_allowed(opts.player, metadata.permission) then
+        if not metadata.permission or Roles.player_has_permission(opts.player, metadata.permission) then
             local value = child:get(opts.player_name)
 
             if value ~= nil or metadata.show_always then
@@ -663,7 +665,7 @@ Elements.toggle_button = Gui.toolbar.create_button{
         sprite = "virtual-signal/signal-info",
         tooltip = { "exp-gui_readme.main-tooltip" },
         visible = function(player)
-            return Roles.player_allowed(player, "gui/readme")
+            return Roles.player_has_permission(player, "exp_scenario.gui.readme")
         end,
     }
     :on_click(function(_, player)

@@ -33,11 +33,7 @@ for _, config_key in ipairs{ "always_protected_names", "always_protected_types",
     end
 end
 
--- Require roles if a permission is assigned in the config
-local Roles --- @type table<string, any>
-if config.ignore_permission then
-    Roles = require("modules.exp_legacy.expcore.roles") --- @dep expcore.roles
-end
+local Roles = require("modules/exp_roles")
 
 ----- Storage Variables -----
 --- Variables stored in the global table
@@ -159,7 +155,7 @@ Event.add(defines.events.on_pre_player_mined_item, function(event)
     -- Check if the player should be ignored
     if config.ignore_admins and player.admin then return end
     if entity.last_user == nil or entity.last_user.index == player.index then return end
-    if config.ignore_permission and Roles.player_allowed(player, config.ignore_permission) then return end
+    if config.ignore_permission and Roles.player_has_permission(player, config.ignore_permission) then return end
 
     -- Check if the entity is protected
     if EntityProtection.is_entity_protected(entity)

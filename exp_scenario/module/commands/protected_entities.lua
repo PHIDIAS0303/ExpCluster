@@ -11,7 +11,7 @@ local expand_area = AABB.expand
 local Commands = require("modules/exp_commands")
 local format_player_name = Commands.format_player_name_locale
 
-local Roles = require("modules.exp_legacy.expcore.roles") --- @dep expcore.roles
+local Roles = require("modules/exp_roles")
 local EntityProtection = require("modules.exp_legacy.modules.control.protection") --- @dep modules.control.protection
 
 local format_string = string.format

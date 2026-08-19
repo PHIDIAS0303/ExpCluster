@@ -1,4 +1,3 @@
-
 --[[-- Command Types - Roles
 The data types that are used with exp_roles
 A lower role index indicates it is more privileged
@@ -11,28 +10,42 @@ Adds parsers for:
     lower_role_player_alive
 ]]
 
+local ExpUtil = require("modules/exp_util")
+local auto_complete = ExpUtil.auto_complete
+
 local Commands = require("modules/exp_commands")
 local add, parse = Commands.add_data_type, Commands.parse_input
 local valid, invalid = Commands.status.success, Commands.status.invalid_input
 
-local Roles = require("modules.exp_legacy.expcore.roles")
-local highest_role = Roles.get_player_highest_role
+local Roles = require("modules/exp_roles")
+local player_outranks = Roles.player_outranks
 
 local types = {} --- @class (partial) Commands.types
 
---- A role defined by exp roles
-types.role = add("role", Commands.types.key_of(Roles.config.roles))
+--- A role known to exp roles, matched on its name
+types.role =
+    add("role", function(input)
+        local names = {}
+        for index, role in ipairs(Roles.get_roles()) do
+            names[index] = role.name
+        end
+
+        local name = auto_complete(names, input)
+        if name == nil then
+            return invalid{ "exp-commands-parse.string-options", table.concat(names, ", ") }
+        else
+            return valid(Roles.get_role(name))
+        end
+    end)
 
 --- A role which is lower than the players highest role
 types.lower_role =
     add("lower_role", function(input, player)
         local success, status, result = parse(input, player, types.role)
         if not success then return status, result end
-        --- @cast result any TODO role is not a defined type
+        --- @cast result ExpRoles.Role
 
-        local player_highest = highest_role(player)
-        local is_root = Roles.config.internal.root == player_highest.name
-        if not is_root and player_highest.index >= result.index then
+        if not Roles.player_outranks_role(player, result) then
             return invalid{ "exp-commands-parse_role.lower-role" }
         else
             return valid(result)
@@ -46,10 +59,7 @@ types.lower_role_player =
         if not success then return status, result end
         --- @cast result LuaPlayer
 
-        local other_highest = highest_role(result)
-        local player_highest = highest_role(player)
-        local is_root = Roles.config.internal.root == player_highest.name
-        if not is_root and player_highest.index >= other_highest.index then
+        if not player_outranks(player, result) then
             return invalid{ "exp-commands-parse_role.lower-role-player" }
         else
             return valid(result)
@@ -63,10 +73,7 @@ types.lower_role_player_online =
         if not success then return status, result end
         --- @cast result LuaPlayer
 
-        local other_highest = highest_role(result)
-        local player_highest = highest_role(player)
-        local is_root = Roles.config.internal.root == player_highest.name
-        if not is_root and player_highest.index >= other_highest.index then
+        if not player_outranks(player, result) then
             return invalid{ "exp-commands-parse_role.lower-role-player" }
         else
             return valid(result)
@@ -80,10 +87,7 @@ types.lower_role_player_alive =
         if not success then return status, result end
         --- @cast result LuaPlayer
 
-        local other_highest = highest_role(result)
-        local player_highest = highest_role(player)
-        local is_root = Roles.config.internal.root == player_highest.name
-        if not is_root and player_highest.index >= other_highest.index then
+        if not player_outranks(player, result) then
             return invalid{ "exp-commands-parse_role.lower-role-player" }
         else
             return valid(result)

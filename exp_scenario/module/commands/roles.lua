@@ -6,8 +6,8 @@ local Commands = require("modules/exp_commands")
 local format_player_name = Commands.format_player_name_locale
 local format_text = Commands.format_rich_text_color_locale
 
-local Roles = require("modules.exp_legacy.expcore.roles") --- @dep expcore.roles
-local get_roles_ordered = Roles.get_roles_ordered
+local Roles = require("modules/exp_roles")
+local get_roles = Roles.get_roles
 local get_player_roles = Roles.get_player_roles
 
 --- Assigns a role to a player
@@ -18,7 +18,7 @@ Commands.new("assign-role", { "exp-commands_roles.description-assign" })
     :add_flags{ "admin_only" }
     :register(function(player, other_player, role)
         --- @cast other_player LuaPlayer
-        --- @cast role any -- TODO
+        --- @cast role ExpRoles.Role
         Roles.assign_player(other_player, role, player.name)
     end)
 
@@ -30,7 +30,7 @@ Commands.new("unassign-role", { "exp-commands_roles.description-unassign" })
     :add_flags{ "admin_only" }
     :register(function(player, other_player, role)
         --- @cast other_player LuaPlayer
-        --- @cast role any -- TODO
+        --- @cast role ExpRoles.Role
         Roles.unassign_player(other_player, role, player.name)
     end)
 
@@ -40,7 +40,7 @@ Commands.new("get-roles", { "exp-commands_roles.description-get" })
     :add_aliases{ "roles" }
     :register(function(player, other_player)
         --- @cast other_player LuaPlayer?
-        local roles = get_roles_ordered()
+        local roles = get_roles()
         local roles_formatted = { "" } --- @type LocalisedString
         local response = { "exp-commands_roles.list-roles", roles_formatted } --[[@as LocalisedString]]
         if other_player then
@@ -50,7 +50,7 @@ Commands.new("get-roles", { "exp-commands_roles.description-get" })
         end
 
         for index, role in ipairs(roles) do
-            local role_name = format_text(role.name, role.custom_color or Commands.color.white)
+            local role_name = format_text(role.name, role.color or Commands.color.white)
             roles_formatted[index + 1] = { "exp-commands_roles.list-element", role_name }
         end
 

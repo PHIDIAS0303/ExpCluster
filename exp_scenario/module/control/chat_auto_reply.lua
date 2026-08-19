@@ -2,7 +2,7 @@
 Adds auto replies to chat messages, as well as chat commands
 ]]
 
-local Roles = require("modules.exp_legacy.expcore.roles")
+local Roles = require("modules/exp_roles")
 local config = require("modules.exp_legacy.config.chat_reply")
 local prefix = config.command_prefix
 local prefix_len = string.len(prefix)
@@ -20,7 +20,7 @@ local function on_console_chat(event)
     -- Check if the player can chat commands
     local commands_allowed = true
     if config.command_admin_only and not player.admin then commands_allowed = false end
-    if config.command_permission and not Roles.player_allowed(player, config.command_permission) then commands_allowed = false end
+    if config.command_permission and not Roles.player_has_permission(player, config.command_permission) then commands_allowed = false end
 
     -- Check if a key word appears in the message
     for key_word, reply in pairs(config.messages) do

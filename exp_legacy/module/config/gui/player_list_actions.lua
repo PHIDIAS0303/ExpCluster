@@ -7,7 +7,7 @@
 
 local ExpUtil = require("modules/exp_util")
 local Gui = require("modules/exp_gui")
-local Roles = require("modules.exp_legacy.expcore.roles") --- @dep expcore.roles
+local Roles = require("modules/exp_roles")
 local Reports = require("modules.exp_legacy.modules.control.reports") --- @dep modules.control.reports
 local Warnings = require("modules.exp_legacy.modules.control.warnings") --- @dep modules.control.warnings
 local Jail = require("modules.exp_legacy.modules.control.jail") --- @dep modules.control.jail
@@ -23,11 +23,7 @@ end
 
 -- auth that will only allow when on player's of lower roles
 local function auth_lower_role(player, selected_player_name)
-    local player_highest = Roles.get_player_highest_role(player)
-    local action_player_highest = Roles.get_player_highest_role(selected_player_name)
-    if player_highest.index < action_player_highest.index then
-        return true
-    end
+    return Roles.player_outranks(player, selected_player_name)
 end
 
 -- gets the action player and a coloured name for the action to be used on
@@ -94,7 +90,7 @@ local report_player = new_button("utility/spawn_flag", { "exp-gui_player-list.re
         if Reports.is_reported(selected_player.name, player.name) then
             player.print({ "exp-commands_report.already-reported" }, Colors.orange_red)
         else
-            set_selected_action(player, "command/report")
+            set_selected_action(player, "exp_scenario.command.create_report")
         end
     end)
 
@@ -110,7 +106,7 @@ end
 -- @element warn_player
 local warn_player = new_button("utility/spawn_flag", { "exp-gui_player-list.warn-player" })
     :on_click(function(def, player, element)
-        set_selected_action(player, "command/give-warning")
+        set_selected_action(player, "exp_scenario.command.create_warning")
     end)
 
 local function warn_player_callback(player, reason)
@@ -128,7 +124,7 @@ local jail_player = new_button("utility/multiplayer_waiting_icon", { "exp-gui_pl
         if Jail.is_jailed(selected_player.name) then
             player.print({ "exp-commands_jail.already-jailed", selected_player_color }, Colors.orange_red)
         else
-            set_selected_action(player, "command/jail")
+            set_selected_action(player, "exp_scenario.command.jail")
         end
     end)
 
@@ -143,7 +139,7 @@ end
 -- @element kick_player
 local kick_player = new_button("utility/warning_icon", { "exp-gui_player-list.kick-player" })
     :on_click(function(def, player, element)
-        set_selected_action(player, "command/kick")
+        set_selected_action(player, "exp_scenario.gui.player_list.kick")
     end)
 
 local function kick_player_callback(player, reason)
@@ -155,7 +151,7 @@ end
 -- @element ban_player
 local ban_player = new_button("utility/danger_icon", { "exp-gui_player-list.ban-player" })
     :on_click(function(def, player, element)
-        set_selected_action(player, "command/ban")
+        set_selected_action(player, "exp_scenario.gui.player_list.ban")
     end)
 
 local function ban_player_callback(player, reason)
@@ -166,39 +162,39 @@ end
 return {
     set_accessors = set_accessors,
     buttons = {
-        ["command/teleport"] = {
+        ["exp_scenario.command.teleport"] = {
             auth = function(player, selected_player)
                 return player.name ~= selected_player.name
             end, -- cant teleport to your self
             goto_player,
             bring_player,
         },
-        ["command/report"] = {
+        ["exp_scenario.command.create_report"] = {
             auth = function(player, selected_player)
                 if player == selected_player then return false end
-                if not Roles.player_allowed(player, "command/give-warning") then
-                    return not Roles.player_has_flag(selected_player, "report-immune")
+                if not Roles.player_has_permission(player, "exp_scenario.command.create_warning") then
+                    return not Roles.player_has_permission(selected_player, "exp_scenario.bypass.reports")
                 end
             end, -- can report any player that isn't immune and you aren't able to give warnings
             reason_callback = report_player_callback,
             report_player,
         },
-        ["command/give-warning"] = {
+        ["exp_scenario.command.create_warning"] = {
             auth = auth_lower_role, -- warn a lower user, replaces report
             reason_callback = warn_player_callback,
             warn_player,
         },
-        ["command/jail"] = {
+        ["exp_scenario.command.jail"] = {
             auth = auth_lower_role,
             reason_callback = jail_player_callback,
             jail_player,
         },
-        ["command/kick"] = {
+        ["exp_scenario.gui.player_list.kick"] = {
             auth = auth_lower_role,
             reason_callback = kick_player_callback,
             kick_player,
         },
-        ["command/ban"] = {
+        ["exp_scenario.gui.player_list.ban"] = {
             auth = auth_lower_role,
             reason_callback = ban_player_callback,
             ban_player,

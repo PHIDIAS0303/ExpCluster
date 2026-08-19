@@ -39,9 +39,9 @@ return {
         allow_zoom_to_map = true, --- @setting allow_zoom_to_map false will disable the zoom to map feature
         allow_remote_launch = true, --- @setting allow_remote_launch false removes the remote launch button for all players
         remote_launch_admins_only = false, --- @setting remote_launch_admins_only true will remove the remote launch button for all non (game) admins
-        remote_launch_role_permission = "gui/rocket-info/remote_launch", --- @setting remote_launch_role_permission value used by custom permission system to allow or disallow the button
+        remote_launch_role_permission = "exp_scenario.gui.rocket_info.remote_launch", --- @setting remote_launch_role_permission value used by custom permission system to allow or disallow the button
         allow_toggle_active = true, --- @setting allow_toggle_active false removes the remote toggle auto launch button for all players
         toggle_active_admins_only = false, --- @setting toggle_active_admins_only true will remove the toggle auto launch button for all non (game) admins
-        toggle_active_role_permission = "gui/rocket-info/toggle-active", --- @setting toggle_active_role_permission value used by custom permission system to allow or disallow the button
+        toggle_active_role_permission = "exp_scenario.gui.rocket_info.toggle_active", --- @setting toggle_active_role_permission value used by custom permission system to allow or disallow the button
     },
 }

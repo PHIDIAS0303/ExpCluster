@@ -4,7 +4,7 @@ Adds a Gui which creates an selection planner to insert modules into buildings
 
 local Gui = require("modules/exp_gui")
 local AABB = require("modules/exp_util/aabb")
-local Roles = require("modules/exp_legacy/expcore/roles")
+local Roles = require("modules/exp_roles")
 
 local Selection = require("modules/exp_util/selection")
 local SelectArea = Selection.connect("ModuleArea")
@@ -259,7 +259,7 @@ Gui.toolbar.create_button{
     sprite = "item/productivity-module-3",
     tooltip = { "exp-gui_module-inserter.tooltip-main" },
     visible = function(player, element)
-        return Roles.player_allowed(player, "gui/module")
+        return Roles.player_has_permission(player, "exp_scenario.gui.module")
     end
 }
 

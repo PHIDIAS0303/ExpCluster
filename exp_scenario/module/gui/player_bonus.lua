@@ -3,7 +3,7 @@ Adds a gui that allows players to apply various bonuses
 ]]
 
 local Gui = require("modules/exp_gui")
-local Roles = require("modules/exp_legacy/expcore/roles")
+local Roles = require("modules/exp_roles")
 local config = require("modules/exp_legacy/config/bonus")
 local vlayer = require("modules/exp_legacy/modules/control/vlayer")
 local format_number = require("util").format_number
@@ -68,7 +68,8 @@ do local _points_limit = {} --- @type table<number, number>
     --- @param player LuaPlayer
     --- @return number
     function Elements.bonus_used._calculate_points_limit(player)
-        local role_diff = Roles.get_role_by_name(config.points.role_name).index - Roles.get_player_highest_role(player).index
+        local role = assert(Roles.get_role(config.points.role_name), "Bonus points role does not exist")
+        local role_diff = role.index - Roles.get_player_highest_role(player).index
         local points_limit = math.floor(config.points.base * (1 + config.points.increase_percentage_per_role_level * role_diff))
         _points_limit[player.index] = points_limit
         return points_limit
@@ -458,19 +459,19 @@ Gui.toolbar.create_button{
     sprite = "item/exoskeleton-equipment",
     tooltip = { "exp-gui_player-bonus.tooltip-main" },
     visible = function(player, element)
-        return Roles.player_allowed(player, "gui/bonus")
+        return Roles.player_has_permission(player, "exp_scenario.gui.bonus")
     end
 }
 
 --- Recalculate and apply the bonus for a player
 local function recalculate_bonus(event)
     local player = Gui.get_player(event)
-    if event.name == Roles.events.on_role_assigned or event.name == Roles.events.on_role_unassigned then
+    if event.name == Roles.events.on_player_roles_changed then
         -- If the player's roles changed then we will need to recalculate their limit
         Elements.bonus_used._clear_points_limit_cache(player)
         local bonus_cost = Elements.container.calculate_cost(player)
         local within_limit = Elements.bonus_used.refresh_player(player, bonus_cost)
-        if not within_limit or not Roles.player_allowed(player, "gui/bonus") then
+        if not within_limit or not Roles.player_has_permission(player, "exp_scenario.gui.bonus") then
             Elements.container.clear_player_bonus(player)
             return
         end
@@ -512,7 +513,7 @@ end
 --- Apply the periodic bonus to all players
 local function apply_periodic_bonus_online()
     for _, player in pairs(game.connected_players) do
-        if player.character and Roles.player_allowed(player, "gui/bonus") then
+        if player.character and Roles.player_has_permission(player, "exp_scenario.gui.bonus") then
             apply_personal_battery_recharge(player)
         end
     end
@@ -524,8 +525,7 @@ return {
     elements = Elements,
     events = {
         [e.on_player_respawned] = recalculate_bonus,
-        [Roles.events.on_role_assigned] = recalculate_bonus,
-        [Roles.events.on_role_unassigned] = recalculate_bonus,
+        [Roles.events.on_player_roles_changed] = recalculate_bonus,
     },
     on_nth_tick = {
         [config.periodic_bonus_rate] = apply_periodic_bonus_online,

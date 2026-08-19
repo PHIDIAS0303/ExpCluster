@@ -6,8 +6,8 @@ local Commands = require("modules/exp_commands")
 local format_player_name = Commands.format_player_name_locale
 local parse_input = Commands.parse_input
 
-local Roles = require("modules.exp_legacy.expcore.roles")
-local player_has_flag = Roles.player_has_flag
+local Roles = require("modules/exp_roles")
+local player_has_permission = Roles.player_has_permission
 
 local Reports = require("modules.exp_legacy.modules.control.reports") --- @dep modules.control.reports
 
@@ -20,7 +20,7 @@ local function reportable_player(input, player)
     if not success then return status, result end
     --- @cast result LuaPlayer
 
-    if player_has_flag(input, "report-immune") then
+    if player_has_permission(input, "exp_scenario.bypass.reports") then
         return Commands.status.invalid_input{ "exp-commands_reports.player-immune" }
     elseif player == input then
         return Commands.status.invalid_input{ "exp-commands_reports.self-report" }

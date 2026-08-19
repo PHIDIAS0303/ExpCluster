@@ -7,25 +7,23 @@
     -- import the module from the control modules
     local Jail = require("modules.exp_legacy.modules.control.jail") --- @dep modules.control.jail
 
-    -- This will move 'MrBiter' to the jail role and remove all other roles from them
+    -- This will give 'MrBiter' the jail role, which suppresses all of their other roles
     -- the player name and reason are only so they can be included in the event for user feedback
     Jail.jail_player('MrBiter', 'Cooldude2606', 'Likes biters too much')
 
-    -- This will give 'MrBiter' all his roles back and remove him from jail
+    -- This will remove the jail role from 'MrBiter', restoring their other roles
     -- again as above the player name is only used in the event for user feedback
     Jail.unjail_player('MrBiter', 'Cooldude2606')
 ]]
 
-local Roles = require("modules.exp_legacy.expcore.roles")
+local Roles = require("modules/exp_roles")
 
 local valid_player = function(p) return type(p) == "userdata" and p or game.get_player(p) end
-local assign_roles = Roles.assign_player
-local unassign_roles = Roles.unassign_player
-local has_role = Roles.player_has_role
-local get_roles = Roles.get_player_roles
+
+--- The role which is given to jailed players, it has a higher priority than every other role
+local jail_role = "Jail"
 
 local Jail = {
-    old_roles = {},
     events = {
         --- When a player is assigned to jail
         -- @event on_player_jailed
@@ -64,10 +62,10 @@ end
 -- @tparam LuaPlayer player the player to check if they are in jail
 -- @treturn boolean whether the player is currently in jail
 function Jail.is_jailed(player)
-    return has_role(valid_player(player), "Jail")
+    return Roles.player_has_role(valid_player(player), jail_role)
 end
 
---- Moves a player to jail and removes all other roles
+--- Moves a player to jail, which suppresses all of their other roles
 -- @tparam LuaPlayer player the player who will be jailed
 -- @tparam string by_player_name the name of the player who is doing the jailing
 -- @tparam[opt='Non given.'] string reason the reason that the player is being jailed
@@ -79,8 +77,7 @@ function Jail.jail_player(player, by_player_name, reason)
 
     reason = reason or "Non given."
 
-    if has_role(player, "Jail") then return end
-    local roles = get_roles(player)
+    if Roles.player_has_role(player, jail_role) then return end
 
     player.walking_state = { walking = false, direction = player.walking_state.direction }
     player.riding_state = { acceleration = defines.riding.acceleration.nothing, direction = player.riding_state.direction }
@@ -89,16 +86,14 @@ function Jail.jail_player(player, by_player_name, reason)
     player.picking_state = false
     player.repair_state = { repairing = false, position = player.repair_state.position }
 
-    unassign_roles(player, roles, by_player_name, nil, true)
-    assign_roles(player, "Jail", by_player_name, nil, true)
-    assign_roles(player, roles, by_player_name, nil, true)
+    Roles.assign_player(player, jail_role, by_player_name, true)
 
     event_emit(Jail.events.on_player_jailed, player, by_player_name, reason)
 
     return true
 end
 
---- Moves a player out of jail and restores all roles previously removed
+--- Moves a player out of jail, which restores all of their other roles
 -- @tparam LuaPlayer player the player that will be unjailed
 -- @tparam string by_player_name the name of the player that is doing the unjail
 -- @treturn boolean whether the player was unjailed successfully
@@ -107,9 +102,9 @@ function Jail.unjail_player(player, by_player_name)
     if not player then return end
     if not by_player_name then return end
 
-    if not has_role(player, "Jail") then return end
+    if not Roles.player_has_role(player, jail_role) then return end
 
-    unassign_roles(player, "Jail", by_player_name, nil, true)
+    Roles.unassign_player(player, jail_role, by_player_name, true)
 
     event_emit(Jail.events.on_player_unjailed, player, by_player_name)
 

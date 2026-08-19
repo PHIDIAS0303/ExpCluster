@@ -5,7 +5,7 @@ Displays the player data for a player
 local ExpUtil = require("modules/exp_util")
 local Gui = require("modules/exp_gui")
 local ElementsExtra = require("modules/exp_scenario/gui/elements")
-local Roles = require("modules/exp_legacy/expcore/roles")
+local Roles = require("modules/exp_roles")
 
 require("modules/exp_legacy/modules/data/statistics")
 local PlayerData = require("modules/exp_legacy/expcore/player_data")
@@ -214,7 +214,7 @@ Gui.toolbar.create_button{
     tooltip = { "exp-gui_player-stats.tooltip-main" },
     left_element = Elements.container,
     visible = function(player, element)
-        return Roles.player_allowed(player, "gui/playerdata")
+        return Roles.player_has_permission(player, "exp_scenario.gui.playerdata")
     end
 }
 

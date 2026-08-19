@@ -4,17 +4,17 @@
 ]]
 
 local Commands = require("modules/exp_commands")
-local Roles = require("modules.exp_legacy.expcore.roles") --- @dep expcore.roles
+local Roles = require("modules/exp_roles")
 
 --- Stores the tag for a player
 local PlayerData = require("modules.exp_legacy.expcore.player_data") --- @dep expcore.player_data
 local PlayerTags = PlayerData.Settings:combine("Tag")
 local PlayerTagColors = PlayerData.Settings:combine("TagColor")
 PlayerTags:set_metadata{
-    permission = "command/tag",
+    permission = "exp_scenario.command.tag",
 }
 PlayerTagColors:set_metadata{
-    permission = "command/tag-color",
+    permission = "exp_scenario.command.tag_color",
 }
 
 local set_tag = function(player, tag, color)
@@ -72,7 +72,7 @@ Commands.new("tag-clear", "Clears your tag. Or another player if you are admin."
         if other_player == player then
             -- No player given so removes your tag
             PlayerTags:remove(other_player)
-        elseif Roles.player_allowed(player, "command/clear-tag/always") then
+        elseif Roles.player_has_permission(player, "exp_scenario.command.tag_clear.always") then
             -- Player given and user is admin so clears that player's tag
             PlayerTags:remove(other_player)
         else
