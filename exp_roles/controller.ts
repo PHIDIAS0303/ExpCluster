@@ -1,6 +1,7 @@
 import { BaseControllerPlugin, InstanceRecord } from "@clusterio/controller";
 import * as lib from "@clusterio/lib";
 import * as messages from "./messages";
+import { seedRoles, seedAssignments, flattenSeedPermissions } from "./seed";
 import * as path from "node:path";
 
 export class ControllerPlugin extends BaseControllerPlugin {
@@ -15,6 +16,12 @@ export class ControllerPlugin extends BaseControllerPlugin {
 				messages.RoleMetaRecord.fromJSON.bind(messages.RoleMetaRecord),
 			).bootstrap()
 		);
+
+		// An empty datastore means the plugin has not run before, so the roles
+		// the scenario used to define are created on the controller
+		if (this.roleMeta.size === 0) {
+			this.seed();
+		}
 
 		// The datastore can be out of step with the roles, either because the
 		// plugin was installed after they were created or because it was
@@ -41,6 +48,78 @@ export class ControllerPlugin extends BaseControllerPlugin {
 
 	async onShutdown() {
 		await this.roleMeta.save();
+	}
+
+	/*
+		Seeding
+	*/
+
+	/**
+	 * Create the roles the scenario shipped with and give the players it listed
+	 * their roles. Roles which already exist by name are reused.
+	 */
+	seed() {
+		const defaultRoleId = this.controller.config.get("controller.default_role_id");
+		const roles = this.controller.roles;
+		let nextId = Math.max(5, ...[...roles.keys()].map(id => id + 1));
+		const idsByName = new Map<string, number>();
+
+		for (const [order, seedRole] of seedRoles.entries()) {
+			const permissions = flattenSeedPermissions(seedRole);
+			for (const permission of permissions) {
+				if (!lib.permissions.has(permission)) {
+					this.logger.warn(`Seed role ${seedRole.name} grants unknown permission ${permission}`);
+				}
+			}
+
+			let role: lib.Role | undefined;
+			if (seedRole.isAdmin) {
+				role = roles.getMutable(lib.Role.DefaultAdminRoleId);
+			} else if (seedRole.isDefault) {
+				role = defaultRoleId !== null ? roles.getMutable(defaultRoleId) : undefined;
+			} else {
+				role = [...roles.valuesMutable()].find(other => other.name === seedRole.name);
+				if (!role) {
+					role = new lib.Role(nextId, seedRole.name, "", permissions);
+					nextId += 1;
+					this.logger.info(`Created role ${seedRole.name}`);
+				} else {
+					for (const permission of permissions) {
+						role.permissions.add(permission);
+					}
+				}
+				roles.set(role);
+			}
+
+			if (!role) {
+				continue;
+			}
+
+			idsByName.set(seedRole.name, role.id);
+			this.roleMeta.set(new messages.RoleMetaRecord(
+				role.id,
+				order + 1,
+				seedRole.priority ?? 0,
+				seedRole.shortHand,
+				"",
+				seedRole.color,
+				seedRole.permissionGroup,
+				seedRole.autoAssignHours === undefined ? null : seedRole.autoAssignHours * 3600000,
+				seedRole.blockAutoAssign ?? false,
+			));
+		}
+
+		for (const [name, roleNames] of Object.entries(seedAssignments)) {
+			const roleIds = roleNames.map(roleName => idsByName.get(roleName)).filter(id => id !== undefined);
+			if (roleIds.length !== roleNames.length) {
+				this.logger.warn(`Seed assignment for ${name} names a role which does not exist`);
+			}
+			const user = this.controller.users.getOrCreateUser(name);
+			user.set("roleIds", new Set([...user.roleIds, ...roleIds]));
+			this.controller.userPermissionsUpdated(user);
+		}
+
+		this.logger.info(`Seeded ${seedRoles.length} roles and ${Object.keys(seedAssignments).length} assignments`);
 	}
 
 	/*
