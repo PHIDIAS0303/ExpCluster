@@ -19,6 +19,7 @@ local valid, invalid = Commands.status.success, Commands.status.invalid_input
 
 local Roles = require("modules/exp_roles")
 local player_outranks = Roles.player_outranks
+local player_has_permission = Roles.player_has_permission
 
 local types = {} --- @class (partial) Commands.types
 
@@ -34,7 +35,7 @@ types.role =
         if name == nil then
             return invalid{ "exp-commands-parse.string-options", table.concat(names, ", ") }
         else
-            return valid(Roles.get_role(name))
+            return valid(Roles.get_role_by_name(name))
         end
     end)
 
@@ -45,7 +46,7 @@ types.lower_role =
         if not success then return status, result end
         --- @cast result ExpRoles.Role
 
-        if not Roles.player_outranks_role(player, result) then
+        if not player_has_permission(player, "core.admin") and not Roles.get_player_highest_role(player):is_higher_than(result) then
             return invalid{ "exp-commands-parse_role.lower-role" }
         else
             return valid(result)

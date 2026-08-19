@@ -21,11 +21,6 @@ local function set_accessors(player_getter, action_setter)
     get_selected_player, set_selected_action = player_getter, action_setter
 end
 
--- auth that will only allow when on player's of lower roles
-local function auth_lower_role(player, selected_player_name)
-    return Roles.player_outranks(player, selected_player_name)
-end
-
 -- gets the action player and a coloured name for the action to be used on
 local function get_action_player(player)
     local selected_player = get_selected_player(player) --[[@as LuaPlayer]]
@@ -98,7 +93,10 @@ local function report_player_callback(player, reason)
     local selected_player, selected_player_color = get_action_player(player)
     local by_player_name_color = format_player_name(player)
     game.print{ "exp-commands_reports.response", selected_player_color, reason }
-    Roles.print_to_roles_higher("Trainee", { "exp-commands_reports.response-admin", selected_player_color, by_player_name_color, reason })
+    local trainee = Roles.get_role_by_name("Trainee")
+    for _, role in ipairs(trainee and Roles.get_higher_roles(trainee) or {}) do
+        role:print{ "exp-commands_reports.response-admin", selected_player_color, by_player_name_color, reason }
+    end
     Reports.report_player(selected_player.name, player.name, reason)
 end
 
@@ -180,22 +178,22 @@ return {
             report_player,
         },
         ["exp_scenario.command.create_warning"] = {
-            auth = auth_lower_role, -- warn a lower user, replaces report
+            auth = Roles.player_outranks, -- warn a lower user, replaces report
             reason_callback = warn_player_callback,
             warn_player,
         },
         ["exp_scenario.command.jail"] = {
-            auth = auth_lower_role,
+            auth = Roles.player_outranks,
             reason_callback = jail_player_callback,
             jail_player,
         },
         ["exp_scenario.gui.player_list.kick"] = {
-            auth = auth_lower_role,
+            auth = Roles.player_outranks,
             reason_callback = kick_player_callback,
             kick_player,
         },
         ["exp_scenario.gui.player_list.ban"] = {
-            auth = auth_lower_role,
+            auth = Roles.player_outranks,
             reason_callback = ban_player_callback,
             ban_player,
         },

@@ -20,8 +20,10 @@ local Roles = require("modules/exp_roles")
 
 local valid_player = function(p) return type(p) == "userdata" and p or game.get_player(p) end
 
---- The role which is given to jailed players, it has a higher priority than every other role
-local jail_role = "Jail"
+--- The role given to jailed players, it has a higher priority than every other role
+local function jail_role()
+    return assert(Roles.get_role_by_name("Jail"), "The Jail role does not exist")
+end
 
 local Jail = {
     events = {
@@ -62,7 +64,8 @@ end
 -- @tparam LuaPlayer player the player to check if they are in jail
 -- @treturn boolean whether the player is currently in jail
 function Jail.is_jailed(player)
-    return Roles.player_has_role(valid_player(player), jail_role)
+    local valid = valid_player(player)
+    return valid ~= nil and jail_role():has_player(valid)
 end
 
 --- Moves a player to jail, which suppresses all of their other roles
@@ -77,7 +80,8 @@ function Jail.jail_player(player, by_player_name, reason)
 
     reason = reason or "Non given."
 
-    if Roles.player_has_role(player, jail_role) then return end
+    local role = jail_role()
+    if role:has_player(player) then return end
 
     player.walking_state = { walking = false, direction = player.walking_state.direction }
     player.riding_state = { acceleration = defines.riding.acceleration.nothing, direction = player.riding_state.direction }
@@ -86,7 +90,7 @@ function Jail.jail_player(player, by_player_name, reason)
     player.picking_state = false
     player.repair_state = { repairing = false, position = player.repair_state.position }
 
-    Roles.assign_player(player, jail_role, by_player_name, true)
+    role:assign(player, { by_player_name = by_player_name, silent = true })
 
     event_emit(Jail.events.on_player_jailed, player, by_player_name, reason)
 
@@ -102,9 +106,10 @@ function Jail.unjail_player(player, by_player_name)
     if not player then return end
     if not by_player_name then return end
 
-    if not Roles.player_has_role(player, jail_role) then return end
+    local role = jail_role()
+    if not role:has_player(player) then return end
 
-    Roles.unassign_player(player, jail_role, by_player_name, true)
+    role:unassign(player, { by_player_name = by_player_name, silent = true })
 
     event_emit(Jail.events.on_player_unjailed, player, by_player_name)
 

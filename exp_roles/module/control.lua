@@ -6,19 +6,20 @@ the controller. This module keeps a copy of that state and answers permission
 checks from it, so a check such as `Roles.player_has_permission(player,
 "exp_scenario.command.kill")` is answered from the same data the web ui shows.
 
-Assignments made in game are applied locally first and then sent to the
-controller, which avoids callers having to deal with the round trip. A local
-assignment which is never sent, such as one earned from time on this map, can be
-made with `assign_player_local`.
+Roles are objects, looked up by their clusterio id, and everything done to or
+with a role is a method on it. Assignments made in game are applied locally
+first and then sent to the controller, which avoids callers having to deal with
+the round trip.
 
-Only the roles with the highest priority a player holds are considered. Jail
-sits above every other role, so holding it suppresses the rest, including the
-default role every player has.
+Only the roles with the highest priority a player holds apply. Jail sits above
+every other role, so holding it suppresses the rest, including the default role
+every player has.
 ]]
 
 local clusterio_api = require("modules/clusterio/api")
 local compat = require("modules/clusterio/compat") --[[@as LibCompat]]
 local Async = require("modules/exp_util/async")
+local Storage = require("modules/exp_util/storage")
 
 --- @class ExpRoles
 local ExpRoles = {
@@ -34,8 +35,8 @@ local ExpRoles = {
 --- @class EventData.ExpRoles.on_player_roles_changed : EventData
 --- @field player_index uint
 --- @field by_player_index uint 0 when the change did not come from a player
---- @field assigned string[] Names of the roles which were assigned
---- @field unassigned string[] Names of the roles which were unassigned
+--- @field assigned number[] Ids of the roles which were assigned
+--- @field unassigned number[] Ids of the roles which were unassigned
 
 --- Methods shared by every role, kept apart from the fields so that defining
 --- them does not count as injecting fields into the role itself
@@ -43,18 +44,24 @@ local ExpRoles = {
 local Role = {}
 ExpRoles._prototype = Role
 
+--- Registered so roles keep their methods across save and load
+local role_metatable = Storage.register_metatable("Role", { __index = Role })
+
 --- @class ExpRoles.Role : ExpRoles.RolePrototype
 --- @field id number Clusterio role id
 --- @field name string
 --- @field short_hand string
---- @field order number Order given by the controller, which can have gaps
---- @field index number Position within the role order, with no gaps
+--- @field order number Position given by the controller, compare roles with the methods rather than this
 --- @field priority number Only the highest priority roles a player holds apply
 --- @field tag string
 --- @field color Color?
 --- @field permissions table<string, true> Permission names granted by this role
---- @field permission_group string? Factorio permission group holders are moved to
 --- @field block_auto_assign boolean
+
+--- @class ExpRoles.AssignOptions
+--- @field by_player_name string? Shown in the game message, defaults to the current player or the server
+--- @field silent boolean? When true no game message is printed
+--- @field local_only boolean? When true the controller is not told, for roles earned on this map only
 
 --- @class ExpRoles.ScriptData
 --- @field roles table<number, ExpRoles.Role> Roles indexed by clusterio id
@@ -65,48 +72,12 @@ ExpRoles._prototype = Role
 --- @field emit_updates boolean
 local script_data = {}
 
---- Roles in order, the most privileged first, rebuilt from script data
-local ordered_roles = {} --- @type ExpRoles.Role[]
---- Roles indexed by name, rebuilt from script data
-local roles_by_name = {} --- @type table<string, ExpRoles.Role>
 --- Async handlers run when the state of a permission may have changed
 local permission_triggers = {} --- @type table<string, Async.AsyncFunction>
-
---- Move a player into a permission group, done async because the game does not
---- allow it from within every event
-local set_permission_group_async = Async.register(function(player, group)
-    --- @cast player LuaPlayer
-    --- @cast group LuaPermissionGroup
-    if player.valid and group.valid then
-        group.add_player(player)
-    end
-end)
 
 --[[
     Role state
 ]]
-
---- Rebuild the ordered and by name views of the roles
-local function rebuild_role_views()
-    local roles = {}
-    for _, role in pairs(script_data.roles) do
-        roles[#roles + 1] = role
-    end
-
-    -- Sorted on the order given by the controller, which can have gaps, the
-    -- index each role is given is its position within that order
-    table.sort(roles, function(a, b)
-        if a.order == b.order then return a.id < b.id end
-        return a.order < b.order
-    end)
-
-    ordered_roles, roles_by_name = {}, {}
-    for index, role in ipairs(roles) do
-        role.index = index
-        ordered_roles[index] = role
-        roles_by_name[role.name] = role
-    end
-end
 
 --- Build a role from the record sent by the controller
 --- @param record table
@@ -126,33 +97,37 @@ local function decode_role(record, names)
         end
     end
 
-    local group = meta.permission_group
-    if group == "" then group = nil end
-
     --- @type ExpRoles.Role
     return setmetatable({
         id = record.id,
         name = record.name,
         short_hand = meta.short_hand or record.name,
         order = meta.order or record.id,
-        index = meta.order or record.id,
         priority = meta.priority or 0,
         tag = meta.tag or "",
         color = meta.color,
         permissions = permissions,
-        permission_group = group,
         block_auto_assign = meta.block_auto_assign or false,
-    }, { __index = ExpRoles._prototype })
+    }, role_metatable)
 end
 
---- Get the name of a player from a player or a name, nil for the server
+--- Sort roles in place, the most privileged first
+--- @param roles ExpRoles.Role[]
+--- @return ExpRoles.Role[]
+local function sort_roles(roles)
+    table.sort(roles, function(a, b)
+        if a.order == b.order then return a.id < b.id end
+        return a.order < b.order
+    end)
+    return roles
+end
+
 --- The server is represented by nil, or by a player object with index 0
---- @param player LuaPlayer | string | nil
---- @return string?
-local function player_name_of(player)
-    if type(player) == "string" then return player end
-    if player and player.index ~= 0 then return player.name end
-    return nil
+--- @param player LuaPlayer?
+--- @return LuaPlayer? # The player when it is not the server
+local function not_server(player)
+    if player == nil or player.index == 0 then return nil end
+    return player
 end
 
 --- Role ids a player has been given, without the default role or priority applied
@@ -171,59 +146,75 @@ local function get_held_role_ids(player_name)
     return role_ids
 end
 
---- Role ids which apply to a player, with the default role and priority applied
+--- Role ids a player has been given, as a set
 --- @param player_name string
 --- @return table<number, true>
-local function get_effective_role_ids(player_name)
+local function get_held_role_set(player_name)
+    local rtn = {}
+    for _, role_id in pairs(get_held_role_ids(player_name)) do
+        rtn[role_id] = true
+    end
+    return rtn
+end
+
+--- Roles which apply to a player, with the default role and priority applied
+--- @param player_name string
+--- @return ExpRoles.Role[]
+local function get_effective_roles(player_name)
     local role_ids = get_held_role_ids(player_name)
     if script_data.default_role_id then
         role_ids[#role_ids + 1] = script_data.default_role_id
     end
 
-    local highest_priority
+    local roles, highest_priority = {}, nil
     for _, role_id in pairs(role_ids) do
         local role = script_data.roles[role_id]
-        if role and (highest_priority == nil or role.priority > highest_priority) then
-            highest_priority = role.priority
+        if role then
+            roles[#roles + 1] = role
+            if highest_priority == nil or role.priority > highest_priority then
+                highest_priority = role.priority
+            end
         end
     end
 
     local rtn = {}
-    for _, role_id in pairs(role_ids) do
-        local role = script_data.roles[role_id]
-        if role and role.priority == highest_priority then
-            rtn[role_id] = true
+    for _, role in pairs(roles) do
+        if role.priority == highest_priority then
+            rtn[#rtn + 1] = role
         end
     end
-    return rtn
+    return sort_roles(rtn)
 end
 
 --[[
     Role lookup
 ]]
 
---- Get a role from its name, its clusterio id, or a role
---- @param any string | number | ExpRoles.Role
+--- Get a role from its clusterio id
+--- @param role_id number
 --- @return ExpRoles.Role?
-function ExpRoles.get_role(any)
-    local t_any = type(any)
-    if t_any == "string" then
-        return roles_by_name[any]
-    elseif t_any == "number" then
-        return script_data.roles[any]
-    elseif t_any == "table" then
-        return script_data.roles[any.id]
-    end
+function ExpRoles.get_role(role_id)
+    return script_data.roles[role_id]
 end
 
---- Get every role in order, the most privileged first
+--- Get a role from its name, roles should be referred to by id where possible
+--- @param name string
+--- @return ExpRoles.Role?
+function ExpRoles.get_role_by_name(name)
+    for _, role in pairs(script_data.roles) do
+        if role.name == name then return role end
+    end
+    return nil
+end
+
+--- Get every role, the most privileged first
 --- @return ExpRoles.Role[]
 function ExpRoles.get_roles()
     local rtn = {}
-    for index, role in ipairs(ordered_roles) do
-        rtn[index] = role
+    for _, role in pairs(script_data.roles) do
+        rtn[#rtn + 1] = role
     end
-    return rtn
+    return sort_roles(rtn)
 end
 
 --- Get the role every player holds
@@ -232,43 +223,60 @@ function ExpRoles.get_default_role()
     return script_data.default_role_id and script_data.roles[script_data.default_role_id] or nil
 end
 
+--- Get a role and every role more privileged than it, the default role excluded
+--- @param role ExpRoles.Role
+--- @return ExpRoles.Role[]
+function ExpRoles.get_higher_roles(role)
+    local rtn = {}
+    for _, other in pairs(script_data.roles) do
+        if not other:is_lower_than(role) and other.id ~= script_data.default_role_id then
+            rtn[#rtn + 1] = other
+        end
+    end
+    return sort_roles(rtn)
+end
+
+--- Get a role and every role less privileged than it, the default role excluded
+--- @param role ExpRoles.Role
+--- @return ExpRoles.Role[]
+function ExpRoles.get_lower_roles(role)
+    local rtn = {}
+    for _, other in pairs(script_data.roles) do
+        if not other:is_higher_than(role) and other.id ~= script_data.default_role_id then
+            rtn[#rtn + 1] = other
+        end
+    end
+    return sort_roles(rtn)
+end
+
 --- Role used when there is no player, such as for commands run by the server
 --- It has core.admin so it passes every permission check
 local server_role = setmetatable({
     id = -1,
     name = "<server>",
     short_hand = "SRV",
-    order = 0,
-    index = 0,
+    order = -math.huge,
     priority = 0,
     tag = "",
     color = nil,
     permissions = { ["core.admin"] = true },
-    permission_group = nil,
     block_auto_assign = true,
-}, { __index = ExpRoles._prototype })
+}, role_metatable)
 
 --- Get the roles which apply to a player, including the default role
 --- Only the roles with the highest priority are returned, which lets a role
 --- such as Jail suppress every other role a player holds
---- @param player LuaPlayer | string | nil
+--- @param player LuaPlayer? nil for the server
 --- @return ExpRoles.Role[]
 function ExpRoles.get_player_roles(player)
-    local player_name = player_name_of(player)
     -- The server is not a player and is allowed to do anything
-    if player_name == nil then return { server_role } end
-
-    local rtn = {}
-    for role_id in pairs(get_effective_role_ids(player_name)) do
-        rtn[#rtn + 1] = script_data.roles[role_id]
-    end
-
-    table.sort(rtn, function(a, b) return a.index < b.index end)
-    return rtn
+    local valid = not_server(player)
+    if not valid then return { server_role } end
+    return get_effective_roles(valid.name)
 end
 
 --- Get the most privileged role which applies to a player
---- @param player LuaPlayer | string | nil
+--- @param player LuaPlayer? nil for the server
 --- @return ExpRoles.Role
 function ExpRoles.get_player_highest_role(player)
     local role = ExpRoles.get_player_roles(player)[1]
@@ -280,7 +288,7 @@ end
 ]]
 
 --- Check if a player has a permission through any of their roles
---- @param player LuaPlayer | string | nil
+--- @param player LuaPlayer? nil for the server
 --- @param permission string A clusterio permission such as `exp_scenario.command.kill`
 --- @return boolean
 function ExpRoles.player_has_permission(player, permission)
@@ -294,49 +302,21 @@ function ExpRoles.player_has_permission(player, permission)
     return false
 end
 
---- Check if a role applies to a player
---- @param player LuaPlayer | string | nil
---- @param search_role string | number | ExpRoles.Role
---- @return boolean
-function ExpRoles.player_has_role(player, search_role)
-    local role = ExpRoles.get_role(search_role)
-    if not role then return false end
-
-    for _, player_role in pairs(ExpRoles.get_player_roles(player)) do
-        if player_role.id == role.id then return true end
-    end
-
-    return false
-end
-
---- Check if a player is more privileged than a role
---- A player with core.admin, which includes the server, outranks every role
---- @param player LuaPlayer | string | nil
---- @param role string | number | ExpRoles.Role
---- @return boolean
-function ExpRoles.player_outranks_role(player, role)
-    local resolved = ExpRoles.get_role(role)
-    if not resolved then return false end
-    if ExpRoles.player_has_permission(player, "core.admin") then return true end
-    local highest = ExpRoles.get_player_roles(player)[1]
-    return highest ~= nil and highest.index < resolved.index
-end
-
 --- Check if a player is more privileged than another player
 --- A player with core.admin, which includes the server, outranks every player
---- @param player LuaPlayer | string | nil
---- @param other LuaPlayer | string | nil
+--- @param player LuaPlayer? nil for the server
+--- @param other LuaPlayer? nil for the server
 --- @return boolean
 function ExpRoles.player_outranks(player, other)
     if ExpRoles.player_has_permission(player, "core.admin") then return true end
     local highest = ExpRoles.get_player_roles(player)[1]
     local other_highest = ExpRoles.get_player_roles(other)[1]
     if highest == nil then return false end
-    return other_highest == nil or highest.index < other_highest.index
+    return other_highest == nil or highest:is_higher_than(other_highest)
 end
 
 --[[
-    Role prototype
+    Role methods
 ]]
 
 --- Check if this role grants a permission
@@ -346,6 +326,35 @@ end
 function Role.has_permission(self, permission)
     local permissions = self.permissions
     return permissions["core.admin"] or permissions[permission] or false
+end
+
+--- Check if this role is more privileged than another
+--- @param self ExpRoles.Role
+--- @param other ExpRoles.Role
+--- @return boolean
+function Role.is_higher_than(self, other)
+    if self.order == other.order then return self.id < other.id end
+    return self.order < other.order
+end
+
+--- Check if this role is less privileged than another
+--- @param self ExpRoles.Role
+--- @param other ExpRoles.Role
+--- @return boolean
+function Role.is_lower_than(self, other)
+    return other:is_higher_than(self)
+end
+
+--- Check if a player has been given this role, or it is the default role
+--- A role a player holds does not always apply, see ExpRoles.get_player_roles
+--- @param self ExpRoles.Role
+--- @param player LuaPlayer? nil for the server
+--- @return boolean
+function Role.has_player(self, player)
+    local valid = not_server(player)
+    if not valid then return self == server_role end
+    if self.id == script_data.default_role_id then return true end
+    return get_held_role_set(valid.name)[self.id] == true
 end
 
 --- Get the names of every player who has been given this role
@@ -402,56 +411,6 @@ function Role.print(self, message)
 end
 
 --[[
-    Printing to roles
-]]
-
---- Print a message to every player holding one of the given roles
---- @param roles (string | number | ExpRoles.Role)[]
---- @param message LocalisedString
-function ExpRoles.print_to_roles(roles, message)
-    for _, role in pairs(roles) do
-        local resolved = ExpRoles.get_role(role)
-        if resolved then resolved:print(message) end
-    end
-end
-
---- Print a message to every player holding the given role or a more privileged one
---- The default role is never included
---- @param role string | number | ExpRoles.Role
---- @param message LocalisedString
-function ExpRoles.print_to_roles_higher(role, message)
-    local resolved = ExpRoles.get_role(role)
-    if not resolved then return end
-
-    local roles = {}
-    for _, other in ipairs(ordered_roles) do
-        if other.index <= resolved.index and other.id ~= script_data.default_role_id then
-            roles[#roles + 1] = other
-        end
-    end
-
-    ExpRoles.print_to_roles(roles, message)
-end
-
---- Print a message to every player holding the given role or a less privileged one
---- The default role is never included
---- @param role string | number | ExpRoles.Role
---- @param message LocalisedString
-function ExpRoles.print_to_roles_lower(role, message)
-    local resolved = ExpRoles.get_role(role)
-    if not resolved then return end
-
-    local roles = {}
-    for _, other in ipairs(ordered_roles) do
-        if other.index >= resolved.index and other.id ~= script_data.default_role_id then
-            roles[#roles + 1] = other
-        end
-    end
-
-    ExpRoles.print_to_roles(roles, message)
-end
-
---[[
     Permission triggers
 ]]
 
@@ -463,22 +422,11 @@ function ExpRoles.define_permission_trigger(permission, callback)
     permission_triggers[permission] = Async.register(callback)
 end
 
---- Run every permission trigger for a player and move them into the permission
---- group of their most privileged role which names one
+--- Run every permission trigger for a player
 --- @param player LuaPlayer
-local function apply_player_state(player)
+local function apply_permission_triggers(player)
     for permission, async_function in pairs(permission_triggers) do
         async_function(player, ExpRoles.player_has_permission(player, permission))
-    end
-
-    for _, role in ipairs(ExpRoles.get_player_roles(player)) do
-        if role.permission_group then
-            local group = game.permissions.get_group(role.permission_group)
-            if group and (not player.permission_group or player.permission_group.name ~= group.name) then
-                set_permission_group_async(player, group)
-            end
-            break
-        end
     end
 end
 
@@ -496,22 +444,27 @@ local function emit_player_roles_changed(player, assigned, unassigned, by_player
     by_player_name = by_player_name or (game.player and game.player.name) or "<server>"
     local by_player = game.get_player(by_player_name)
 
+    local assigned_ids, unassigned_ids = {}, {}
     local assigned_names, unassigned_names = {}, {}
-    for index, role in ipairs(assigned) do assigned_names[index] = role.name end
-    for index, role in ipairs(unassigned) do unassigned_names[index] = role.name end
+    for index, role in ipairs(assigned) do
+        assigned_ids[index], assigned_names[index] = role.id, role.name
+    end
+    for index, role in ipairs(unassigned) do
+        unassigned_ids[index], unassigned_names[index] = role.id, role.name
+    end
 
     if not silent then
-        if #assigned_names > 0 then
+        if #assigned > 0 then
             game.print{ "exp-roles.game-message-assign", player.name, table.concat(assigned_names, ", "), by_player_name }
         end
-        if #unassigned_names > 0 then
+        if #unassigned > 0 then
             game.print{ "exp-roles.game-message-unassign", player.name, table.concat(unassigned_names, ", "), by_player_name }
         end
     end
 
-    if #assigned_names > 0 then
+    if #assigned > 0 then
         player.play_sound{ path = "utility/achievement_unlocked" }
-    elseif #unassigned_names > 0 then
+    elseif #unassigned > 0 then
         player.play_sound{ path = "utility/game_lost" }
     end
 
@@ -520,22 +473,11 @@ local function emit_player_roles_changed(player, assigned, unassigned, by_player
         tick = game.tick,
         player_index = player.index,
         by_player_index = by_player and by_player.index or 0,
-        assigned = assigned_names,
-        unassigned = unassigned_names,
+        assigned = assigned_ids,
+        unassigned = unassigned_ids,
     })
 
-    apply_player_state(player)
-end
-
---- Role ids a player has been given, as a set
---- @param player_name string
---- @return table<number, true>
-local function get_held_role_set(player_name)
-    local rtn = {}
-    for _, role_id in pairs(get_held_role_ids(player_name)) do
-        rtn[role_id] = true
-    end
-    return rtn
+    apply_permission_triggers(player)
 end
 
 --- Compare the roles a player had been given before and after a change and
@@ -558,9 +500,7 @@ local function emit_held_diff(player_name, before, by_player_name, silent)
     end
 
     if #assigned > 0 or #unassigned > 0 then
-        table.sort(assigned, function(a, b) return a.index < b.index end)
-        table.sort(unassigned, function(a, b) return a.index < b.index end)
-        emit_player_roles_changed(player, assigned, unassigned, by_player_name, silent)
+        emit_player_roles_changed(player, sort_roles(assigned), sort_roles(unassigned), by_player_name, silent)
     end
 end
 
@@ -591,56 +531,32 @@ local function add_role_id(list, role_id)
     return true
 end
 
---- Convert a role, role name, or array of either into an array of roles
---- @param roles any
---- @return ExpRoles.Role[]
-local function resolve_roles(roles)
-    if type(roles) ~= "table" or roles.name then
-        roles = { roles }
-    end
-
-    local rtn = {}
-    for _, role in pairs(roles) do
-        local resolved = ExpRoles.get_role(role)
-        if resolved then rtn[#rtn + 1] = resolved end
-    end
-
-    return rtn
-end
-
---- Apply a role change to the local state
+--- Apply a role change to the local state, returns true when something changed
 --- @param player_name string
---- @param roles ExpRoles.Role[]
---- @param change_type "assign" | "unassign"
+--- @param role ExpRoles.Role
+--- @param assign boolean
 --- @param sync boolean
---- @return ExpRoles.Role[] # The roles which actually changed
-local function apply_local_change(player_name, roles, change_type, sync)
+--- @return boolean
+local function apply_local_change(player_name, role, assign, sync)
     local local_roles = script_data.local_players[player_name] or {}
     local pending = script_data.pending[player_name] or {}
-    local changed = {}
+    local changed
 
-    for _, role in pairs(roles) do
-        if change_type == "assign" then
-            local synced = script_data.synced_players[player_name] or {}
-            local already_synced = false
-            for _, role_id in pairs(synced) do
-                if role_id == role.id then already_synced = true break end
-            end
-            if not already_synced and add_role_id(local_roles, role.id) then
-                changed[#changed + 1] = role
-                if sync then add_role_id(pending, role.id) end
-            end
-        else
-            local removed = remove_role_id(local_roles, role.id)
-            remove_role_id(pending, role.id)
-            -- A synced role is only taken away here when the controller is
-            -- being told as well, otherwise the next update would restore it
-            if sync then
-                removed = remove_role_id(script_data.synced_players[player_name], role.id) or removed
-            end
-            if removed then
-                changed[#changed + 1] = role
-            end
+    if assign then
+        local synced = script_data.synced_players[player_name] or {}
+        local already_synced = false
+        for _, role_id in pairs(synced) do
+            if role_id == role.id then already_synced = true break end
+        end
+        changed = not already_synced and add_role_id(local_roles, role.id)
+        if changed and sync then add_role_id(pending, role.id) end
+    else
+        changed = remove_role_id(local_roles, role.id)
+        remove_role_id(pending, role.id)
+        -- A synced role is only taken away here when the controller is
+        -- being told as well, otherwise the next update would restore it
+        if sync then
+            changed = remove_role_id(script_data.synced_players[player_name], role.id) or changed
         end
     end
 
@@ -652,83 +568,53 @@ end
 
 --- Send a role change to the controller
 --- @param player_name string
---- @param roles ExpRoles.Role[]
---- @param change_type "assign" | "unassign"
-local function emit_assignment_update(player_name, roles, change_type)
+--- @param role ExpRoles.Role
+--- @param assign boolean
+local function emit_assignment_update(player_name, role, assign)
     if not script_data.emit_updates then return end
-
-    local role_ids = {}
-    for index, role in ipairs(roles) do
-        role_ids[index] = role.id
-    end
 
     clusterio_api.send_json("exp_roles:assignment_update", {
         name = player_name,
-        assign = change_type == "assign" and role_ids or nil,
-        unassign = change_type == "unassign" and role_ids or nil,
+        assign = assign and { role.id } or nil,
+        unassign = not assign and { role.id } or nil,
     })
 end
 
---- Change the roles a player holds
---- @param player LuaPlayer | string
---- @param roles any A role, role name, or array of either
---- @param change_type "assign" | "unassign"
---- @param by_player_name string?
---- @param silent boolean?
---- @param sync boolean
-local function change_player_roles(player, roles, change_type, by_player_name, silent, sync)
-    local player_name = player_name_of(player)
-    if not player_name then return end
+--- Change whether a player holds a role
+--- @param role ExpRoles.Role
+--- @param player LuaPlayer
+--- @param assign boolean
+--- @param options ExpRoles.AssignOptions?
+local function change_player_role(role, player, assign, options)
+    local valid = not_server(player)
+    if not valid then return end
+    options = options or {}
 
-    local role_objects = resolve_roles(roles)
-    if #role_objects == 0 then return end
-
+    local player_name = valid.name
     local before = get_held_role_set(player_name)
-    local changed = apply_local_change(player_name, role_objects, change_type, sync)
-    if #changed == 0 then return end
+    if not apply_local_change(player_name, role, assign, not options.local_only) then return end
 
-    if sync then
-        emit_assignment_update(player_name, changed, change_type)
+    if not options.local_only then
+        emit_assignment_update(player_name, role, assign)
     end
 
-    emit_held_diff(player_name, before, by_player_name, silent)
+    emit_held_diff(player_name, before, options.by_player_name, options.silent)
 end
 
---- Give a player one or more roles, the change is sent to the controller
---- @param player LuaPlayer | string
---- @param roles any A role, role name, or array of either
---- @param by_player_name string? Shown in the game message, defaults to the current player or the server
---- @param silent boolean? When true no game message is printed
-function ExpRoles.assign_player(player, roles, by_player_name, silent)
-    change_player_roles(player, roles, "assign", by_player_name, silent, true)
+--- Give a player this role, the change is sent to the controller unless local_only is set
+--- @param self ExpRoles.Role
+--- @param player LuaPlayer
+--- @param options ExpRoles.AssignOptions?
+function Role.assign(self, player, options)
+    change_player_role(self, player, true, options)
 end
 
---- Take one or more roles from a player, the change is sent to the controller
---- @param player LuaPlayer | string
---- @param roles any A role, role name, or array of either
---- @param by_player_name string? Shown in the game message, defaults to the current player or the server
---- @param silent boolean? When true no game message is printed
-function ExpRoles.unassign_player(player, roles, by_player_name, silent)
-    change_player_roles(player, roles, "unassign", by_player_name, silent, true)
-end
-
---- Give a player one or more roles on this map only, the controller is not told
---- Use this for roles earned from progress which does not leave this map
---- @param player LuaPlayer | string
---- @param roles any A role, role name, or array of either
---- @param by_player_name string? Shown in the game message, defaults to the current player or the server
---- @param silent boolean? When true no game message is printed
-function ExpRoles.assign_player_local(player, roles, by_player_name, silent)
-    change_player_roles(player, roles, "assign", by_player_name, silent, false)
-end
-
---- Take one or more local roles from a player, the controller is not told
---- @param player LuaPlayer | string
---- @param roles any A role, role name, or array of either
---- @param by_player_name string? Shown in the game message, defaults to the current player or the server
---- @param silent boolean? When true no game message is printed
-function ExpRoles.unassign_player_local(player, roles, by_player_name, silent)
-    change_player_roles(player, roles, "unassign", by_player_name, silent, false)
+--- Take this role from a player, the change is sent to the controller unless local_only is set
+--- @param self ExpRoles.Role
+--- @param player LuaPlayer
+--- @param options ExpRoles.AssignOptions?
+function Role.unassign(self, player, options)
+    change_player_role(self, player, false, options)
 end
 
 --[[
@@ -736,7 +622,7 @@ end
 ]]
 
 --- Stop holding a pending role locally once the controller has confirmed it
---- Roles assigned with assign_player_local are never pending so are untouched
+--- Roles assigned with local_only are never pending so are untouched
 --- @param player_name string
 local function drop_confirmed_local(player_name)
     local pending = script_data.pending[player_name]
@@ -758,9 +644,6 @@ end
 --- Restore local references to persistent script data after load
 function ExpRoles.on_load()
     script_data = compat.script_data["exp_roles"]
-    if script_data then
-        rebuild_role_views()
-    end
 end
 
 --- Enable or disable sending role changes back to the controller
@@ -769,7 +652,7 @@ function ExpRoles.set_emit_events(enabled)
     script_data.emit_updates = enabled ~= false
 end
 
---- Apply the state of every connected player, and raise the event so guis
+--- Apply the triggers of every connected player, and raise the event so guis
 --- can refresh, after the roles themselves have changed
 local function roles_changed()
     for _, player in pairs(game.connected_players) do
@@ -818,9 +701,7 @@ function ExpRoles.initialise(payload)
     end
     script_data.pending = {}
 
-    rebuild_role_views()
     roles_changed()
-
     script_data.emit_updates = emit_updates
 end
 
@@ -843,7 +724,6 @@ function ExpRoles.receive_role_updates(records)
         end
     end
 
-    rebuild_role_views()
     roles_changed()
 end
 
@@ -868,17 +748,15 @@ end
 --- Roll back a local assignment which the controller rejected
 --- @param payload { name: string, role_ids: number[] }
 function ExpRoles.reject_assignment(payload)
-    local player_name = payload.name
-    local roles = {}
+    local player = game.get_player(payload.name)
     for _, role_id in pairs(payload.role_ids) do
         local role = script_data.roles[role_id]
-        if role then roles[#roles + 1] = role end
+        if role and player then
+            role:unassign(player, { by_player_name = "<server>", silent = true, local_only = true })
+        elseif role then
+            apply_local_change(payload.name, role, false, false)
+        end
     end
-
-    if #roles == 0 then return end
-
-    -- Sync is false, so this is never sent back to the controller
-    change_player_roles(player_name, roles, "unassign", "<server>", true, false)
 end
 
 --- Get the current script data for debugging purposes
@@ -908,11 +786,11 @@ function ExpRoles.on_server_startup()
     ExpRoles.on_load()
 end
 
---- Apply the permission triggers and group for a player who just joined
+--- Apply the permission triggers for a player who just joined
 --- @param event EventData.on_player_joined_game
 function ExpRoles.on_player_joined_game(event)
     local player = game.get_player(event.player_index)
-    if player then apply_player_state(player) end
+    if player then apply_permission_triggers(player) end
 end
 
 return ExpRoles

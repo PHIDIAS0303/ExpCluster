@@ -19,7 +19,7 @@ Commands.new("assign-role", { "exp-commands_roles.description-assign" })
     :register(function(player, other_player, role)
         --- @cast other_player LuaPlayer
         --- @cast role ExpRoles.Role
-        Roles.assign_player(other_player, role, player.name)
+        role:assign(other_player, { by_player_name = player.name })
     end)
 
 --- Unassigns a role to a player
@@ -31,7 +31,7 @@ Commands.new("unassign-role", { "exp-commands_roles.description-unassign" })
     :register(function(player, other_player, role)
         --- @cast other_player LuaPlayer
         --- @cast role ExpRoles.Role
-        Roles.unassign_player(other_player, role, player.name)
+        role:unassign(other_player, { by_player_name = player.name })
     end)
 
 --- Lists all roles in they correct order

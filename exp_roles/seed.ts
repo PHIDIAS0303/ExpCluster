@@ -1,8 +1,8 @@
 import { RoleColor } from "./messages";
 
 /**
- * A role created the first time the plugin runs, as the scenario defined it
- * before roles moved to the controller. `parent` stands in for the inheritance
+ * A role created by the seed, as the scenario defined it before roles moved to
+ * the controller. `parent` stands in for the inheritance
  * the old config had and is flattened by the seed. The default and admin roles
  * already exist, so those entries only provide the in game properties.
  */
@@ -10,8 +10,6 @@ export interface SeedRole {
 	name: string;
 	shortHand: string;
 	color: RoleColor | null;
-	/** Factorio permission group, see exp_legacy/module/config/expcore/permission_groups.lua */
-	permissionGroup: string;
 	priority?: number;
 	autoAssignHours?: number;
 	blockAutoAssign?: boolean;
@@ -24,16 +22,11 @@ export interface SeedRole {
 	permissions: string[];
 }
 
-const admin = ["exp_scenario.player.admin", "exp_scenario.player.spectator", "exp_scenario.bypass.reports"];
-const instantRespawn = ["exp_scenario.player.instant_respawn"];
-const trusted = ["exp_scenario.player.spectator", "exp_scenario.bypass.reports", ...instantRespawn];
-
 export const seedRoles: SeedRole[] = [
 	{
 		name: "System",
 		shortHand: "SYS",
 		color: null,
-		permissionGroup: "Default",
 		isAdmin: true,
 		permissions: [],
 	},
@@ -41,11 +34,8 @@ export const seedRoles: SeedRole[] = [
 		name: "Senior Administrator",
 		shortHand: "SAdmin",
 		color: new RoleColor(233, 63, 233),
-		permissionGroup: "Admin",
 		parent: "Administrator",
 		permissions: [
-			...admin, ...instantRespawn,
-			"exp_scenario.player.system_commands",
 			"exp_scenario.command._rcon",
 			"exp_scenario.command.debug",
 			"exp_scenario.command.set_cheat_mode",
@@ -56,10 +46,8 @@ export const seedRoles: SeedRole[] = [
 		name: "Administrator",
 		shortHand: "Admin",
 		color: new RoleColor(233, 63, 233),
-		permissionGroup: "Admin",
 		parent: "Moderator",
 		permissions: [
-			...admin, ...instantRespawn,
 			"exp_scenario.gui.warp_list.bypass_proximity",
 			"exp_scenario.gui.warp_list.bypass_cooldown",
 			"exp_scenario.command.connect_all",
@@ -69,10 +57,9 @@ export const seedRoles: SeedRole[] = [
 		name: "Moderator",
 		shortHand: "Mod",
 		color: new RoleColor(0, 170, 0),
-		permissionGroup: "Admin",
 		parent: "Trainee",
 		permissions: [
-			...admin, ...instantRespawn,
+			"exp_scenario.player.instant_respawn",
 			"exp_scenario.command.assign_role",
 			"exp_scenario.command.unassign_role",
 			"exp_scenario.command.repair",
@@ -107,10 +94,11 @@ export const seedRoles: SeedRole[] = [
 		name: "Trainee",
 		shortHand: "TrMod",
 		color: new RoleColor(0, 170, 0),
-		permissionGroup: "Admin",
 		parent: "Veteran",
 		permissions: [
-			...admin,
+			"exp_scenario.player.admin",
+			"exp_scenario.player.spectator",
+			"exp_scenario.bypass.reports",
 			"exp_scenario.command.admin_chat",
 			"exp_scenario.command.goto",
 			"exp_scenario.command.teleport",
@@ -139,10 +127,8 @@ export const seedRoles: SeedRole[] = [
 		name: "Board Member",
 		shortHand: "Board",
 		color: new RoleColor(247, 246, 54),
-		permissionGroup: "Trusted",
 		parent: "Sponsor",
 		permissions: [
-			...trusted,
 			"exp_scenario.command.goto",
 			"exp_scenario.command.repair",
 			"exp_scenario.command.spectate",
@@ -154,20 +140,17 @@ export const seedRoles: SeedRole[] = [
 		name: "Senior Backer",
 		shortHand: "Backer",
 		color: new RoleColor(238, 172, 44),
-		permissionGroup: "Trusted",
 		parent: "Sponsor",
-		permissions: [
-			...trusted,
-		],
+		permissions: [],
 	},
 	{
 		name: "Sponsor",
 		shortHand: "Spon",
 		color: new RoleColor(238, 172, 44),
-		permissionGroup: "Trusted",
 		parent: "Supporter",
 		permissions: [
-			...trusted,
+			"exp_scenario.bypass.reports",
+			"exp_scenario.player.instant_respawn",
 			"exp_scenario.gui.rocket_info.toggle_active",
 			"exp_scenario.gui.rocket_info.remote_launch",
 			"exp_scenario.gui.bonus",
@@ -182,7 +165,6 @@ export const seedRoles: SeedRole[] = [
 		name: "Supporter",
 		shortHand: "Sup",
 		color: new RoleColor(230, 99, 34),
-		permissionGroup: "Trusted",
 		parent: "Veteran",
 		permissions: [
 			"exp_scenario.player.spectator",
@@ -197,7 +179,6 @@ export const seedRoles: SeedRole[] = [
 		name: "Partner",
 		shortHand: "Part",
 		color: new RoleColor(140, 120, 200),
-		permissionGroup: "Trusted",
 		parent: "Veteran",
 		permissions: [
 			"exp_scenario.player.spectator",
@@ -209,7 +190,6 @@ export const seedRoles: SeedRole[] = [
 		name: "Veteran",
 		shortHand: "Vet",
 		color: new RoleColor(140, 120, 200),
-		permissionGroup: "Trusted",
 		parent: "Member",
 		autoAssignHours: 10,
 		permissions: [
@@ -223,7 +203,6 @@ export const seedRoles: SeedRole[] = [
 		name: "Member",
 		shortHand: "Mem",
 		color: new RoleColor(24, 172, 188),
-		permissionGroup: "Standard",
 		parent: "Regular",
 		permissions: [
 			"exp_scenario.bypass.deconstruction_log",
@@ -245,7 +224,6 @@ export const seedRoles: SeedRole[] = [
 		name: "Regular",
 		shortHand: "Reg",
 		color: new RoleColor(79, 155, 163),
-		permissionGroup: "Standard",
 		autoAssignHours: 3,
 		permissions: [
 			"exp_scenario.command.kill",
@@ -261,7 +239,6 @@ export const seedRoles: SeedRole[] = [
 		name: "Jail",
 		shortHand: "Jail",
 		color: new RoleColor(50, 50, 50),
-		permissionGroup: "Restricted",
 		priority: 1,
 		blockAutoAssign: true,
 		permissions: [],
@@ -270,53 +247,10 @@ export const seedRoles: SeedRole[] = [
 		name: "Guest",
 		shortHand: "",
 		color: new RoleColor(185, 187, 160),
-		permissionGroup: "Guest",
 		isDefault: true,
 		permissions: [],
 	},
 ];
-
-/** Players given roles the first time the plugin runs, by role name. */
-export const seedAssignments: Record<string, string[]> = {
-	"PHIDIAS0303": ["Moderator", "Board Member", "Member"],
-	"aldldl": ["Administrator", "Moderator", "Member"],
-	"arty714": ["Senior Administrator", "Moderator", "Member"],
-	"Cooldude2606": ["Senior Administrator", "Moderator", "Member"],
-	"Drahc_pro": ["Administrator", "Moderator", "Member"],
-	"mark9064": ["Administrator", "Moderator", "Member"],
-	"7h3w1z4rd": ["Moderator", "Member"],
-	"FlipHalfling90": ["Moderator", "Member"],
-	"hamsterbryan": ["Moderator", "Member"],
-	"HunterOfGames": ["Moderator", "Member"],
-	"NextIdea": ["Moderator", "Member"],
-	"TheKernel32": ["Moderator", "Member"],
-	"TheKernel64": ["Moderator", "Member"],
-	"tovernaar123": ["Moderator", "Member"],
-	"UUBlueFire": ["Moderator", "Member"],
-	"AssemblyStorm": ["Moderator", "Member"],
-	"banakeg": ["Moderator", "Member"],
-	"connormkii": ["Moderator", "Member"],
-	"cydes": ["Moderator", "Member"],
-	"darklich14": ["Moderator", "Member"],
-	"facere": ["Moderator", "Member"],
-	"freek18": ["Moderator", "Member"],
-	"Gizan": ["Moderator", "Member"],
-	"LoicB": ["Moderator", "Member"],
-	"M74132": ["Moderator", "Member"],
-	"mafisch3": ["Moderator", "Member"],
-	"maplesyrup01": ["Moderator", "Member"],
-	"ookl": ["Moderator", "Member"],
-	"Phoenix27833": ["Moderator", "Member"],
-	"porelos": ["Moderator", "Member"],
-	"Ruuyji": ["Moderator", "Member"],
-	"samy115": ["Moderator", "Member"],
-	"SilentLog": ["Moderator", "Member"],
-	"Tcheko": ["Moderator", "Member"],
-	"thadius856": ["Moderator", "Member"],
-	"whoami32": ["Moderator", "Member"],
-	"Windbomb": ["Moderator", "Member"],
-	"XenoCyber": ["Moderator", "Member"],
-};
 
 /** The permissions a seed role grants, including those of its parents. */
 export function flattenSeedPermissions(role: SeedRole, roles = seedRoles) {

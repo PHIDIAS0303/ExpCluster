@@ -68,8 +68,11 @@ do local _points_limit = {} --- @type table<number, number>
     --- @param player LuaPlayer
     --- @return number
     function Elements.bonus_used._calculate_points_limit(player)
-        local role = assert(Roles.get_role(config.points.role_name), "Bonus points role does not exist")
-        local role_diff = role.index - Roles.get_player_highest_role(player).index
+        local roles = Roles.get_roles()
+        local positions = {}
+        for index, role in ipairs(roles) do positions[role.id] = index end
+        local role = assert(Roles.get_role_by_name(config.points.role_name), "Bonus points role does not exist")
+        local role_diff = positions[role.id] - positions[Roles.get_player_highest_role(player).id]
         local points_limit = math.floor(config.points.base * (1 + config.points.increase_percentage_per_role_level * role_diff))
         _points_limit[player.index] = points_limit
         return points_limit

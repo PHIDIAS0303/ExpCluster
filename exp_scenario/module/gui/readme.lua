@@ -396,7 +396,7 @@ define_tab(
         for _, group in ipairs(groups) do
             local seen = {}
             for _, role_name in ipairs(group.roles) do
-                local role = Roles.get_role(role_name)
+                local role = Roles.get_role_by_name(role_name)
                 for _, player_name in ipairs(role and role:get_player_names() or {}) do
                     if not seen[player_name] then
                         seen[player_name] = true

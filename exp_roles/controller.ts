@@ -1,7 +1,7 @@
 import { BaseControllerPlugin, InstanceRecord } from "@clusterio/controller";
 import * as lib from "@clusterio/lib";
 import * as messages from "./messages";
-import { SeedRole, seedRoles, seedAssignments, flattenSeedPermissions } from "./seed";
+import { SeedRole, seedRoles, flattenSeedPermissions } from "./seed";
 import * as path from "node:path";
 
 export class ControllerPlugin extends BaseControllerPlugin {
@@ -16,12 +16,6 @@ export class ControllerPlugin extends BaseControllerPlugin {
 				messages.RoleMetaRecord.fromJSON.bind(messages.RoleMetaRecord),
 			).bootstrap()
 		);
-
-		// An empty datastore means the plugin has not run before, so the roles
-		// the scenario used to define are created on the controller
-		if (this.roleMeta.size === 0) {
-			this.seed();
-		}
 
 		// The datastore can be out of step with the roles, either because the
 		// plugin was installed after they were created or because it was
@@ -41,6 +35,7 @@ export class ControllerPlugin extends BaseControllerPlugin {
 
 		this.controller.handle(messages.RoleListRequest, this.handleRoleListRequest.bind(this));
 		this.controller.handle(messages.RoleMetaUpdateRequest, this.handleRoleMetaUpdateRequest.bind(this));
+		this.controller.handle(messages.SeedRolesRequest, this.handleSeedRolesRequest.bind(this));
 
 		this.controller.handle(messages.AssignmentListRequest, this.handleAssignmentListRequest.bind(this));
 		this.controller.handle(messages.AssignmentUpdateRequest, this.handleAssignmentUpdateRequest.bind(this));
@@ -55,18 +50,16 @@ export class ControllerPlugin extends BaseControllerPlugin {
 	*/
 
 	/**
-	 * Create the roles the scenario shipped with and give the players it listed
-	 * their roles. Roles which already exist by name are reused.
+	 * Create the roles the scenario shipped with. Roles which already exist
+	 * by name are reused and only gain the seed permissions.
 	 */
-	seed() {
-		const idsByName = new Map<string, number>();
+	async handleSeedRolesRequest() {
 		for (const [index, seedRole] of seedRoles.entries()) {
 			const role = this.seedRole(seedRole);
 			if (!role) {
 				continue;
 			}
 
-			idsByName.set(seedRole.name, role.id);
 			this.roleMeta.set(new messages.RoleMetaRecord(
 				role.id,
 				index + 1,
@@ -74,23 +67,12 @@ export class ControllerPlugin extends BaseControllerPlugin {
 				seedRole.shortHand,
 				"",
 				seedRole.color,
-				seedRole.permissionGroup,
 				seedRole.autoAssignHours === undefined ? null : seedRole.autoAssignHours * 3600000,
 				seedRole.blockAutoAssign ?? false,
 			));
 		}
 
-		for (const [name, roleNames] of Object.entries(seedAssignments)) {
-			const roleIds = roleNames.map(roleName => idsByName.get(roleName)).filter(id => id !== undefined);
-			if (roleIds.length !== roleNames.length) {
-				this.logger.warn(`Seed assignment for ${name} names a role which does not exist`);
-			}
-			const user = this.controller.users.getOrCreateUser(name);
-			user.set("roleIds", new Set([...user.roleIds, ...roleIds]));
-			this.controller.userPermissionsUpdated(user);
-		}
-
-		this.logger.info(`Seeded ${seedRoles.length} roles and ${Object.keys(seedAssignments).length} assignments`);
+		this.logger.info(`Seeded ${seedRoles.length} roles`);
 	}
 
 	/** Find or create the clusterio role for a seed role, returns undefined if it has no role to use. */

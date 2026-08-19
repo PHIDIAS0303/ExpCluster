@@ -123,7 +123,6 @@ const definitions: Definition[] = [
 	["exp_scenario.player.admin", "Factorio admin", "Be promoted to Factorio admin while holding a role with this permission."],
 	["exp_scenario.player.instant_respawn", "Instant respawn", "Respawn after two seconds instead of the default delay."],
 	["exp_scenario.player.spectator", "Spectator", "Remove the zoom to world noise effect, as Factorio does for spectators."],
-	["exp_scenario.player.system_commands", "System commands", "Unlock commands flagged system only, such as /_rcon and /_sudo."],
 ];
 
 for (const [name, title, description, grantByDefault] of definitions) {

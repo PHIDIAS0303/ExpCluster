@@ -218,13 +218,16 @@ SelectEntities:on_stop(on_player_selection_stop)
 
 --- When there is a repeat offence print it in chat
 local function on_repeat_violation(event)
-    Roles.print_to_roles_higher("Regular", {
-        "exp-commands_entity-protection.repeat-offence",
-        format_player_name(event.player_index),
-        event.entity.localised_name,
-        event.entity.position.x,
-        event.entity.position.y
-    })
+    local regular = Roles.get_role_by_name("Regular")
+    for _, role in ipairs(regular and Roles.get_higher_roles(regular) or {}) do
+        role:print{
+            "exp-commands_entity-protection.repeat-offence",
+            format_player_name(event.player_index),
+            event.entity.localised_name,
+            event.entity.position.x,
+            event.entity.position.y
+        }
+    end
 end
 
 return {

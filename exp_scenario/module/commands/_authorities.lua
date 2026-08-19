@@ -22,7 +22,7 @@ authorities.exp_permission =
         end
     end)
 
-Roles.define_permission_trigger("exp_scenario.player.system_commands", function(player, state)
+Roles.define_permission_trigger("core.admin", function(player, state)
     if state then
         Commands.unlock_system_commands(player.name)
     else

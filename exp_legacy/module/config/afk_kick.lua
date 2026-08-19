@@ -8,7 +8,7 @@ return {
     trust_time = 3600 * 60 * 10, --- @setting trust_time The time in ticks that a player must be online for to count as trusted
     update_time = 3600 * 30, --- @setting update_time How often in ticks the script checks for active players
     custom_active_check = function(player)
-        local veteran = Roles.get_role("Veteran")
-        return veteran ~= nil and Roles.get_player_highest_role(player).index <= veteran.index
+        local veteran = Roles.get_role_by_name("Veteran")
+        return veteran ~= nil and not Roles.get_player_highest_role(player):is_lower_than(veteran)
     end,
 }
