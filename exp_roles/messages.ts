@@ -51,6 +51,11 @@ export class RoleMetaRecord {
 		public tag: string = "",
 		/** Colour used for the role in game, null uses the default colour. */
 		public color: RoleColor | null = null,
+		/**
+		 * Factorio permission group players are moved into while this is their
+		 * most privileged role which names one, empty leaves the group alone.
+		 */
+		public permissionGroup: string = "",
 		/** Online time after which this role is granted, null never grants it. */
 		public autoAssignOnlineTimeMs: number | null = null,
 		/** When true holders of this role are never granted roles automatically. */
@@ -66,6 +71,7 @@ export class RoleMetaRecord {
 		short_hand: Type.Optional(Type.String()),
 		tag: Type.Optional(Type.String()),
 		color: Type.Optional(Type.Union([RoleColor.jsonSchema, Type.Null()])),
+		permission_group: Type.Optional(Type.String()),
 		auto_assign_online_time_ms: Type.Optional(Type.Union([Type.Number(), Type.Null()])),
 		block_auto_assign: Type.Optional(Type.Boolean()),
 		updated_at_ms: Type.Optional(Type.Number()),
@@ -92,6 +98,10 @@ export class RoleMetaRecord {
 
 		if (this.color) {
 			json.color = this.color.toJSON();
+		}
+
+		if (this.permissionGroup) {
+			json.permission_group = this.permissionGroup;
 		}
 
 		if (this.autoAssignOnlineTimeMs !== null) {
@@ -121,6 +131,7 @@ export class RoleMetaRecord {
 			json.short_hand ?? "",
 			json.tag ?? "",
 			json.color ? RoleColor.fromJSON(json.color) : null,
+			json.permission_group ?? "",
 			json.auto_assign_online_time_ms ?? null,
 			json.block_auto_assign ?? false,
 			json.updated_at_ms ?? 0,

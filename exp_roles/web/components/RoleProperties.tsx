@@ -15,6 +15,7 @@ type RoleFormValues = {
 	shortHand: string;
 	tag: string;
 	color: string | { toRgb(): { r: number, g: number, b: number } } | null;
+	permissionGroup: string;
 	autoAssignHours: number | null;
 	blockAutoAssign: boolean;
 };
@@ -46,6 +47,7 @@ export default function RoleProperties(props: { plugin: WebPlugin, role?: lib.Ro
 			shortHand: meta.shortHand,
 			tag: meta.tag,
 			color: meta.color ? `rgb(${meta.color.r}, ${meta.color.g}, ${meta.color.b})` : null,
+			permissionGroup: meta.permissionGroup,
 			autoAssignHours: meta.autoAssignOnlineTimeMs === null
 				? null
 				: meta.autoAssignOnlineTimeMs / MS_PER_HOUR,
@@ -78,6 +80,7 @@ export default function RoleProperties(props: { plugin: WebPlugin, role?: lib.Ro
 			values.shortHand ?? "",
 			values.tag ?? "",
 			color,
+			values.permissionGroup ?? "",
 			values.autoAssignHours === null || values.autoAssignHours === undefined
 				? null
 				: values.autoAssignHours * MS_PER_HOUR,
@@ -155,6 +158,19 @@ export default function RoleProperties(props: { plugin: WebPlugin, role?: lib.Ro
 						label={labelled("Colour", "Used for the role name and tag in game")}
 					>
 						<ColorPicker allowClear format="rgb" disabledAlpha />
+					</Form.Item>
+				</Col>
+
+				<Col xs={24} sm={12} xl={6}>
+					<Form.Item
+						name="permissionGroup"
+						label={labelled(
+							"Permission group",
+							"Factorio permission group players are moved into while this is their "
+							+ "most privileged role which names one. Leave empty to not change their group"
+						)}
+					>
+						<Input />
 					</Form.Item>
 				</Col>
 
