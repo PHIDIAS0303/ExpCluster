@@ -7,7 +7,8 @@
 	"repository": "explosivegaming/ExpCluster",
 	"main": "dist/node/index.js",
 	"scripts": {
-		"prepare": "tsc --build && webpack-cli --env production"
+		"prepare": "tsc --build && webpack-cli --env production",
+		"test": "tap --disable-coverage --allow-empty-coverage test/*.test.js"
 	},
 	"engines": {
 		"node": ">=18"
@@ -24,6 +25,7 @@
 		"@clusterio/host": "workspace:^",
 		"@clusterio/lib": "workspace:^",
 		"@clusterio/web_ui": "workspace:^",
+		"@expcluster/scenario": "workspace:^",
 		"@types/node": "catalog:",
 		"@types/react": "catalog:",
 		"antd": "catalog:",
@@ -32,6 +34,8 @@
 		"react-router-dom": "catalog:",
 		"typescript": "catalog:",
 		"webpack": "catalog:",
+		"fengari": "^0.1.5",
+		"tap": "^21.1.0",
 		"webpack-cli": "catalog:",
 		"webpack-merge": "catalog:"
 	},
