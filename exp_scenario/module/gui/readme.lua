@@ -214,7 +214,7 @@ define_tab(
         container.add{ type = "flow" }.style.height = 4
 
         local role_names = {}
-        for i, role in ipairs(Roles.get_player_roles(player)) do
+        for i, role in ipairs(Roles.sort_roles(Roles.get_player_roles(player))) do
             role_names[i] = role.name
         end
 

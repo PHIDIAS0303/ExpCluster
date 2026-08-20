@@ -27,7 +27,7 @@ local types = {} --- @class (partial) Commands.types
 types.role =
     add("role", function(input)
         local names = {}
-        for index, role in ipairs(Roles.get_roles()) do
+        for index, role in ipairs(Roles.get_ordered_roles()) do
             names[index] = role.name
         end
 

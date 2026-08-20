@@ -7,7 +7,7 @@ local format_player_name = Commands.format_player_name_locale
 local format_text = Commands.format_rich_text_color_locale
 
 local Roles = require("modules/exp_roles")
-local get_roles = Roles.get_roles
+local get_ordered_roles = Roles.get_ordered_roles
 local get_player_roles = Roles.get_player_roles
 
 --- Assigns a role to a player
@@ -40,11 +40,11 @@ Commands.new("get-roles", { "exp-commands_roles.description-get" })
     :add_aliases{ "roles" }
     :register(function(player, other_player)
         --- @cast other_player LuaPlayer?
-        local roles = get_roles()
+        local roles = get_ordered_roles()
         local roles_formatted = { "" } --- @type LocalisedString
         local response = { "exp-commands_roles.list-roles", roles_formatted } --[[@as LocalisedString]]
         if other_player then
-            roles = get_player_roles(other_player)
+            roles = Roles.sort_roles(get_player_roles(other_player))
             response[1] = "exp-commands_roles.list-player"
             response[3] = format_player_name(other_player)
         end

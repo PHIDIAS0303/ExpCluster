@@ -203,7 +203,7 @@ function Elements.player_table.calculate_row_data()
     -- Flatten the roles into a single ordered list
     local count = 0
     local row_data = {}
-    for _, role in ipairs(Roles.get_roles()) do
+    for _, role in ipairs(Roles.get_ordered_roles()) do
         local role_name = role.name
         if players[role_name] then
             for _, player in pairs(players[role_name]) do
