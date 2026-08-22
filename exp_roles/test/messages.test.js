@@ -7,7 +7,7 @@ const fullMeta = new messages.RoleMetaRecord(
 	7, 3, 1, "Mod", "[Mod]", new messages.RoleColor(1, 2, 3), 3600000, true, 12345, false,
 );
 
-t.test("RoleColor", subtest => {
+t.test("class RoleColor", subtest => {
 	testRoundTripJsonSerialisable(messages.RoleColor, testMatrix(
 		[0, 255], // r
 		[0, 128], // g
@@ -17,7 +17,7 @@ t.test("RoleColor", subtest => {
 	subtest.end();
 });
 
-t.test("RoleMetaRecord", subtest => {
+t.test("class RoleMetaRecord", subtest => {
 	testRoundTripJsonSerialisable(messages.RoleMetaRecord, testMatrix(
 		[7], // id
 		[3], // order
@@ -34,7 +34,7 @@ t.test("RoleMetaRecord", subtest => {
 	subtest.end();
 });
 
-t.test("RoleRecord", subtest => {
+t.test("class RoleRecord", subtest => {
 	testRoundTripJsonSerialisable(messages.RoleRecord, testMatrix(
 		[7], // id
 		["Moderator"], // name
@@ -48,7 +48,7 @@ t.test("RoleRecord", subtest => {
 	subtest.end();
 });
 
-t.test("AssignmentRecord", subtest => {
+t.test("class AssignmentRecord", subtest => {
 	testRoundTripJsonSerialisable(messages.AssignmentRecord, testMatrix(
 		["alice"], // name
 		[new Set(), new Set([5, 6])], // roleIds
@@ -59,19 +59,34 @@ t.test("AssignmentRecord", subtest => {
 	subtest.end();
 });
 
-t.test("update events and requests", subtest => {
-	const record = new messages.RoleRecord(7, "Moderator", ["a.b"], fullMeta, true, 12345);
-	const assignment = new messages.AssignmentRecord("alice", new Set([5]), 12345);
+const sampleRecord = new messages.RoleRecord(7, "Moderator", ["a.b"], fullMeta, true, 12345);
+const sampleAssignment = new messages.AssignmentRecord("alice", new Set([5]), 12345);
 
+t.test("class RoleUpdatedEvent", subtest => {
 	testRoundTripJsonSerialisable(messages.RoleUpdatedEvent, testMatrix(
-		[[], [record]], // updates
+		[[], [sampleRecord]], // updates
 	));
+	subtest.pass("round trips");
+	subtest.end();
+});
+
+t.test("class AssignmentUpdatedEvent", subtest => {
 	testRoundTripJsonSerialisable(messages.AssignmentUpdatedEvent, testMatrix(
-		[[], [assignment]], // updates
+		[[], [sampleAssignment]], // updates
 	));
+	subtest.pass("round trips");
+	subtest.end();
+});
+
+t.test("class RoleMetaUpdateRequest", subtest => {
 	testRoundTripJsonSerialisable(messages.RoleMetaUpdateRequest, testMatrix(
 		[new messages.RoleMetaRecord(7, 3), fullMeta], // meta
 	));
+	subtest.pass("round trips");
+	subtest.end();
+});
+
+t.test("class AssignmentUpdateRequest", subtest => {
 	testRoundTripJsonSerialisable(messages.AssignmentUpdateRequest, testMatrix(
 		["alice"], // name
 		[[], [5]], // assign

@@ -65,131 +65,134 @@ async function startPlugin(t2, { roles = [], users = [], config = {} } = {}) {
 
 const role = (id, name, permissions = []) => new lib.Role(id, name, "", new Set(permissions));
 
-t.test("init creates properties for existing roles and sweeps orphans", async t2 => {
-	const { plugin } = await startPlugin(t2, { roles: [role(0, "Cluster Admin"), role(5, "Moderator")] });
+t.test("class ControllerPlugin", t2 => {
+	t2.test("init and sweepRoleMeta manage the role properties", async t2 => {
+		const { plugin } = await startPlugin(t2, { roles: [role(0, "Cluster Admin"), role(5, "Moderator")] });
 
-	t2.strictSame(plugin.roleMeta.get(0).order, 1, "the first role is ordered first");
-	t2.strictSame(plugin.roleMeta.get(5).order, 2, "the next role is ordered after it");
+		t2.strictSame(plugin.roleMeta.get(0).order, 1, "the first role is ordered first");
+		t2.strictSame(plugin.roleMeta.get(5).order, 2, "the next role is ordered after it");
 
-	plugin.roleMeta.set(new messages.RoleMetaRecord(99, 3));
-	plugin.sweepRoleMeta();
-	t2.notOk(plugin.roleMeta.get(99), "properties without a role are removed");
-	t2.ok(plugin.roleMeta.get(5), "properties with a role are kept");
-});
-
-t.test("role records combine the role with its properties", async t2 => {
-	const { plugin } = await startPlugin(t2, {
-		roles: [role(1, "Player"), role(5, "Moderator", ["exp_scenario.command.kill"])],
-	});
-	plugin.roleMeta.set(new messages.RoleMetaRecord(5, 2, 1, "Mod"));
-
-	const record = plugin.buildRoleRecord(plugin.controller.roles.get(5));
-	t2.strictSame(record.name, "Moderator", "the name comes from the role");
-	t2.strictSame(record.permissions, ["exp_scenario.command.kill"], "the permissions come from the role");
-	t2.strictSame(record.meta.shortHand, "Mod", "the properties come from the datastore");
-	t2.notOk(record.isDefault, "not the default role");
-	t2.ok(plugin.buildRoleRecord(plugin.controller.roles.get(1)).isDefault, "the default role is marked");
-});
-
-t.test("role changes broadcast to subscribers", async t2 => {
-	const { plugin, controller, state } = await startPlugin(t2, { roles: [role(1, "Player")] });
-
-	state.broadcasts.length = 0;
-	controller.roles.set(role(5, "Moderator"));
-	const updated = state.broadcasts.flatMap(event => event.updates.map(update => update.name));
-	t2.ok(updated.includes("Moderator"), "a new role is broadcast");
-
-	state.broadcasts.length = 0;
-	plugin.roleMeta.set(new messages.RoleMetaRecord(5, 2, 0, "Mod"));
-	t2.ok(state.broadcasts.some(
-		event => event instanceof messages.RoleUpdatedEvent && event.updates[0].meta.shortHand === "Mod"
-	), "a property change is broadcast as its role");
-
-	state.broadcasts.length = 0;
-	await plugin.onControllerConfigFieldChanged("controller.default_role_id");
-	t2.ok(state.broadcasts.some(event => event instanceof messages.RoleUpdatedEvent), "a default role change rebroadcasts");
-});
-
-t.test("subscriptions replay only newer records", async t2 => {
-	const { plugin, controller } = await startPlugin(t2, { roles: [role(1, "Player")] });
-	controller.roles.set(role(5, "Moderator"));
-	const updatedAtMs = plugin.buildRoleRecord(controller.roles.get(5)).updatedAtMs;
-
-	const all = await plugin.handleRoleSubscription({ lastRequestTimeMs: 0 });
-	t2.strictSame(all.updates.length, 2, "everything is replayed from the start");
-	const none = await plugin.handleRoleSubscription({ lastRequestTimeMs: updatedAtMs });
-	t2.strictSame(none, null, "nothing is replayed when up to date");
-});
-
-t.test("assignments mirror users without the default role", async t2 => {
-	const alice = new FakeUser("alice", [lib.Role.DefaultPlayerRoleId, 5]);
-	alice.updatedAtMs = 10;
-	const bob = new FakeUser("bob", [lib.Role.DefaultPlayerRoleId]);
-	const { plugin } = await startPlugin(t2, { roles: [role(1, "Player"), role(5, "Moderator")], users: [alice, bob] });
-
-	const records = plugin.listAssignmentRecords();
-	t2.strictSame(records.length, 1, "users with only the default role are left out");
-	t2.strictSame(records[0].name, "alice");
-	t2.strictSame([...records[0].roleIds], [5], "the default role is not listed");
-});
-
-t.test("assignment updates validate the user and roles", async t2 => {
-	const alice = new FakeUser("alice", [5]);
-	const { plugin, state } = await startPlugin(t2, {
-		roles: [role(1, "Player"), role(5, "Moderator"), role(6, "Regular")], users: [alice],
+		plugin.roleMeta.set(new messages.RoleMetaRecord(99, 3));
+		plugin.sweepRoleMeta();
+		t2.notOk(plugin.roleMeta.get(99), "properties without a role are removed");
+		t2.ok(plugin.roleMeta.get(5), "properties with a role are kept");
 	});
 
-	await t2.rejects(
-		plugin.handleAssignmentUpdateRequest(new messages.AssignmentUpdateRequest("nobody", [], [])),
-		{ message: /does not exist/ }, "an unknown user is refused",
-	);
-	await t2.rejects(
-		plugin.handleAssignmentUpdateRequest(new messages.AssignmentUpdateRequest("alice", [99], [])),
-		{ message: /does not exist/ }, "an unknown role is refused",
-	);
+	t2.test("buildRoleRecord combines the role with its properties", async t2 => {
+		const { plugin } = await startPlugin(t2, {
+			roles: [role(1, "Player"), role(5, "Moderator", ["exp_scenario.command.kill"])],
+		});
+		plugin.roleMeta.set(new messages.RoleMetaRecord(5, 2, 1, "Mod"));
 
-	await plugin.handleAssignmentUpdateRequest(new messages.AssignmentUpdateRequest("alice", [6], [5]));
-	t2.strictSame([...alice.roleIds], [6], "roles are added and removed");
-	t2.ok(state.permissionUpdates.includes("alice"), "permission changes are pushed to the user");
-});
-
-t.test("roles are granted from online time", async t2 => {
-	const newcomer = new FakeUser("newcomer");
-	newcomer.playerStats.onlineTimeMs = 3600000;
-	const veteran = new FakeUser("veteran");
-	veteran.playerStats.onlineTimeMs = 7200000;
-	const jailed = new FakeUser("jailed", [7]);
-	jailed.playerStats.onlineTimeMs = 7200000;
-
-	const { plugin } = await startPlugin(t2, {
-		roles: [role(1, "Player"), role(6, "Regular"), role(7, "Jail")],
-		users: [newcomer, veteran, jailed],
-	});
-	// The blocking role is marked first, since setting properties applies auto assignment
-	plugin.roleMeta.set(new messages.RoleMetaRecord(7, 3, 1, "", "", null, null, true));
-	plugin.roleMeta.set(new messages.RoleMetaRecord(6, 2, 0, "", "", null, 7200000));
-	t2.ok(veteran.roleIds.has(6), "enough online time grants the role");
-	t2.notOk(newcomer.roleIds.has(6), "not enough online time does not");
-	t2.notOk(jailed.roleIds.has(6), "a blocking role prevents the grant");
-
-	veteran.roleIds.delete(6);
-	await plugin.onPlayerEvent(undefined, { type: "leave", name: "veteran" });
-	t2.ok(veteran.roleIds.has(6), "granted again when the player leaves");
-});
-
-t.test("seeding creates the roles and reuses them by name", async t2 => {
-	const { plugin, controller } = await startPlugin(t2, {
-		roles: [role(0, "Cluster Admin", ["core.admin"]), role(1, "Player")],
+		const record = plugin.buildRoleRecord(plugin.controller.roles.get(5));
+		t2.strictSame(record.name, "Moderator", "the name comes from the role");
+		t2.strictSame(record.permissions, ["exp_scenario.command.kill"], "the permissions come from the role");
+		t2.strictSame(record.meta.shortHand, "Mod", "the properties come from the datastore");
+		t2.notOk(record.isDefault, "not the default role");
+		t2.ok(plugin.buildRoleRecord(plugin.controller.roles.get(1)).isDefault, "the default role is marked");
 	});
 
-	await plugin.handleSeedRolesRequest();
-	t2.strictSame(controller.roles.size, seedRoles.length, "every seed role exists");
+	t2.test("rolesUpdated and roleMetaUpdated broadcast to subscribers", async t2 => {
+		const { plugin, controller, state } = await startPlugin(t2, { roles: [role(1, "Player")] });
 
-	const moderator = [...controller.roles.values()].find(other => other.name === "Moderator");
-	t2.ok(moderator.permissions.has("exp_scenario.command.jail"), "parent permissions are flattened in");
-	t2.ok(plugin.roleMeta.get(moderator.id), "the role properties are created");
-	t2.strictSame(plugin.roleMeta.get(moderator.id).shortHand, "Mod", "the properties match the seed");
+		state.broadcasts.length = 0;
+		controller.roles.set(role(5, "Moderator"));
+		const updated = state.broadcasts.flatMap(event => event.updates.map(update => update.name));
+		t2.ok(updated.includes("Moderator"), "a new role is broadcast");
 
-	await plugin.handleSeedRolesRequest();
-	t2.strictSame(controller.roles.size, seedRoles.length, "seeding again reuses the roles");
+		state.broadcasts.length = 0;
+		plugin.roleMeta.set(new messages.RoleMetaRecord(5, 2, 0, "Mod"));
+		t2.ok(state.broadcasts.some(
+			event => event instanceof messages.RoleUpdatedEvent && event.updates[0].meta.shortHand === "Mod"
+		), "a property change is broadcast as its role");
+
+		state.broadcasts.length = 0;
+		await plugin.onControllerConfigFieldChanged("controller.default_role_id");
+		t2.ok(state.broadcasts.some(event => event instanceof messages.RoleUpdatedEvent), "a default role change rebroadcasts");
+	});
+
+	t2.test("handleRoleSubscription replays only newer records", async t2 => {
+		const { plugin, controller } = await startPlugin(t2, { roles: [role(1, "Player")] });
+		controller.roles.set(role(5, "Moderator"));
+		const updatedAtMs = plugin.buildRoleRecord(controller.roles.get(5)).updatedAtMs;
+
+		const all = await plugin.handleRoleSubscription({ lastRequestTimeMs: 0 });
+		t2.strictSame(all.updates.length, 2, "everything is replayed from the start");
+		const none = await plugin.handleRoleSubscription({ lastRequestTimeMs: updatedAtMs });
+		t2.strictSame(none, null, "nothing is replayed when up to date");
+	});
+
+	t2.test("listAssignmentRecords mirrors users without the default role", async t2 => {
+		const alice = new FakeUser("alice", [lib.Role.DefaultPlayerRoleId, 5]);
+		alice.updatedAtMs = 10;
+		const bob = new FakeUser("bob", [lib.Role.DefaultPlayerRoleId]);
+		const { plugin } = await startPlugin(t2, { roles: [role(1, "Player"), role(5, "Moderator")], users: [alice, bob] });
+
+		const records = plugin.listAssignmentRecords();
+		t2.strictSame(records.length, 1, "users with only the default role are left out");
+		t2.strictSame(records[0].name, "alice");
+		t2.strictSame([...records[0].roleIds], [5], "the default role is not listed");
+	});
+
+	t2.test("handleAssignmentUpdateRequest validates the user and roles", async t2 => {
+		const alice = new FakeUser("alice", [5]);
+		const { plugin, state } = await startPlugin(t2, {
+			roles: [role(1, "Player"), role(5, "Moderator"), role(6, "Regular")], users: [alice],
+		});
+
+		await t2.rejects(
+			plugin.handleAssignmentUpdateRequest(new messages.AssignmentUpdateRequest("nobody", [], [])),
+			{ message: /does not exist/ }, "an unknown user is refused",
+		);
+		await t2.rejects(
+			plugin.handleAssignmentUpdateRequest(new messages.AssignmentUpdateRequest("alice", [99], [])),
+			{ message: /does not exist/ }, "an unknown role is refused",
+		);
+
+		await plugin.handleAssignmentUpdateRequest(new messages.AssignmentUpdateRequest("alice", [6], [5]));
+		t2.strictSame([...alice.roleIds], [6], "roles are added and removed");
+		t2.ok(state.permissionUpdates.includes("alice"), "permission changes are pushed to the user");
+	});
+
+	t2.test("applyAutoAssign and onPlayerEvent grant roles from online time", async t2 => {
+		const newcomer = new FakeUser("newcomer");
+		newcomer.playerStats.onlineTimeMs = 3600000;
+		const veteran = new FakeUser("veteran");
+		veteran.playerStats.onlineTimeMs = 7200000;
+		const jailed = new FakeUser("jailed", [7]);
+		jailed.playerStats.onlineTimeMs = 7200000;
+
+		const { plugin } = await startPlugin(t2, {
+			roles: [role(1, "Player"), role(6, "Regular"), role(7, "Jail")],
+			users: [newcomer, veteran, jailed],
+		});
+		// The blocking role is marked first, since setting properties applies auto assignment
+		plugin.roleMeta.set(new messages.RoleMetaRecord(7, 3, 1, "", "", null, null, true));
+		plugin.roleMeta.set(new messages.RoleMetaRecord(6, 2, 0, "", "", null, 7200000));
+		t2.ok(veteran.roleIds.has(6), "enough online time grants the role");
+		t2.notOk(newcomer.roleIds.has(6), "not enough online time does not");
+		t2.notOk(jailed.roleIds.has(6), "a blocking role prevents the grant");
+
+		veteran.roleIds.delete(6);
+		await plugin.onPlayerEvent(undefined, { type: "leave", name: "veteran" });
+		t2.ok(veteran.roleIds.has(6), "granted again when the player leaves");
+	});
+
+	t2.test("handleSeedRolesRequest creates the roles and reuses them by name", async t2 => {
+		const { plugin, controller } = await startPlugin(t2, {
+			roles: [role(0, "Cluster Admin", ["core.admin"]), role(1, "Player")],
+		});
+
+		await plugin.handleSeedRolesRequest();
+		t2.strictSame(controller.roles.size, seedRoles.length, "every seed role exists");
+
+		const moderator = [...controller.roles.values()].find(other => other.name === "Moderator");
+		t2.ok(moderator.permissions.has("exp_scenario.command.jail"), "parent permissions are flattened in");
+		t2.ok(plugin.roleMeta.get(moderator.id), "the role properties are created");
+		t2.strictSame(plugin.roleMeta.get(moderator.id).shortHand, "Mod", "the properties match the seed");
+
+		await plugin.handleSeedRolesRequest();
+		t2.strictSame(controller.roles.size, seedRoles.length, "seeding again reuses the roles");
+	});
+	t2.end();
 });

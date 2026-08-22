@@ -3,8 +3,8 @@ Provides the surface a clusterio module touches, recording what the module does
 to it. Every stub raises an error when an unimplemented property is read, which
 mirrors the game api and catches mistakes in tests early.
 
-Plugins compose these from their own test/lua/env.lua, adding stubs of their
-own through `stubs.requires` and `Stubs.strict`.
+Plugins compose these from their own test/lua/env.lua, adding their own stubs
+with the extend methods rather than by mutating the tables directly.
 ]]
 
 local Stubs = {}
@@ -29,6 +29,25 @@ function Stubs.strict(name, tbl, allowed_nil)
     })
 end
 
+--- Merge extra into target recursively, raising when a value already exists
+--- @generic T : table
+--- @param target T
+--- @param extra table
+--- @return T
+function Stubs.extend(target, extra)
+    for key, value in pairs(extra) do
+        local existing = rawget(target, key)
+        if existing == nil then
+            rawset(target, key, value)
+        elseif type(existing) == "table" and type(value) == "table" then
+            Stubs.extend(existing, value)
+        else
+            error("Stub already implements: " .. tostring(key), 2)
+        end
+    end
+    return target
+end
+
 --- Create an independent set of stubs, installed as the lua globals
 function Stubs.new()
     local stubs = {
@@ -39,7 +58,8 @@ function Stubs.new()
     }
 
     local next_event_id = 100
-    script = Stubs.strict("script", {
+    local registered_metatables = {} --- @type table<table, true>
+    script = Stubs.strict("LuaBootstrap", {
         generate_event_name = function()
             next_event_id = next_event_id + 1
             return next_event_id
@@ -47,7 +67,9 @@ function Stubs.new()
         raise_event = function(id, data)
             stubs.events[#stubs.events + 1] = { id = id, data = data }
         end,
-        register_metatable = function() end,
+        register_metatable = function(_, metatable)
+            registered_metatables[metatable] = true
+        end,
     })
 
     defines = Stubs.strict("defines", {
@@ -58,7 +80,7 @@ function Stubs.new()
     })
 
     local players_by_name, players_by_index, connected = {}, {}, {}
-    game = Stubs.strict("game", {
+    game = Stubs.strict("LuaGameScript", {
         tick = 1,
         players = players_by_name,
         connected_players = connected,
@@ -87,10 +109,10 @@ function Stubs.new()
     end
 
     --- A player object which represents the server
-    stubs.server = Stubs.strict("server player", { index = 0, name = "<server>" })
+    stubs.server = Stubs.strict("LuaPlayer <server>", { index = 0, name = "<server>" })
 
-    --- Modules resolved by the stubbed require, extend before loading the module
-    stubs.requires = {
+    --- Modules resolved by the stubbed require, add to them with extend_requires
+    local requires = {
         ["modules/clusterio/api"] = Stubs.strict("clusterio api", {
             send_json = function(channel, data)
                 stubs.sent[#stubs.sent + 1] = { channel = channel, data = data }
@@ -104,7 +126,44 @@ function Stubs.new()
         }),
     }
     require = function(name)
-        return assert(stubs.requires[name], "Unexpected require: " .. name)
+        return assert(rawget(requires, name), "Unexpected require: " .. name)
+    end
+
+    --- Add modules or properties to the stubbed require
+    function stubs.extend_requires(extra) return Stubs.extend(requires, extra) end
+
+    --- Add properties to the script, game, and defines globals
+    function stubs.extend_script(extra) return Stubs.extend(script, extra) end
+    function stubs.extend_game(extra) return Stubs.extend(game, extra) end
+    function stubs.extend_defines(extra) return Stubs.extend(defines, extra) end
+
+    --- Copy a value the way factorio saves script data: functions are refused
+    --- and only metatables registered with script.register_metatable survive
+    local function save_load_copy(value, copies)
+        if type(value) == "function" then
+            error("Functions can not be stored in script data", 0)
+        end
+        if type(value) ~= "table" then return value end
+        if copies[value] then return copies[value] end
+
+        local copy = {}
+        copies[value] = copy
+        for key, entry in pairs(value) do
+            copy[save_load_copy(key, copies)] = save_load_copy(entry, copies)
+        end
+
+        local metatable = getmetatable(value)
+        if metatable ~= nil and registered_metatables[metatable] then
+            setmetatable(copy, metatable)
+        end
+        return copy
+    end
+
+    --- Replace the script data with a copy of itself as if the map was saved
+    --- and loaded, the module's on_load handler should be called afterwards
+    function stubs.save_load()
+        local compat = requires["modules/clusterio/compat"]
+        compat.script_data = save_load_copy(compat.script_data, {})
     end
 
     --- Forget everything recorded so far

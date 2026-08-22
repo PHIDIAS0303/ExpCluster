@@ -6,7 +6,7 @@ const { seedRoles, flattenSeedPermissions } = require("../dist/node/seed");
 // Importing this defines the exp_scenario permissions the seed grants
 require("@expcluster/scenario/dist/node/permissions");
 
-t.test("every seed permission is defined", subtest => {
+t.test("seedRoles grant only defined permissions", subtest => {
 	for (const role of seedRoles) {
 		for (const permission of flattenSeedPermissions(role)) {
 			subtest.ok(lib.permissions.has(permission), `${role.name} grants defined permission ${permission}`);
@@ -15,7 +15,7 @@ t.test("every seed permission is defined", subtest => {
 	subtest.end();
 });
 
-t.test("parents exist and their permissions are inherited", subtest => {
+t.test("flattenSeedPermissions carries parents into their children", subtest => {
 	const byName = new Map(seedRoles.map(role => [role.name, role]));
 	for (const role of seedRoles) {
 		if (role.parent === undefined) {
@@ -31,7 +31,7 @@ t.test("parents exist and their permissions are inherited", subtest => {
 	subtest.end();
 });
 
-t.test("seed role names are unique with one default and one admin", subtest => {
+t.test("seedRoles are unique with one default and one admin", subtest => {
 	const names = seedRoles.map(role => role.name);
 	subtest.strictSame(names.length, new Set(names).size, "names are unique");
 	subtest.strictSame(seedRoles.filter(role => role.isDefault).length, 1, "one default role");

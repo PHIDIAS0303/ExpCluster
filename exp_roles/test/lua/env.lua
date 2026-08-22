@@ -1,10 +1,11 @@
 --[[-- Test environment for module/control.lua
-Composes the shared stubs and framework from the repository test folder with
-the fixtures for this plugin. Each call to Env.new() is an independent
-environment with a fresh copy of the roles module.
+The module specific extension between the shared stubs and the test files: it
+creates environments which combine the stubs with a fresh copy of the roles
+module and the fixtures below, and hands each test file a suite built around
+that factory.
 
-Run as a chunk by test/lua/runner.js, receiving the shared folder and
-returning this table, which is in turn passed to each test chunk.
+Run as a chunk by test/lua/runner.js, receiving the shared folder. The suite
+returned here becomes `...` in each test file.
 ]]
 
 local shared_root = ... --- @type string
@@ -14,13 +15,8 @@ local plugin_root = assert(source:match("^@(.*)/test/lua/env%.lua$"))
 local Stubs = assert(loadfile(shared_root .. "/stubs.lua"))()
 local Framework = assert(loadfile(shared_root .. "/framework.lua"))()
 
-local Env = {
-    --- Test registry for the file being run, see framework.lua
-    Test = Framework.new(),
-}
-
 --- Standard fixture: permission names sent once and referenced by zero based index
-Env.permission_names = {
+local permission_names = {
     "core.admin",                       -- 0
     "exp_scenario.command.kill",        -- 1
     "exp_scenario.command.jail",        -- 2
@@ -36,7 +32,7 @@ local function meta(order, extra)
 end
 
 --- Standard fixture: the roles as the controller would send them on initialise
-function Env.role_records()
+local function role_records()
     return {
         { id = 0, name = "Cluster Admin", permissions = { 0 }, meta = meta(1, { short_hand = "SYS" }) },
         { id = 5, name = "Moderator", permissions = { 1, 2, 3, 5 }, meta = meta(2, { color = { r = 0, g = 170, b = 0 } }) },
@@ -47,12 +43,8 @@ function Env.role_records()
     }
 end
 
-function Env.assignment(name, role_ids)
-    return { name = name, role_ids = role_ids }
-end
-
 --- Create an independent environment with a fresh copy of the roles module
-function Env.new()
+local function make_env()
     local env = Stubs.new()
 
     env.Roles = assert(loadfile(plugin_root .. "/module/control.lua"))()
@@ -63,22 +55,37 @@ function Env.new()
         return (assert(env.Roles.get_role_by_name(name), "No role named " .. name))
     end
 
+    --- Names of an array of roles
+    function env.names(roles)
+        local rtn = {}
+        for index, role in ipairs(roles) do
+            rtn[index] = role.name
+        end
+        return rtn
+    end
+
+    --- An assignment record as the controller would send it
+    function env.assignment(name, role_ids)
+        return { name = name, role_ids = role_ids }
+    end
+
     --- Load the standard fixture and the given assignments
     function env.initialise(assignments)
         env.Roles.initialise{
-            permission_names = Env.permission_names,
-            roles = Env.role_records(),
+            permission_names = permission_names,
+            roles = role_records(),
             assignments = assignments or {},
         }
+    end
+
+    --- Save and load the map, as far as the roles module can tell
+    local stub_save_load = env.save_load
+    function env.save_load()
+        stub_save_load()
+        env.Roles.on_load()
     end
 
     return env
 end
 
---- Run the declared tests, each against a fresh environment
-function Env.finish()
-    Env.Test.run(Env.new)
-    return Env.Test.results_json()
-end
-
-return Env
+return Framework.new_suite(make_env)
