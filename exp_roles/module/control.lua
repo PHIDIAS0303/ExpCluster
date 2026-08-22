@@ -168,21 +168,18 @@ local function get_effective_roles(player_name)
         role_ids[#role_ids + 1] = script_data.default_role_id
     end
 
-    local roles, highest_priority = {}, nil
+    -- Only the roles with the highest priority apply, so the list restarts
+    -- whenever a higher priority is found
+    local rtn, highest_priority = {}, nil
     for _, role_id in pairs(role_ids) do
         local role = script_data.roles[role_id]
         if role then
-            roles[#roles + 1] = role
             if highest_priority == nil or role.priority > highest_priority then
                 highest_priority = role.priority
+                rtn = { role }
+            elseif role.priority == highest_priority then
+                rtn[#rtn + 1] = role
             end
-        end
-    end
-
-    local rtn = {}
-    for _, role in pairs(roles) do
-        if role.priority == highest_priority then
-            rtn[#rtn + 1] = role
         end
     end
     return rtn
