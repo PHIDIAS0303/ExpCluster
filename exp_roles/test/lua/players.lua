@@ -1,56 +1,81 @@
 --- Player role and permission checks
 local Env = ...
-local env = Env.new()
-local check, eq, names, R = env.check, env.eq, env.names, env.R
-local Roles = env.Roles
+local Test = Env.Test
+local test, check, eq = Test.test, Test.check, Test.eq
 
-local alice = env.add_player("alice", 1)  -- moderator
-local bob = env.add_player("bob", 2)      -- regular
-local carol = env.add_player("carol", 3)  -- only the default role
-env.initialise{
-    Env.assignment("alice", { 5 }),
-    Env.assignment("bob", { 6 }),
-}
+--- alice is a moderator, bob is a regular, and carol has only the default role
+local function setup(env)
+    local players = {
+        alice = env.add_player("alice", 1),
+        bob = env.add_player("bob", 2),
+        carol = env.add_player("carol", 3),
+    }
+    env.initialise{
+        Env.assignment("alice", { 5 }),
+        Env.assignment("bob", { 6 }),
+    }
+    return players
+end
 
-check(eq(env.sorted(names(Roles.get_player_roles(alice))), { "Moderator", "Player" }),
-    "player roles include the default role")
-check(eq(names(Roles.get_player_roles(carol)), { "Player" }), "a player with no roles has the default role")
-check(eq(names(Roles.get_player_roles(nil)), { "<server>" }), "nil is the server")
-check(eq(names(Roles.get_player_roles(env.server)), { "<server>" }), "a player with index 0 is the server")
-check(Roles.get_player_highest_role(alice) == R("Moderator"), "highest role")
-check(Roles.get_player_highest_role(carol) == R("Player"), "highest role is the default role when none are held")
+test("player roles include the default role", function(env)
+    local players = setup(env)
+    check(eq(Test.sorted(Test.names(env.Roles.get_player_roles(players.alice))), { "Moderator", "Player" }),
+        "held roles and the default role")
+    check(eq(Test.names(env.Roles.get_player_roles(players.carol)), { "Player" }),
+        "a player with no roles has the default role")
+end)
 
-check(Roles.player_has_permission(alice, "exp_scenario.command.kill"), "permission through a held role")
-check(Roles.player_has_permission(alice, "exp_scenario.gui.readme"), "permission through the default role")
-check(not Roles.player_has_permission(bob, "exp_scenario.command.jail"), "permission not granted")
-check(Roles.player_has_permission(nil, "anything.at.all"), "the server has every permission")
-check(Roles.player_has_permission(env.server, "anything.at.all"), "an index 0 player has every permission")
+test("the server is nil or a player with index 0", function(env)
+    setup(env)
+    check(eq(Test.names(env.Roles.get_player_roles(nil)), { "<server>" }), "nil is the server")
+    check(eq(Test.names(env.Roles.get_player_roles(env.server)), { "<server>" }), "index 0 is the server")
+    check(env.Roles.player_has_permission(nil, "anything.at.all"), "the server has every permission")
+    check(not env.R("Player"):has_player(nil), "the server does not have the default role")
+end)
 
-check(Roles.player_has_any_permission(bob, "exp_scenario.command.jail", "exp_scenario.command.kill"),
-    "has any passes when one permission is granted")
-check(not Roles.player_has_any_permission(bob, "exp_scenario.command.jail", "exp_scenario.command.assign_role"),
-    "has any fails when none are granted")
-check(not Roles.player_has_any_permission(bob), "has any with no permissions is false")
-check(Roles.player_has_all_permission(alice, "exp_scenario.command.jail", "exp_scenario.command.kill"),
-    "has all passes when every permission is granted")
-check(not Roles.player_has_all_permission(bob, "exp_scenario.command.jail", "exp_scenario.command.kill"),
-    "has all fails when one is missing")
-check(Roles.player_has_all_permission(bob), "has all with no permissions is true")
-check(Roles.player_has_any_permission(nil, "anything.at.all"), "the server passes has any")
+test("the highest role", function(env)
+    local players = setup(env)
+    check(env.Roles.get_player_highest_role(players.alice) == env.R("Moderator"), "highest held role")
+    check(env.Roles.get_player_highest_role(players.carol) == env.R("Player"), "the default role when none are held")
+end)
 
-check(R("Moderator"):has_permission("exp_scenario.command.kill"), "role has_permission")
-check(not R("Regular"):has_permission("exp_scenario.command.jail"), "role has_permission not granted")
-check(R("Cluster Admin"):has_permission("anything.at.all"), "core.admin grants everything")
+test("permission checks", function(env)
+    local players = setup(env)
+    check(env.Roles.player_has_permission(players.alice, "exp_scenario.command.kill"), "granted by a held role")
+    check(env.Roles.player_has_permission(players.alice, "exp_scenario.gui.readme"), "granted by the default role")
+    check(not env.Roles.player_has_permission(players.bob, "exp_scenario.command.jail"), "not granted")
+end)
 
-check(R("Moderator"):has_player(alice), "has_player for a held role")
-check(not R("Moderator"):has_player(bob), "has_player for a role not held")
-check(R("Player"):has_player(carol), "everyone has the default role")
-check(not R("Player"):has_player(nil), "the server does not have the default role")
+test("has any and has all", function(env)
+    local players = setup(env)
+    local jail, kill = "exp_scenario.command.jail", "exp_scenario.command.kill"
+    check(env.Roles.player_has_any_permission(players.bob, jail, kill), "any passes when one is granted")
+    check(not env.Roles.player_has_any_permission(players.bob, jail, "exp_scenario.command.assign_role"),
+        "any fails when none are granted")
+    check(not env.Roles.player_has_any_permission(players.bob), "any of none is false")
+    check(env.Roles.player_has_all_permission(players.alice, jail, kill), "all passes when every one is granted")
+    check(not env.Roles.player_has_all_permission(players.bob, jail, kill), "all fails when one is missing")
+    check(env.Roles.player_has_all_permission(players.bob), "all of none is true")
+    check(env.Roles.player_has_any_permission(nil, "anything.at.all"), "the server passes any")
+end)
 
-check(Roles.player_outranks(alice, bob), "a higher role outranks a lower one")
-check(not Roles.player_outranks(bob, alice), "a lower role does not outrank a higher one")
-check(not Roles.player_outranks(alice, alice), "nobody outranks themselves")
-check(Roles.player_outranks(nil, alice), "the server outranks everyone")
-check(not Roles.player_outranks(alice, nil), "nobody outranks the server")
+test("role permission and player methods", function(env)
+    local players = setup(env)
+    check(env.R("Moderator"):has_permission("exp_scenario.command.kill"), "has_permission granted")
+    check(not env.R("Regular"):has_permission("exp_scenario.command.jail"), "has_permission not granted")
+    check(env.R("Cluster Admin"):has_permission("anything.at.all"), "core.admin grants everything")
+    check(env.R("Moderator"):has_player(players.alice), "has_player for a held role")
+    check(not env.R("Moderator"):has_player(players.bob), "has_player for a role not held")
+    check(env.R("Player"):has_player(players.carol), "everyone has the default role")
+end)
 
-return Env.results_json(env)
+test("outranks", function(env)
+    local players = setup(env)
+    check(env.Roles.player_outranks(players.alice, players.bob), "a higher role outranks a lower one")
+    check(not env.Roles.player_outranks(players.bob, players.alice), "a lower role does not outrank a higher one")
+    check(not env.Roles.player_outranks(players.alice, players.alice), "nobody outranks themselves")
+    check(env.Roles.player_outranks(nil, players.alice), "the server outranks everyone")
+    check(not env.Roles.player_outranks(players.alice, nil), "nobody outranks the server")
+end)
+
+return Env.finish()

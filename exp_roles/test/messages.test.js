@@ -1,31 +1,83 @@
 "use strict";
 const t = require("tap");
-const { Value } = require("@sinclair/typebox/value");
 const messages = require("../dist/node/messages");
+const { testMatrix, testRoundTripJsonSerialisable } = require("../../test/common");
 
-function roundTrip(subtest, Record, record) {
-	const json = record.toJSON();
-	subtest.ok(Value.Check(Record.jsonSchema, json), "json matches the schema");
-	subtest.strictSame(Record.fromJSON(json), record, "the record round trips");
-}
+const fullMeta = new messages.RoleMetaRecord(
+	7, 3, 1, "Mod", "[Mod]", new messages.RoleColor(1, 2, 3), 3600000, true, 12345, false,
+);
+
+t.test("RoleColor", subtest => {
+	testRoundTripJsonSerialisable(messages.RoleColor, testMatrix(
+		[0, 255], // r
+		[0, 128], // g
+		[0, 1], // b
+	));
+	subtest.pass("round trips");
+	subtest.end();
+});
 
 t.test("RoleMetaRecord", subtest => {
-	roundTrip(subtest, messages.RoleMetaRecord, new messages.RoleMetaRecord(7, 3));
-	roundTrip(subtest, messages.RoleMetaRecord, new messages.RoleMetaRecord(
-		7, 3, 1, "Mod", "[Mod]", new messages.RoleColor(1, 2, 3), 3600000, true, 12345, false,
+	testRoundTripJsonSerialisable(messages.RoleMetaRecord, testMatrix(
+		[7], // id
+		[3], // order
+		[0, 1], // priority
+		["", "Mod"], // shortHand
+		["", "[Mod]"], // tag
+		[null, new messages.RoleColor(1, 2, 3)], // color
+		[null, 3600000], // autoAssignOnlineTimeMs
+		[false, true], // blockAutoAssign
+		[0, 12345], // updatedAtMs
+		[false, true], // isDeleted
 	));
+	subtest.pass("round trips");
 	subtest.end();
 });
 
 t.test("RoleRecord", subtest => {
-	roundTrip(subtest, messages.RoleRecord, new messages.RoleRecord(
-		7, "Moderator", ["exp_scenario.command.kill"], new messages.RoleMetaRecord(7, 3), true, 12345,
+	testRoundTripJsonSerialisable(messages.RoleRecord, testMatrix(
+		[7], // id
+		["Moderator"], // name
+		[[], ["a.b", "c.d"]], // permissions
+		[new messages.RoleMetaRecord(7, 3), fullMeta], // meta
+		[false, true], // isDefault
+		[0, 12345], // updatedAtMs
+		[false, true], // isDeleted
 	));
+	subtest.pass("round trips");
 	subtest.end();
 });
 
 t.test("AssignmentRecord", subtest => {
-	roundTrip(subtest, messages.AssignmentRecord, new messages.AssignmentRecord("alice", new Set([5, 6]), 12345));
+	testRoundTripJsonSerialisable(messages.AssignmentRecord, testMatrix(
+		["alice"], // name
+		[new Set(), new Set([5, 6])], // roleIds
+		[0, 12345], // updatedAtMs
+		[false, true], // isDeleted
+	));
+	subtest.pass("round trips");
+	subtest.end();
+});
+
+t.test("update events and requests", subtest => {
+	const record = new messages.RoleRecord(7, "Moderator", ["a.b"], fullMeta, true, 12345);
+	const assignment = new messages.AssignmentRecord("alice", new Set([5]), 12345);
+
+	testRoundTripJsonSerialisable(messages.RoleUpdatedEvent, testMatrix(
+		[[], [record]], // updates
+	));
+	testRoundTripJsonSerialisable(messages.AssignmentUpdatedEvent, testMatrix(
+		[[], [assignment]], // updates
+	));
+	testRoundTripJsonSerialisable(messages.RoleMetaUpdateRequest, testMatrix(
+		[new messages.RoleMetaRecord(7, 3), fullMeta], // meta
+	));
+	testRoundTripJsonSerialisable(messages.AssignmentUpdateRequest, testMatrix(
+		["alice"], // name
+		[[], [5]], // assign
+		[[], [6]], // unassign
+	));
+	subtest.pass("round trips");
 	subtest.end();
 });
 

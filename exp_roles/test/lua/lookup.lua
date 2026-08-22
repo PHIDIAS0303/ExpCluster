@@ -1,36 +1,48 @@
 --- Role lookup, decoding, and comparisons
 local Env = ...
-local env = Env.new()
-local check, eq, names, R = env.check, env.eq, env.names, env.R
-local Roles = env.Roles
+local Test = Env.Test
+local test, check, eq = Test.test, Test.check, Test.eq
 
-env.initialise{}
+test("roles are ordered most privileged first", function(env)
+    env.initialise{}
+    check(eq(Test.names(env.Roles.get_ordered_roles()), { "Cluster Admin", "Moderator", "Regular", "Jail", "Player" }),
+        "ordered roles follow their order with deleted roles skipped")
+    check(#env.Roles.get_roles() == 5, "get_roles returns every role")
 
-check(eq(names(Roles.get_ordered_roles()), { "Cluster Admin", "Moderator", "Regular", "Jail", "Player" }),
-    "ordered roles are most privileged first with deleted roles skipped")
-check(#Roles.get_roles() == 5, "get_roles returns every role")
-check(Roles.get_role(6).name == "Regular", "get_role looks up by clusterio id")
-check(Roles.get_role_by_name("Moderator").id == 5, "get_role_by_name searches the roles")
-check(Roles.get_role(R("Jail").id) == R("Jail"), "lookups return the same object")
-check(Roles.get_role(9) == nil and Roles.get_role_by_name("Gone") == nil, "deleted roles are not known")
-check(Roles.get_default_role() == R("Player"), "the default role comes from is_default")
+    local sorted = env.Roles.sort_roles{ env.R("Player"), env.R("Cluster Admin"), env.R("Regular") }
+    check(eq(Test.names(sorted), { "Cluster Admin", "Regular", "Player" }), "sort_roles orders most privileged first")
+end)
 
-check(R("Moderator").short_hand == "Mod" or R("Moderator").short_hand == "Moderator",
-    "short hand falls back to the name")
-check(R("Cluster Admin").short_hand == "SYS", "short hand decoded")
-check(R("Moderator").color.g == 170, "color decoded")
-check(R("Jail").priority == 1 and R("Jail").block_auto_assign, "priority and block auto assign decoded")
+test("roles are looked up by id", function(env)
+    env.initialise{}
+    check(env.Roles.get_role(6).name == "Regular", "get_role looks up by clusterio id")
+    check(env.Roles.get_role_by_name("Moderator").id == 5, "get_role_by_name searches the roles")
+    check(env.Roles.get_role(env.R("Jail").id) == env.R("Jail"), "lookups return the same object")
+    check(env.Roles.get_role(9) == nil and env.Roles.get_role_by_name("Gone") == nil, "deleted roles are not known")
+    check(env.Roles.get_default_role() == env.R("Player"), "the default role comes from is_default")
+end)
 
-check(R("Moderator"):is_higher_than(R("Player")), "roles compare on their order")
-check(R("Player"):is_lower_than(R("Moderator")), "is_lower_than is the reverse")
-check(not R("Moderator"):is_higher_than(R("Moderator")), "a role is not higher than itself")
+test("role records are decoded", function(env)
+    env.initialise{}
+    check(env.R("Cluster Admin").short_hand == "SYS", "short hand decoded")
+    check(env.R("Moderator").short_hand == "Moderator", "short hand falls back to the name")
+    check(env.R("Moderator").color.g == 170, "color decoded")
+    check(env.R("Jail").priority == 1 and env.R("Jail").block_auto_assign, "priority and block auto assign decoded")
+end)
 
-check(eq(env.sorted(names(Roles.get_higher_roles(R("Regular")))), { "Cluster Admin", "Moderator", "Regular" }),
-    "higher roles include the role itself and exclude the default role")
-check(eq(env.sorted(names(Roles.get_lower_roles(R("Regular")))), { "Jail", "Regular" }),
-    "lower roles include the role itself and exclude the default role")
+test("roles compare on their order", function(env)
+    env.initialise{}
+    check(env.R("Moderator"):is_higher_than(env.R("Player")), "a lower order is more privileged")
+    check(env.R("Player"):is_lower_than(env.R("Moderator")), "is_lower_than is the reverse")
+    check(not env.R("Moderator"):is_higher_than(env.R("Moderator")), "a role is not higher than itself")
+end)
 
-local sorted = Roles.sort_roles{ R("Player"), R("Cluster Admin"), R("Regular") }
-check(eq(names(sorted), { "Cluster Admin", "Regular", "Player" }), "sort_roles orders most privileged first")
+test("higher and lower roles", function(env)
+    env.initialise{}
+    check(eq(Test.sorted(Test.names(env.Roles.get_higher_roles(env.R("Regular")))), { "Cluster Admin", "Moderator", "Regular" }),
+        "higher roles include the role itself and exclude the default role")
+    check(eq(Test.sorted(Test.names(env.Roles.get_lower_roles(env.R("Regular")))), { "Jail", "Regular" }),
+        "lower roles include the role itself and exclude the default role")
+end)
 
-return Env.results_json(env)
+return Env.finish()

@@ -3,28 +3,30 @@ const path = require("node:path");
 const fs = require("node:fs");
 const { lua, lauxlib, lualib, to_luastring, to_jsstring } = require("fengari");
 
-const moduleRoot = path.join(__dirname, "..", "..", "module");
-const luaRoot = path.join(__dirname, "..", "lua");
-
 /**
  * Run one lua test file in its own lua state and return its results.
  *
  * The state is created here, on first use by the caller, so every test file
- * gets an independent environment. The file receives the environment helpers
- * from env.lua and must return an array of { name, ok, detail? } results,
- * encoded as JSON.
+ * gets an independent set of stubs. Three chunks run in order, each taking one
+ * argument and returning one value:
  *
- * @param {string} name - File in test/lua to run, such as "lookup.lua".
+ * 1. The plugin's env.lua, receiving this directory so it can load the shared
+ *    stubs and framework, returning its environment module.
+ * 2. The test file, receiving the environment module, declaring its tests.
+ * 3. The tests then run, each against a fresh environment, and the results
+ *    are returned as JSON.
+ *
+ * @param {string} envFile - Absolute path of the plugin's test/lua/env.lua.
+ * @param {string} testFile - Absolute path of the lua test file to run.
  * @returns {{ name: string, ok: boolean, detail?: string }[]}
  */
-function runLuaTests(name) {
+function runLuaTests(envFile, testFile) {
 	const L = lauxlib.luaL_newstate();
 	lualib.luaL_openlibs(L);
 
-	// Each file is run as a chunk taking one argument and returning one value
-	const load = (file, chunkName) => {
+	const load = (file) => {
 		const code = fs.readFileSync(file);
-		const status = lauxlib.luaL_loadbuffer(L, code, code.length, to_luastring(`@${chunkName}`));
+		const status = lauxlib.luaL_loadbuffer(L, code, code.length, to_luastring(`@${file}`));
 		if (status !== lua.LUA_OK) {
 			throw new Error(to_jsstring(lua.lua_tostring(L, -1)));
 		}
@@ -35,13 +37,12 @@ function runLuaTests(name) {
 		}
 	};
 
-	// The environment stubs factorio and loads module/control.lua from disk
-	load(path.join(luaRoot, "env.lua"), "test/lua/env.lua");
-	lua.lua_pushstring(L, to_luastring(moduleRoot));
+	load(envFile);
+	lua.lua_pushstring(L, to_luastring(__dirname));
 	call();
 
 	// The environment stays on the stack and is passed to the test chunk
-	load(path.join(luaRoot, name), `test/lua/${name}`);
+	load(testFile);
 	lua.lua_insert(L, -2);
 	call();
 
@@ -49,10 +50,10 @@ function runLuaTests(name) {
 	return JSON.parse(json);
 }
 
-/** Report lua results through a tap test object. */
-function reportLuaTests(t, name) {
-	const results = runLuaTests(name);
-	t.ok(results.length > 0, `${name} produced results`);
+/** Report the results of a lua test file through a tap test object. */
+function reportLuaTests(t, envFile, testFile) {
+	const results = runLuaTests(envFile, testFile);
+	t.ok(results.length > 0, `${path.basename(testFile)} produced results`);
 	for (const result of results) {
 		t.ok(result.ok, result.name, result.detail ? { detail: result.detail } : {});
 	}
