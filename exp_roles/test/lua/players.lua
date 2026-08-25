@@ -18,16 +18,16 @@ end
 
 test("get_player_roles includes the default role", function(env)
     local players = setup(env)
-    eq(Suite.sorted(env.names(env.Roles.get_player_roles(players.alice))), { "Moderator", "Player" },
+    eq(Suite.sorted(Suite.names(env.Roles.get_player_roles(players.alice))), { "Moderator", "Player" },
         "held roles and the default role")
-    eq(env.names(env.Roles.get_player_roles(players.carol)), { "Player" },
+    eq(Suite.names(env.Roles.get_player_roles(players.carol)), { "Player" },
         "a player with no roles has the default role")
 end)
 
 test("get_player_roles treats nil and index 0 as the server", function(env)
     setup(env)
-    eq(env.names(env.Roles.get_player_roles(nil)), { "<server>" }, "nil is the server")
-    eq(env.names(env.Roles.get_player_roles(env.server)), { "<server>" }, "index 0 is the server")
+    eq(Suite.names(env.Roles.get_player_roles(nil)), { "<server>" }, "nil is the server")
+    eq(Suite.names(env.Roles.get_player_roles(env.server)), { "<server>" }, "index 0 is the server")
     check(env.Roles.player_has_permission(nil, "anything.at.all"), "the server has every permission")
     check(not env.R("Player"):has_player(nil), "the server does not have the default role")
 end)

@@ -22,14 +22,14 @@ end)
 
 test("get_ordered_roles returns the most privileged first", function(env)
     env.initialise{}
-    eq(env.names(env.Roles.get_ordered_roles()), { "Cluster Admin", "Moderator", "Regular", "Jail", "Player" },
+    eq(Suite.names(env.Roles.get_ordered_roles()), { "Cluster Admin", "Moderator", "Regular", "Jail", "Player" },
         "roles follow their order")
 end)
 
 test("sort_roles orders most privileged first", function(env)
     env.initialise{}
     local sorted = env.Roles.sort_roles{ env.R("Player"), env.R("Cluster Admin"), env.R("Regular") }
-    eq(env.names(sorted), { "Cluster Admin", "Regular", "Player" }, "the list is sorted in place")
+    eq(Suite.names(sorted), { "Cluster Admin", "Regular", "Player" }, "the list is sorted in place")
 end)
 
 test("get_default_role follows is_default", function(env)
@@ -39,9 +39,9 @@ end)
 
 test("get_higher_roles and get_lower_roles include the role and exclude the default", function(env)
     env.initialise{}
-    eq(Suite.sorted(env.names(env.Roles.get_higher_roles(env.R("Regular")))),
+    eq(Suite.sorted(Suite.names(env.Roles.get_higher_roles(env.R("Regular")))),
         { "Cluster Admin", "Moderator", "Regular" }, "higher roles")
-    eq(Suite.sorted(env.names(env.Roles.get_lower_roles(env.R("Regular")))),
+    eq(Suite.sorted(Suite.names(env.Roles.get_lower_roles(env.R("Regular")))),
         { "Jail", "Regular" }, "lower roles")
 end)
 

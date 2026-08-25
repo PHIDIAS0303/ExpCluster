@@ -1,6 +1,6 @@
 --- Tests for the assignment methods of module/control.lua
 local Suite = ... --- The suite this file adds its tests to, see test/lua/framework.lua
-local test, check, eq = Suite.test, Suite.check, Suite.eq
+local test, check, eq, deep_eq = Suite.test, Suite.check, Suite.eq, Suite.deep_eq
 
 --- alice is a moderator and bob a regular, with changes sent to the controller
 local function setup(env)
@@ -20,13 +20,20 @@ end
 test("role:assign applies locally and is sent to the controller", function(env)
     local players = setup(env)
     env.R("Moderator"):assign(players.bob, { by_player_name = "alice" })
-    check(#env.sent == 1 and env.sent[1].channel == "exp_roles:assignment_update", "the assignment is sent")
-    check(env.sent[1].data.name == "bob", "the payload names the player")
-    eq(env.sent[1].data.assign, { 5 }, "the payload names the role")
+    deep_eq(env.sent, {
+        { channel = "exp_roles:assignment_update", data = { name = "bob", assign = { 5 } } },
+    }, "the assignment is sent to the controller")
     check(env.R("Moderator"):has_player(players.bob), "the role applies before confirmation")
-    check(#env.events == 1, "one event is raised")
-    eq(env.events[1].data.assigned, { 5 }, "the event carries the assigned role id")
-    check(env.events[1].data.by_player_index == 1, "the event carries who made the change")
+    deep_eq(env.events, {
+        {
+            name = env.Roles.events.on_player_roles_changed,
+            tick = 1,
+            player_index = 2,
+            by_player_index = 1,
+            assigned = { 5 },
+            unassigned = {},
+        },
+    }, "the event carries the change")
     check(#env.printed == 1 and env.printed[1][1] == "exp-roles.game-message-assign", "the change is announced")
     eq(env.sounds, { "bob:utility/achievement_unlocked" }, "the assign sound plays")
 
@@ -54,11 +61,20 @@ end)
 test("role:unassign removes a synced role", function(env)
     local players = setup(env)
     env.R("Regular"):unassign(players.bob, { by_player_name = "alice", silent = true })
-    check(#env.sent == 1, "the unassignment is sent")
-    eq(env.sent[1].data.unassign, { 6 }, "the payload names the role")
+    deep_eq(env.sent, {
+        { channel = "exp_roles:assignment_update", data = { name = "bob", unassign = { 6 } } },
+    }, "the unassignment is sent to the controller")
     check(not env.R("Regular"):has_player(players.bob), "the role is removed locally")
-    check(#env.events == 1, "one event is raised")
-    eq(env.events[1].data.unassigned, { 6 }, "the event carries the unassigned role id")
+    deep_eq(env.events, {
+        {
+            name = env.Roles.events.on_player_roles_changed,
+            tick = 1,
+            player_index = 2,
+            by_player_index = 1,
+            assigned = {},
+            unassigned = { 6 },
+        },
+    }, "the event carries the change")
     check(#env.printed == 0, "silent suppresses the announcement")
     eq(env.sounds, { "bob:utility/game_lost" }, "the unassign sound plays")
 end)
@@ -72,8 +88,16 @@ test("reject_assignment rolls the assignment back", function(env)
     env.Roles.reject_assignment{ name = "alice", role_ids = { 7 } }
     check(not env.R("Jail"):has_player(players.alice), "the rejected role is rolled back")
     check(#env.sent == 0, "the rollback is not sent to the controller")
-    check(#env.events == 1, "the rollback raises the event")
-    eq(env.events[1].data.unassigned, { 7 }, "the event carries the refused role id")
+    deep_eq(env.events, {
+        {
+            name = env.Roles.events.on_player_roles_changed,
+            tick = 1,
+            player_index = 1,
+            by_player_index = 0,
+            assigned = {},
+            unassigned = { 7 },
+        },
+    }, "the rollback raises the event")
 
     local sd = env.Roles._script_data()
     check(sd.local_players.alice == nil and sd.pending.alice == nil, "the rollback clears the local state")
@@ -100,20 +124,20 @@ end)
 test("role:assign of a higher priority role suppresses the rest", function(env)
     local players = setup(env)
     env.R("Jail"):assign(players.alice, { by_player_name = "<server>", silent = true })
-    eq(env.names(env.Roles.get_player_roles(players.alice)), { "Jail" }, "only the jail role applies")
+    eq(Suite.names(env.Roles.get_player_roles(players.alice)), { "Jail" }, "only the jail role applies")
     check(env.R("Moderator"):has_player(players.alice), "a suppressed role is still held")
     check(not env.Roles.player_has_permission(players.alice, "exp_scenario.command.kill"), "permissions are lost")
     check(not env.Roles.player_has_permission(players.alice, "exp_scenario.gui.readme"), "the default role is lost")
     check(not env.Roles.player_outranks(players.alice, players.bob), "a jailed player no longer outranks")
-    eq(env.events[1].data.assigned, { 7 }, "the event lists the jail role")
-    check(#env.events[1].data.unassigned == 0, "the suppressed roles are not listed as unassigned")
+    eq(env.events[1].assigned, { 7 }, "the event lists the jail role")
+    check(#env.events[1].unassigned == 0, "the suppressed roles are not listed as unassigned")
 
     env.reset_log()
     env.R("Jail"):unassign(players.alice, { by_player_name = "<server>", silent = true })
-    eq(Suite.sorted(env.names(env.Roles.get_player_roles(players.alice))), { "Moderator", "Player" },
+    eq(Suite.sorted(Suite.names(env.Roles.get_player_roles(players.alice))), { "Moderator", "Player" },
         "unjail restores the roles")
-    check(#env.events[1].data.assigned == 0, "the restored roles are not listed as assigned")
-    eq(env.events[1].data.unassigned, { 7 }, "the unjail event lists the jail role")
+    check(#env.events[1].assigned == 0, "the restored roles are not listed as assigned")
+    eq(env.events[1].unassigned, { 7 }, "the unjail event lists the jail role")
 end)
 
 test("role:assign ignores the server", function(env)

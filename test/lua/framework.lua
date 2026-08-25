@@ -101,6 +101,18 @@ function Framework.new_suite(make_env)
         Suite.check(deep_equal(a, b), name, ("%s ~= %s"):format(repr(a, 1), repr(b, 1)))
     end
 
+    --- Names of an array of values with a name property, such as roles,
+    --- players, forces, or events
+    --- @param values { name: string }[]
+    --- @return string[]
+    function Suite.names(values)
+        local rtn = {}
+        for index, value in ipairs(values) do
+            rtn[index] = value.name
+        end
+        return rtn
+    end
+
     --- Sorted copy of an array of strings
     function Suite.sorted(list)
         local rtn = {}

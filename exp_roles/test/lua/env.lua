@@ -55,15 +55,6 @@ local function make_env()
         return (assert(env.Roles.get_role_by_name(name), "No role named " .. name))
     end
 
-    --- Names of an array of roles
-    function env.names(roles)
-        local rtn = {}
-        for index, role in ipairs(roles) do
-            rtn[index] = role.name
-        end
-        return rtn
-    end
-
     --- An assignment record as the controller would send it
     function env.assignment(name, role_ids)
         return { name = name, role_ids = role_ids }
@@ -76,13 +67,6 @@ local function make_env()
             roles = role_records(),
             assignments = assignments or {},
         }
-    end
-
-    --- Save and load the map, as far as the roles module can tell
-    local stub_save_load = env.save_load
-    function env.save_load()
-        stub_save_load()
-        env.Roles.on_load()
     end
 
     return env

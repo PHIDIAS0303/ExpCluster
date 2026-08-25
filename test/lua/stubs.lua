@@ -65,7 +65,10 @@ function Stubs.new()
             return next_event_id
         end,
         raise_event = function(id, data)
-            stubs.events[#stubs.events + 1] = { id = id, data = data }
+            -- Factorio fills in the name and tick of the event
+            data.name = id
+            data.tick = game.tick
+            stubs.events[#stubs.events + 1] = data
         end,
         register_metatable = function(_, metatable)
             registered_metatables[metatable] = true
@@ -79,13 +82,17 @@ function Stubs.new()
         }),
     })
 
-    local players_by_name, players_by_index, connected = {}, {}, {}
+    -- Stored by name, with an index metamethod so players are also found by
+    -- their player index, the same way game.players works
+    local players_by_index = {}
+    local players = setmetatable({}, { __index = players_by_index })
+    local connected = {}
     game = Stubs.strict("LuaGameScript", {
         tick = 1,
-        players = players_by_name,
+        players = players,
         connected_players = connected,
         print = function(message) stubs.printed[#stubs.printed + 1] = message end,
-        get_player = function(key) return players_by_name[key] or players_by_index[key] end,
+        get_player = function(key) return players[key] end,
     }, { "player" })
 
     --- Add a player to the stubbed game
@@ -102,7 +109,7 @@ function Stubs.new()
                 stubs.printed[#stubs.printed + 1] = { to = name, message }
             end,
         })
-        players_by_name[name] = player
+        rawset(players, name, player)
         players_by_index[index] = player
         if player.connected then connected[#connected + 1] = player end
         return player
