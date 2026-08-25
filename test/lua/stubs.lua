@@ -95,8 +95,9 @@ function Stubs.new()
         get_player = function(key) return players[key] end,
     }, { "player" })
 
-    --- Add a player to the stubbed game
-    function stubs.add_player(name, index, is_connected)
+    --- Add a player to the stubbed game, indexes are assigned in join order
+    function stubs.add_player(name, is_connected)
+        local index = #players_by_index + 1
         local player = Stubs.strict("LuaPlayer " .. name, {
             name = name,
             index = index,

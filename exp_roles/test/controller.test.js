@@ -52,7 +52,7 @@ async function startPlugin(t2, { roles = [] } = {}) {
 const role = (id, name, permissions = []) => new lib.Role(id, name, "", new Set(permissions));
 
 t.test("class ControllerPlugin", t2 => {
-	t2.test("init and sweepRoleMeta manage the role properties", async t3 => {
+	t2.test(".init() and .sweepRoleMeta() manage the role properties", async t3 => {
 		const { plugin } = await startPlugin(t3, { roles: [role(0, "Cluster Admin"), role(5, "Moderator")] });
 
 		t3.strictSame(plugin.roleMeta.get(0).order, 1, "the first role is ordered first");
@@ -64,7 +64,7 @@ t.test("class ControllerPlugin", t2 => {
 		t3.ok(plugin.roleMeta.get(5), "properties with a role are kept");
 	});
 
-	t2.test("buildRoleRecord combines the role with its properties", async t3 => {
+	t2.test(".buildRoleRecord() combines the role with its properties", async t3 => {
 		const { plugin, controller } = await startPlugin(t3, {
 			roles: [role(1, "Player"), role(5, "Moderator", ["exp_scenario.command.kill"])],
 		});
@@ -78,7 +78,7 @@ t.test("class ControllerPlugin", t2 => {
 		t3.ok(plugin.buildRoleRecord(controller.roles.get(1)).isDefault, "the default role is marked");
 	});
 
-	t2.test("rolesUpdated and roleMetaUpdated broadcast to subscribers", async t3 => {
+	t2.test(".rolesUpdated() and .roleMetaUpdated() broadcast to subscribers", async t3 => {
 		const { plugin, controller, state } = await startPlugin(t3, { roles: [role(1, "Player")] });
 
 		state.broadcasts.length = 0;
@@ -102,7 +102,7 @@ t.test("class ControllerPlugin", t2 => {
 		);
 	});
 
-	t2.test("handleRoleSubscription replays only newer records", async t3 => {
+	t2.test(".handleRoleSubscription() replays only newer records", async t3 => {
 		const { plugin, controller } = await startPlugin(t3, { roles: [role(1, "Player")] });
 		controller.roles.set(role(5, "Moderator"));
 		const updatedAtMs = plugin.buildRoleRecord(controller.roles.get(5)).updatedAtMs;
@@ -113,7 +113,7 @@ t.test("class ControllerPlugin", t2 => {
 		t3.strictSame(none, null, "nothing is replayed when up to date");
 	});
 
-	t2.test("listAssignmentRecords mirrors users without the default role", async t3 => {
+	t2.test(".listAssignmentRecords() mirrors users without the default role", async t3 => {
 		const { plugin, controller } = await startPlugin(t3, { roles: [role(1, "Player"), role(5, "Moderator")] });
 		controller.users.createUser("alice").set("roleIds", new Set([lib.Role.DefaultPlayerRoleId, 5]));
 		controller.users.createUser("bob");
@@ -124,7 +124,7 @@ t.test("class ControllerPlugin", t2 => {
 		t3.strictSame([...records[0].roleIds], [5], "the default role is not listed");
 	});
 
-	t2.test("handleAssignmentUpdateRequest validates the user and roles", async t3 => {
+	t2.test(".handleAssignmentUpdateRequest() validates the user and roles", async t3 => {
 		const { plugin, controller, state } = await startPlugin(t3, {
 			roles: [role(1, "Player"), role(5, "Moderator"), role(6, "Regular")],
 		});
@@ -144,7 +144,7 @@ t.test("class ControllerPlugin", t2 => {
 		t3.ok(state.permissionUpdates.includes("alice"), "permission changes are pushed to the user");
 	});
 
-	t2.test("applyAutoAssign and onPlayerEvent grant roles from online time", async t3 => {
+	t2.test(".applyAutoAssign() and .onPlayerEvent() grant roles from online time", async t3 => {
 		const { plugin, controller } = await startPlugin(t3, {
 			roles: [role(1, "Player"), role(6, "Regular"), role(7, "Jail")],
 		});
@@ -173,7 +173,32 @@ t.test("class ControllerPlugin", t2 => {
 		t3.strictSame(applied.length, 1, "other player events do not");
 	});
 
-	t2.test("handleSeedRolesRequest creates the roles and reuses them by name", async t3 => {
+	t2.test(".handleRoleMetaUpdateRequest() validates the role", async t3 => {
+		const { plugin } = await startPlugin(t3, { roles: [role(1, "Player"), role(5, "Moderator")] });
+
+		await t3.rejects(
+			plugin.handleRoleMetaUpdateRequest(new messages.RoleMetaUpdateRequest(new messages.RoleMetaRecord(99, 1))),
+			{ message: /does not exist/ }, "properties for an unknown role are refused",
+		);
+
+		await plugin.handleRoleMetaUpdateRequest(new messages.RoleMetaUpdateRequest(
+			new messages.RoleMetaRecord(5, 2, 0, "Mod"),
+		));
+		t3.strictSame(plugin.roleMeta.get(5).shortHand, "Mod", "the properties are stored");
+	});
+
+	t2.test(".handleAssignmentSubscription() replays only newer records", async t3 => {
+		const { plugin, controller } = await startPlugin(t3, { roles: [role(1, "Player"), role(5, "Moderator")] });
+		controller.users.createUser("alice").set("roleIds", new Set([5]));
+		const updatedAtMs = plugin.listAssignmentRecords()[0].updatedAtMs;
+
+		const all = await plugin.handleAssignmentSubscription({ lastRequestTimeMs: 0 });
+		t3.strictSame(all.updates.length, 1, "everything is replayed from the start");
+		const none = await plugin.handleAssignmentSubscription({ lastRequestTimeMs: updatedAtMs });
+		t3.strictSame(none, null, "nothing is replayed when up to date");
+	});
+
+	t2.test(".handleSeedRolesRequest() creates the roles and reuses them by name", async t3 => {
 		const { plugin, controller } = await startPlugin(t3, {
 			roles: [role(0, "Cluster Admin", ["core.admin"]), role(1, "Player")],
 		});

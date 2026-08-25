@@ -15,7 +15,7 @@ t.test("seedRoles grant only defined permissions", subtest => {
 	subtest.end();
 });
 
-t.test("flattenSeedPermissions carries parents into their children", subtest => {
+t.test("flattenSeedPermissions() carries parents into their children", subtest => {
 	const byName = new Map(seedRoles.map(role => [role.name, role]));
 	for (const role of seedRoles) {
 		if (role.parent === undefined) {

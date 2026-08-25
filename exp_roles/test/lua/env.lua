@@ -1,8 +1,7 @@
 --[[-- Test environment for module/control.lua
 The module specific extension between the shared stubs and the test files: it
-creates environments which combine the stubs with a fresh copy of the roles
-module and the fixtures below, and hands each test file a suite built around
-that factory.
+extends each environment with a fresh copy of the roles module and the
+fixtures below, and hands each test file a suite built around that.
 
 Run as a chunk by test/lua/runner.js, receiving the shared folder. The suite
 returned here becomes `...` in each test file.
@@ -12,7 +11,6 @@ local shared_root = ... --- @type string
 local source = assert(debug.getinfo(1, "S")).source
 local plugin_root = assert(source:match("^@(.*)/test/lua/env%.lua$"))
 
-local Stubs = assert(loadfile(shared_root .. "/stubs.lua"))()
 local Framework = assert(loadfile(shared_root .. "/framework.lua"))()
 
 --- Standard fixture: permission names sent once and referenced by zero based index
@@ -43,21 +41,33 @@ local function role_records()
     }
 end
 
---- Create an independent environment with a fresh copy of the roles module
-local function make_env()
-    local env = Stubs.new()
+--- Fixture role ids by name, avoiding a search of the roles on every lookup
+local role_ids = {}
+for _, record in ipairs(role_records()) do
+    role_ids[record.name] = record.id
+end
 
+return Framework.suite(function(env)
     env.Roles = assert(loadfile(plugin_root .. "/module/control.lua"))()
     env.Roles.on_server_startup()
 
-    --- Get a role by name, failing the test when it does not exist
+    --- Get a fixture role by name, failing the test when it does not exist
+    --- Roles added by a test are found by a search instead
     function env.R(name)
+        local role_id = role_ids[name]
+        if role_id then
+            return (assert(env.Roles.get_role(role_id), "No role with id " .. role_id))
+        end
         return (assert(env.Roles.get_role_by_name(name), "No role named " .. name))
     end
 
-    --- An assignment record as the controller would send it
-    function env.assignment(name, role_ids)
-        return { name = name, role_ids = role_ids }
+    --- An assignment record as the controller would send it, roles by name
+    function env.assignment(player_name, role_names)
+        local ids = {}
+        for index, role_name in ipairs(role_names) do
+            ids[index] = assert(role_ids[role_name], "No fixture role named " .. role_name)
+        end
+        return { name = player_name, role_ids = ids }
     end
 
     --- Load the standard fixture and the given assignments
@@ -70,6 +80,4 @@ local function make_env()
     end
 
     return env
-end
-
-return Framework.new_suite(make_env)
+end)

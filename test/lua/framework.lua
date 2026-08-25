@@ -1,10 +1,14 @@
 --[[-- Test framework for plugin module tests
 A suite is a collection of named tests. Test files declare them with
 `Suite.test(name, function(env) ... end)`, naming each test after the function
-or method it covers. Every test function receives a fresh environment from the
-factory the suite was created with, so tests are independent and can not leak
-state into each other.
+or method it covers. Every test function receives a fresh environment: the
+stubs extended by the function the suite was created with, so tests are
+independent and can not leak state into each other.
 ]]
+
+local source = assert(debug.getinfo(1, "S")).source
+local shared_root = assert(source:match("^@(.*)/framework%.lua$"))
+local Stubs = assert(loadfile(shared_root .. "/stubs.lua"))()
 
 local Framework = {}
 
@@ -21,8 +25,8 @@ local function repr(value, depth)
 end
 
 --- Create a suite of tests, one is made per test file
---- @param make_env fun(): table Creates the environment given to each test
-function Framework.new_suite(make_env)
+--- @param extend_env fun(env: table): table Extends the stubs given to each test
+function Framework.suite(extend_env)
     --- @class Suite
     local Suite = {
         tests = {},   -- { name, fn } in declaration order
@@ -70,20 +74,6 @@ function Framework.new_suite(make_env)
         end
     end
 
-    --- Check two values or arrays are shallowly equal
-    function Suite.eq(a, b, name)
-        local equal
-        if type(a) ~= "table" or type(b) ~= "table" then
-            equal = a == b
-        else
-            equal = #a == #b
-            for i = 1, #a do
-                if a[i] ~= b[i] then equal = false break end
-            end
-        end
-        Suite.check(equal, name, ("%s ~= %s"):format(repr(a, 1), repr(b, 1)))
-    end
-
     --- Recursive table equality, keys checked from both sides
     local function deep_equal(a, b)
         if type(a) ~= "table" or type(b) ~= "table" then return a == b end
@@ -97,7 +87,7 @@ function Framework.new_suite(make_env)
     end
 
     --- Check two values are equal, comparing tables recursively
-    function Suite.deep_eq(a, b, name)
+    function Suite.eq(a, b, name)
         Suite.check(deep_equal(a, b), name, ("%s ~= %s"):format(repr(a, 1), repr(b, 1)))
     end
 
@@ -126,7 +116,9 @@ function Framework.new_suite(make_env)
     function Suite.run()
         for _, test in ipairs(Suite.tests) do
             current_test = test.name
-            local ok, err = pcall(test.fn, make_env())
+            local ok, err = pcall(function()
+                test.fn(extend_env(Stubs.new()))
+            end)
             if not ok then
                 Suite.fail("did not error", tostring(err))
             end

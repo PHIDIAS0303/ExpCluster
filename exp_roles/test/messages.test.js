@@ -96,7 +96,7 @@ t.test("class AssignmentUpdateRequest", subtest => {
 	subtest.end();
 });
 
-t.test("encodeRolesForLua sends each permission name once", subtest => {
+t.test("encodeRolesForLua() sends each permission name once", subtest => {
 	const meta = id => new messages.RoleMetaRecord(id, id);
 	const encoded = messages.encodeRolesForLua([
 		new messages.RoleRecord(1, "A", ["p.one", "p.two"], meta(1)),
