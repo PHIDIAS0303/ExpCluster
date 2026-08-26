@@ -91,6 +91,26 @@ function Framework.suite(extend_env)
         Suite.check(deep_equal(a, b), name, ("%s ~= %s"):format(repr(a, 1), repr(b, 1)))
     end
 
+    --- Check a table has no entries
+    function Suite.empty(value, name)
+        Suite.check(next(value) == nil, name, repr(value, 1))
+    end
+
+    --- Check a function raises an error containing the message
+    --- @param fn fun()
+    --- @param message string
+    --- @param name string
+    function Suite.throws(fn, message, name)
+        local ok, err = pcall(fn)
+        if ok then
+            Suite.fail(name, "did not error")
+        elseif not tostring(err):find(message, 1, true) then
+            Suite.fail(name, ("%s does not contain %s"):format(tostring(err), message))
+        else
+            Suite.pass(name)
+        end
+    end
+
     --- Names of an array of values with a name property, such as roles,
     --- players, forces, or events
     --- @param values { name: string }[]

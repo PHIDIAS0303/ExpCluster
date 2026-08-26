@@ -43,7 +43,9 @@ test("get_player_highest_role() errors when a player has no roles", function(env
     env.Roles.receive_role_updates{
         { id = env.R("Player").id, name = "Player", permissions = {}, meta = { id = 0, order = 5 }, is_deleted = true },
     }
-    check(not pcall(env.Roles.get_player_highest_role, players.carol), "no default role and no held roles errors")
+    Suite.throws(function()
+        env.Roles.get_player_highest_role(players.carol)
+    end, "Player has no roles", "no default role and no held roles errors")
 end)
 
 test("player_has_permission()", function(env)

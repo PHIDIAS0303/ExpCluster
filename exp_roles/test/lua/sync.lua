@@ -1,6 +1,6 @@
 --- Tests for the sync entry points of module/control.lua
 local Suite = ... --- The suite this file adds its tests to, see test/lua/framework.lua
-local test, check, eq = Suite.test, Suite.check, Suite.eq
+local test, check, eq, empty = Suite.test, Suite.check, Suite.eq, Suite.empty
 
 --- alice is a moderator and carol has only the default role, both connected
 local function setup(env)
@@ -23,9 +23,12 @@ end
 test("initialise() applies triggers and raises empty events", function(env)
     setup(env)
     eq(env.admin_state, { alice = true, carol = false }, "triggers run for connected players")
-    check(#env.events == 2, "the event is raised once per connected player")
-    check(#env.events[1].assigned == 0 and #env.events[1].unassigned == 0, "the events are empty")
-    check(#env.printed == 0 and #env.sent == 0 and #env.sounds == 0, "initialise is silent and sends nothing")
+    eq(#env.events, 2, "the event is raised once per connected player")
+    empty(env.events[1].assigned, "the events assign nothing")
+    empty(env.events[1].unassigned, "the events unassign nothing")
+    empty(env.printed, "initialise is silent")
+    empty(env.sent, "initialise sends nothing")
+    empty(env.sounds, "initialise plays no sounds")
 end)
 
 test("initialise() skips deleted assignments", function(env)
@@ -46,10 +49,10 @@ test("initialise() is authoritative for pending roles", function(env)
 
     env.reset_log()
     env.initialise{ env.assignment("alice", { "Moderator" }) }
-    check(sd.pending.carol == nil, "pending roles are cleared")
+    eq(sd.pending.carol, nil, "pending roles are cleared")
     check(not env.R("Moderator"):has_player(players.carol), "an unconfirmed role is given up")
     eq(sd.local_players.carol, { env.R("Jail").id }, "local only roles are kept")
-    check(#env.sent == 0, "initialise sends nothing")
+    empty(env.sent, "initialise sends nothing")
 end)
 
 test("receive_assignment_updates() applies controller changes", function(env)
@@ -67,7 +70,9 @@ test("receive_assignment_updates() applies controller changes", function(env)
             unassigned = {},
         },
     }, "the event carries the change with no by player")
-    check(#env.printed == 1 and env.printed[1][4] == "<server>", "the change is announced by the server")
+    eq(env.printed, {
+        { "exp-roles.game-message-assign", "carol", "Moderator", "<server>" },
+    }, "the change is announced by the server")
     check(env.admin_state.carol == true, "triggers follow the assignment")
 
     env.reset_log()
@@ -81,7 +86,8 @@ test("receive_assignment_updates() for players not on this map raises nothing", 
     setup(env)
     env.reset_log()
     env.Roles.receive_assignment_updates{ env.assignment("zed", { "Moderator" }) }
-    check(#env.events == 0 and #env.printed == 0, "no event and no announcement")
+    empty(env.events, "no event is raised")
+    empty(env.printed, "nothing is announced")
 end)
 
 test("receive_role_updates() applies to the holders", function(env)
@@ -92,13 +98,13 @@ test("receive_role_updates() applies to the holders", function(env)
         { id = regular_id, name = "Regular", permissions = { "exp_scenario.command.jail" }, meta = { id = 0, order = 3 } },
     }
     check(env.R("Regular"):has_permission("exp_scenario.command.jail"), "the permission change applies")
-    check(#env.events == 2, "a role change raises for every connected player")
-    check(#env.events[1].assigned == 0, "role change events are empty")
+    eq(#env.events, 2, "a role change raises for every connected player")
+    empty(env.events[1].assigned, "role change events are empty")
 
     env.Roles.receive_role_updates{
         { id = regular_id, name = "Regular", permissions = {}, meta = { id = 0, order = 3 }, is_deleted = true },
     }
-    check(env.Roles.get_role(regular_id) == nil, "a deleted role is removed")
+    eq(env.Roles.get_role(regular_id), nil, "a deleted role is removed")
 end)
 
 test("receive_role_updates() moves the default role", function(env)
@@ -116,12 +122,14 @@ test("set_emit_events() gates what is sent and defaults to enabled", function(en
     env.Roles.set_emit_events(false)
     env.reset_log()
     env.R("Regular"):assign(players.alice)
-    check(#env.sent == 0, "nothing is sent while disabled")
+    empty(env.sent, "nothing is sent while disabled")
     check(env.R("Regular"):has_player(players.alice), "the assignment still applies locally")
 
     env.Roles.set_emit_events()
     env.R("Jail"):assign(players.alice, { silent = true })
-    check(#env.sent == 1, "no argument enables sending")
+    eq(env.sent, {
+        { channel = "exp_roles:assignment_update", data = { name = "alice", assign = { env.R("Jail").id } } },
+    }, "no argument enables sending")
 end)
 
 test("on_load() restores the state after a save and load", function(env)

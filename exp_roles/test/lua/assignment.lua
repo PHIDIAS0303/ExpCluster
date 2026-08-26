@@ -1,6 +1,6 @@
 --- Tests for the assignment methods of module/control.lua
 local Suite = ... --- The suite this file adds its tests to, see test/lua/framework.lua
-local test, check, eq = Suite.test, Suite.check, Suite.eq
+local test, check, eq, empty = Suite.test, Suite.check, Suite.eq, Suite.empty
 
 --- alice is a moderator and bob a regular, with changes sent to the controller
 local function setup(env)
@@ -35,7 +35,9 @@ test(".assign() applies locally and is sent to the controller", function(env)
             unassigned = {},
         },
     }, "the event carries the change")
-    check(#env.printed == 1 and env.printed[1][1] == "exp-roles.game-message-assign", "the change is announced")
+    eq(env.printed, {
+        { "exp-roles.game-message-assign", "bob", "Moderator", "alice" },
+    }, "the change is announced")
     eq(env.sounds, { "bob:utility/achievement_unlocked" }, "the assign sound plays")
 
     local sd = env.Roles._script_data()
@@ -44,14 +46,15 @@ test(".assign() applies locally and is sent to the controller", function(env)
 
     env.reset_log()
     moderator:assign(players.bob)
-    check(#env.sent == 0 and #env.events == 0, "assigning a held role is a no-op")
+    empty(env.sent, "assigning a held role sends nothing")
+    empty(env.events, "assigning a held role raises nothing")
 end)
 
 test(".assign() defaults the by player to game.player", function(env)
     local players = setup(env)
     game.player = players.alice
     env.R("Jail"):assign(players.bob, { silent = true })
-    check(env.events[1].by_player_index == players.alice.index, "the acting player is game.player")
+    eq(env.events[1].by_player_index, players.alice.index, "the acting player is game.player")
 end)
 
 test("receive_assignment_updates() releases the local hold once confirmed", function(env)
@@ -59,7 +62,8 @@ test("receive_assignment_updates() releases the local hold once confirmed", func
     env.R("Moderator"):assign(players.bob)
     env.reset_log()
     env.Roles.receive_assignment_updates{ env.assignment("bob", { "Regular", "Moderator" }) }
-    check(#env.events == 0 and #env.printed == 0, "a confirmation raises nothing")
+    empty(env.events, "a confirmation raises no events")
+    empty(env.printed, "a confirmation announces nothing")
 
     local sd = env.Roles._script_data()
     check(sd.local_players.bob == nil and sd.pending.bob == nil, "the role is no longer held locally")
@@ -84,7 +88,7 @@ test(".unassign() removes a synced role", function(env)
             unassigned = { regular.id },
         },
     }, "the event carries the change")
-    check(#env.printed == 0, "silent suppresses the announcement")
+    empty(env.printed, "silent suppresses the announcement")
     eq(env.sounds, { "bob:utility/game_lost" }, "the unassign sound plays")
 end)
 
@@ -97,7 +101,7 @@ test("reject_assignment() rolls the assignment back", function(env)
     env.reset_log()
     env.Roles.reject_assignment{ name = "alice", role_ids = { jail.id } }
     check(not jail:has_player(players.alice), "the rejected role is rolled back")
-    check(#env.sent == 0, "the rollback is not sent to the controller")
+    empty(env.sent, "the rollback is not sent to the controller")
     eq(env.events, {
         {
             name = env.Roles.events.on_player_roles_changed,
@@ -117,7 +121,7 @@ test(".assign() with local_only never reaches the controller", function(env)
     local players = setup(env)
     local regular = env.R("Regular")
     regular:assign(players.alice, { silent = true, local_only = true })
-    check(#env.sent == 0, "the assignment is not sent")
+    empty(env.sent, "the assignment is not sent")
     check(regular:has_player(players.alice), "the role applies")
 
     local sd = env.Roles._script_data()
@@ -129,7 +133,8 @@ test(".assign() with local_only never reaches the controller", function(env)
 
     env.reset_log()
     regular:unassign(players.alice, { local_only = true })
-    check(not regular:has_player(players.alice) and #env.sent == 0, "removed without sync")
+    check(not regular:has_player(players.alice), "the role is removed")
+    empty(env.sent, "the removal is not sent")
 end)
 
 test(".assign() of a higher priority role suppresses the rest", function(env)
@@ -142,20 +147,21 @@ test(".assign() of a higher priority role suppresses the rest", function(env)
     check(not env.Roles.player_has_permission(players.alice, "exp_scenario.gui.readme"), "the default role is lost")
     check(not env.Roles.player_outranks(players.alice, players.bob), "a jailed player no longer outranks")
     eq(env.events[1].assigned, { jail.id }, "the event lists the jail role")
-    check(#env.events[1].unassigned == 0, "the suppressed roles are not listed as unassigned")
+    empty(env.events[1].unassigned, "the suppressed roles are not listed as unassigned")
 
     env.reset_log()
     jail:unassign(players.alice, { by_player_name = "<server>", silent = true })
     eq(Suite.sorted(Suite.names(env.Roles.get_player_roles(players.alice))), { "Moderator", "Player" },
         "unjail restores the roles")
-    check(#env.events[1].assigned == 0, "the restored roles are not listed as assigned")
+    empty(env.events[1].assigned, "the restored roles are not listed as assigned")
     eq(env.events[1].unassigned, { jail.id }, "the unjail event lists the jail role")
 end)
 
 test(".assign() ignores the server", function(env)
     setup(env)
     env.R("Moderator"):assign(env.server)
-    check(#env.sent == 0 and #env.events == 0, "assigning to the server is a no-op")
+    empty(env.sent, "assigning to the server sends nothing")
+    empty(env.events, "assigning to the server raises nothing")
 end)
 
 return Suite.run()

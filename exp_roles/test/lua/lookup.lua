@@ -5,18 +5,20 @@ local test, check, eq = Suite.test, Suite.check, Suite.eq
 test("get_role() returns the role with the given clusterio id", function(env)
     env.initialise{}
     check(env.Roles.get_role(env.R("Regular").id) == env.R("Regular"), "the role is found by id")
-    check(env.Roles.get_role(9) == nil, "deleted roles are not known")
+    eq(env.Roles.get_role(9), nil, "deleted roles are not known")
 end)
 
 test("get_role_by_name() searches the roles", function(env)
     env.initialise{}
     check(env.Roles.get_role_by_name("Moderator") == env.R("Moderator"), "the role is found by name")
-    check(env.Roles.get_role_by_name("Gone") == nil, "deleted roles are not known")
+    eq(env.Roles.get_role_by_name("Gone"), nil, "deleted roles are not known")
 end)
 
 test("get_roles() returns every role", function(env)
     env.initialise{}
-    check(#env.Roles.get_roles() == 5, "every role is returned with deleted roles skipped")
+    eq(Suite.sorted(Suite.names(env.Roles.get_roles())),
+        { "Cluster Admin", "Jail", "Moderator", "Player", "Regular" },
+        "every role is returned with deleted roles skipped")
 end)
 
 test("get_ordered_roles() returns the most privileged first", function(env)
@@ -60,9 +62,9 @@ end)
 
 test("initialise() decodes the role records", function(env)
     env.initialise{}
-    check(env.R("Cluster Admin").short_hand == "SYS", "short hand decoded")
-    check(env.R("Moderator").short_hand == "Moderator", "short hand falls back to the name")
-    check(env.R("Moderator").color.g == 170, "color decoded")
+    eq(env.R("Cluster Admin").short_hand, "SYS", "short hand decoded")
+    eq(env.R("Moderator").short_hand, "Moderator", "short hand falls back to the name")
+    eq(env.R("Moderator").color, { r = 0, g = 170, b = 0 }, "color decoded")
     check(env.R("Jail").priority == 1 and env.R("Jail").block_auto_assign, "priority and block auto assign decoded")
 end)
 
