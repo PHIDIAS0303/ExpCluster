@@ -3,7 +3,7 @@ Disable new players from having certain items in their inventory, most commonly 
 ]]
 
 local ExpUtil = require("modules/exp_util")
-local Roles = require("modules.exp_legacy.expcore.roles")
+local Roles = require("modules/exp_roles")
 local config = require("modules.exp_legacy.config.nukeprotect")
 
 --- Check all items in the given inventory
@@ -12,14 +12,14 @@ local config = require("modules.exp_legacy.config.nukeprotect")
 --- @param banned_items string[]
 local function check_items(player, type, banned_items)
     -- If the player has perms to be ignored, then they should be
-    if config.ignore_permission and Roles.player_allowed(player, config.ignore_permission) then return end
+    if config.ignore_permission and Roles.player_has_permission(player, config.ignore_permission) then return end
     if config.ignore_admins and player.admin then return end
 
     local items = {} --- @type LuaItemStack[]
     local inventory = assert(player.get_inventory(type))
     -- Check what items the player has
     for i = 1, #inventory do
-        local item = inventory[i]
+        local item = inventory[i --[[@as uint]]]
         if item.valid_for_read and banned_items[item.name] then
             player.print{ "exp_nuke-protection.chat-found", item.prototype.localised_name }
             items[#items + 1] = item

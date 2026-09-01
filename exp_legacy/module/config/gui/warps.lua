@@ -8,23 +8,23 @@ return {
     default_icon = { type = "item", name = "discharge-defense-equipment" }, --- @setting default_icon the default icon that will be used for warps
 
     -- Warp cooldowns
-    bypass_warp_cooldown = "expcore.roles", --- @setting bypass_warp_cooldown dictates who the warp cooldown is applied to; values: all, admin, expcore.roles, none
-    expcore_roles_bypass_warp_cooldown = "gui/warp-list/bypass-cooldown", --- @setting expcore_roles_bypass_warp_cooldown if expcore.roles is used then this is the required permission
+    bypass_warp_cooldown = "exp_roles", --- @setting bypass_warp_cooldown dictates who the warp cooldown is applied to; values: all, admin, exp_roles, none
+    exp_roles_bypass_warp_cooldown = "exp_scenario.gui.warp_list.bypass_cooldown", --- @setting exp_roles_bypass_warp_cooldown if exp_roles is used then this is the required permission
     cooldown_duration = 60, --- @setting cooldown_duration the duration of the warp cooldown in seconds
 
     -- Warp proximity
-    bypass_warp_proximity = "expcore.roles", --- @setting bypass_warp_proximity dictates who the warp proximity is applied to; values: all, admin, expcore.roles, none
-    expcore_roles_bypass_warp_proximity = "gui/warp-list/bypass-proximity", --- @setting expcore_roles_bypass_warp_proximity if expcore.roles is used then this is the required permission
+    bypass_warp_proximity = "exp_roles", --- @setting bypass_warp_proximity dictates who the warp proximity is applied to; values: all, admin, exp_roles, none
+    exp_roles_bypass_warp_proximity = "exp_scenario.gui.warp_list.bypass_proximity", --- @setting exp_roles_bypass_warp_proximity if exp_roles is used then this is the required permission
     standard_proximity_radius = 4, --- @setting standard_proximity_radius the minimum distance a player is allowed to be to a warp in order to use it
     spawn_proximity_radius = 20, --- @setting spawn_proximity_radius the minimum distance a player is allowed to be from they spawn point to use warps
 
     -- Adding warps
-    allow_add_warp = "expcore.roles", --- @setting allow_add_warp dictates who is allowed to add warps; values: all, admin, expcore.roles, none
-    expcore_roles_allow_add_warp = "gui/warp-list/add", --- @setting expcore_roles_allow_add_warp if expcore.roles is used then this is the required permission
+    allow_add_warp = "exp_roles", --- @setting allow_add_warp dictates who is allowed to add warps; values: all, admin, exp_roles, none
+    exp_roles_allow_add_warp = "exp_scenario.gui.warp_list.add", --- @setting exp_roles_allow_add_warp if exp_roles is used then this is the required permission
 
     -- Editing warps
-    allow_edit_warp = "expcore.roles", --- @setting allow_edit_warp dictates who is allowed to edit warps; values: all, admin, expcore.roles, none
-    expcore_roles_allow_edit_warp = "gui/warp-list/edit", --- @setting expcore_roles_allow_edit_warp if expcore.roles is used then this is the required permission
+    allow_edit_warp = "exp_roles", --- @setting allow_edit_warp dictates who is allowed to edit warps; values: all, admin, exp_roles, none
+    exp_roles_allow_edit_warp = "exp_scenario.gui.warp_list.edit", --- @setting exp_roles_allow_edit_warp if exp_roles is used then this is the required permission
     user_can_edit_own_warps = false, --- @settings user_can_edit_own_warps if true then the user who made the warp can edit it regardless of the allow_edit_warp setting
 
     -- Warp area generation

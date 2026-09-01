@@ -3,7 +3,7 @@ Adds a Gui for displaying item production stats
 ]]
 
 local Gui = require("modules/exp_gui")
-local Roles = require("modules/exp_legacy/expcore/roles")
+local Roles = require("modules/exp_roles")
 
 --- @class ExpGui_ProductionStats.elements
 local Elements = {}
@@ -250,7 +250,7 @@ Gui.toolbar.create_button{
     sprite = "entity/assembling-machine-3",
     tooltip = { "exp-gui_production-stats.tooltip-main" },
     visible = function(player, element)
-        return Roles.player_allowed(player, "gui/production")
+        return Roles.player_has_permission(player, "exp_scenario.gui.production")
     end
 }
 

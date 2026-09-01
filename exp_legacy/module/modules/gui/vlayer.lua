@@ -5,7 +5,7 @@
 ]]
 
 local Gui = require("modules/exp_gui")
-local Roles = require("modules.exp_legacy.expcore.roles") --- @dep expcore.roles
+local Roles = require("modules/exp_roles")
 local Event = require("modules/exp_legacy/utils/event") --- @dep utils.event
 local format_number = require("util").format_number --- @dep util
 local config = require("modules.exp_legacy.config.vlayer") --- @dep config.vlayer
@@ -457,7 +457,7 @@ local vlayer_control_set = Gui.define("vlayer_control_set")
         vlayer_gui_control_see(disp)
         local b = vlayer_gui_control_build(disp)
         local r = vlayer_gui_control_remove(disp)
-        local v = Roles.player_allowed(player, "gui/vlayer-edit")
+        local v = Roles.player_has_permission(player, "exp_scenario.gui.vlayer_edit")
         b.visible = v
         r.visible = v
 
@@ -484,22 +484,21 @@ Gui.toolbar.create_button{
     sprite = "entity/solar-panel",
     tooltip = { "vlayer.main-tooltip" },
     visible = function(player, element)
-        return Roles.player_allowed(player, "gui/vlayer")
+        return Roles.player_has_permission(player, "exp_scenario.gui.vlayer")
     end
 }
 
 --- Update the visibly of the buttons based on a players roles
 local function role_update_event(event)
     local player = game.players[event.player_index]
-    local visible = Roles.player_allowed(player, "gui/vlayer-edit")
+    local visible = Roles.player_has_permission(player, "exp_scenario.gui.vlayer_edit")
     local container = Gui.get_left_element(vlayer_container, player)
     local disp = container.frame["vlayer_st_2"].disp.table
     disp[vlayer_gui_control_build.name].visible = visible
     disp[vlayer_gui_control_remove.name].visible = visible
 end    
 
-Event.add(Roles.events.on_role_assigned, role_update_event)
-Event.add(Roles.events.on_role_unassigned, role_update_event)
+Event.add(Roles.events.on_player_roles_changed, role_update_event)
 
 Event.on_nth_tick(config.update_tick_gui, function(_)
     local stats = vlayer.get_statistics()

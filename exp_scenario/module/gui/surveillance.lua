@@ -4,7 +4,7 @@ Adds cameras which can be used to view players and locations
 
 local Gui = require("modules/exp_gui")
 local ElementsExtra = require("modules/exp_scenario/gui/elements")
-local Roles = require("modules/exp_legacy/expcore/roles")
+local Roles = require("modules/exp_roles")
 
 --- @class ExpGui_Surveillance.elements
 local Elements = {}
@@ -234,7 +234,7 @@ Gui.toolbar.create_button{
     sprite = "entity/radar",
     tooltip = { "exp-gui_surveillance.tooltip-main" },
     visible = function(player, element)
-        return Roles.player_allowed(player, "gui/surveillance")
+        return Roles.player_has_permission(player, "exp_scenario.gui.surveillance")
     end
 }:on_click(function(def, player, element, event)
     Elements.container(player.gui.screen)

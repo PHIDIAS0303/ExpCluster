@@ -9,7 +9,7 @@ local Gui = require("modules/exp_gui")
 local Datastore = require("modules.exp_legacy.expcore.datastore") --- @dep expcore.datastore
 local Storage = require("modules/exp_util/storage")
 local Event = require("modules/exp_legacy/utils/event") --- @dep utils.event
-local Roles = require("modules.exp_legacy.expcore.roles") --- @dep expcore.roles
+local Roles = require("modules/exp_roles")
 local Colors = require("modules/exp_util/include/color")
 local config = require("modules.exp_legacy.config.gui.warps") --- @dep config.gui.warps
 local Warps = require("modules.exp_legacy.modules.control.warps") --- @dep modules.control.warps
@@ -68,8 +68,8 @@ local function check_player_permissions(player, action, warp)
         return true
     elseif action_config == "admin" then
         return player.admin
-    elseif action_config == "expcore.roles" then
-        return Roles.player_allowed(player, config["expcore_roles_" .. action])
+    elseif action_config == "exp_roles" then
+        return Roles.player_has_permission(player, config["exp_roles_" .. action])
     end
 
     -- Return false as all other conditions have not been met
@@ -708,7 +708,7 @@ Gui.toolbar.create_button{
     sprite = config.default_icon.type .. "/" .. config.default_icon.name,
     tooltip = { "warp-list.main-tooltip" },
     visible = function(player, element)
-        return Roles.player_allowed(player, "gui/warp-list")
+        return Roles.player_has_permission(player, "exp_scenario.gui.warp_list")
     end
 }:on_click(function(def, player, element)
     -- Set gui keep open state for player that clicked the button: true if visible, false if invisible
@@ -885,8 +885,7 @@ local function role_update_event(event)
     add_new_warp_element.visible = allow_add_warp
 end
 
-Event.add(Roles.events.on_role_assigned, role_update_event)
-Event.add(Roles.events.on_role_unassigned, role_update_event)
+Event.add(Roles.events.on_player_roles_changed, role_update_event)
 
 --- When a chart tag is removed or edited make sure it is not one that belongs to a warp
 local function maintain_tag(event)

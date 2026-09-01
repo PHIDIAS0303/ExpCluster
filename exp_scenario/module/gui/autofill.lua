@@ -3,7 +3,7 @@ Adds a config menu for setting autofill of placed entities
 ]]
 
 local Gui = require("modules/exp_gui")
-local Roles = require("modules.exp_legacy.expcore.roles")
+local Roles = require("modules/exp_roles")
 local config = require("modules.exp_legacy.config.gui.autofill")
 local FlyingText = require("modules/exp_util/flying_text")
 
@@ -330,7 +330,7 @@ Gui.toolbar.create_button{
     sprite = config.icon,
     tooltip = { "exp-gui_autofill.tooltip-main" },
     visible = function(player, element)
-        return Roles.player_allowed(player, "gui/autofill")
+        return Roles.player_has_permission(player, "exp_scenario.gui.autofill")
     end
 }
 

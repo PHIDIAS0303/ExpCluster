@@ -4,7 +4,7 @@ Adds a rocket information gui which shows general stats, milestones and build pr
 
 local ExpUtil = require("modules/exp_util")
 local Gui = require("modules/exp_gui")
-local Roles = require("modules/exp_legacy/expcore/roles")
+local Roles = require("modules/exp_roles")
 local config = require("modules/exp_legacy/config/gui/rockets")
 
 --- @class ExpGui_RocketInfo.elements
@@ -651,7 +651,7 @@ Gui.toolbar.create_button{
     sprite = "item/rocket-silo",
     tooltip = { "exp-gui_rocket-info.tooltip-main" },
     visible = function(player, element)
-        return Roles.player_allowed(player, "gui/rocket-info")
+        return Roles.player_has_permission(player, "exp_scenario.gui.rocket_info")
     end
 }
 

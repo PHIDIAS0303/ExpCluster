@@ -1,4 +1,4 @@
-local Roles = require("modules.exp_legacy.expcore.roles")
+local Roles = require("modules/exp_roles")
 
 return {
     admin_as_active = true, --- @setting admin_as_active When true admins will be treated as active regardless of afk time
@@ -8,6 +8,7 @@ return {
     trust_time = 3600 * 60 * 10, --- @setting trust_time The time in ticks that a player must be online for to count as trusted
     update_time = 3600 * 30, --- @setting update_time How often in ticks the script checks for active players
     custom_active_check = function(player)
-        return Roles.get_player_highest_role(player).index <= Roles.get_role_from_any("Veteran").index
+        local veteran = Roles.get_role_by_name("Veteran")
+        return veteran ~= nil and not Roles.get_player_highest_role(player):is_lower_than(veteran)
     end,
 }

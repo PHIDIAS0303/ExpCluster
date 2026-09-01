@@ -7,8 +7,8 @@ local teleport_player = ExpUtil.teleport_player
 
 local Commands = require("modules/exp_commands")
 
-local Roles = require("modules.exp_legacy.expcore.roles") --- @dep expcore.roles
-local player_allowed = Roles.player_allowed
+local Roles = require("modules/exp_roles")
+local player_has_permission = Roles.player_has_permission
 
 --- @class ExpCommands_Teleport.commands
 local commands = {}
@@ -85,7 +85,7 @@ commands.spawn = Commands.new("spawn", { "exp-commands_teleport.description-spaw
             if not teleport_player(player, game.surfaces.nauvis, { 0, 0 }, "dismount") then
                 return Commands.status.error{ "exp-commands_teleport.unavailable" }
             end
-        elseif player_allowed(player, "command/spawn/always") then
+        elseif player_has_permission(player, "exp_scenario.command.spawn.always") then
             if not teleport_player(other_player, game.surfaces.nauvis, { 0, 0 }, "dismount") then
                 return Commands.status.error{ "exp-commands_teleport.unavailable" }
             end

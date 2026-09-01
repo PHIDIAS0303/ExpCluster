@@ -8,7 +8,7 @@ local Commands = require("modules/exp_commands")
 local PlayerData = require("modules.exp_legacy.expcore.player_data") --- @dep expcore.player_data
 local CustomMessages = PlayerData.Settings:combine("JoinMessage")
 CustomMessages:set_metadata{
-    permission = "command/join-message",
+    permission = "exp_scenario.command.set_join_message",
 }
 
 --- When a players data loads show their message

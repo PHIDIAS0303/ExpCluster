@@ -2,8 +2,8 @@
 Wires the role sync into the factorio event handler.
 
 This is kept apart from control.lua because `ExpRoles.events` holds the ids of
-the events this module raises, which is the interface the legacy role system
-had, and event_handler expects `events` to be the handlers to register.
+the events this module raises, while event_handler expects `events` to be the
+handlers to register.
 ]]
 
 local clusterio_api = require("modules/clusterio/api")
