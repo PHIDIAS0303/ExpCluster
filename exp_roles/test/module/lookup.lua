@@ -1,5 +1,5 @@
 --- Tests for the role lookup functions of module/control.lua
-local Suite = ... --- @type Suite The suite this file adds its tests to, see test/lua/framework.lua
+local Suite = ... --- @type Suite<ExpRoles.TestEnv> The suite this file adds its tests to, see test/lua/framework.lua
 local test, check, eq = Suite.test, Suite.check, Suite.eq
 
 test("get_role() returns the role with the given clusterio id", function(env)

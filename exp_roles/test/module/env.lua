@@ -47,7 +47,17 @@ for _, record in ipairs(role_records()) do
     role_ids[record.name] = record.id
 end
 
+--- The environment given to each test: the stubs extended with a fresh copy
+--- of the roles module and the fixture helpers
+--- @class ExpRoles.TestEnv : Stubs
+--- @field Roles ExpRoles A fresh copy of the roles module
+--- @field R fun(name: string): ExpRoles.Role Get a fixture role by name
+--- @field assignment fun(player_name: string, role_names: string[]): { name: string, role_ids: number[], is_deleted: boolean? }
+--- @field script_data fun(): ExpRoles.ScriptData The module's script data, for asserting on internal state
+--- @field initialise fun(assignments: table[]?) Load the standard fixture and the given assignments
+
 return Framework.suite(function(env)
+    --- @cast env ExpRoles.TestEnv
     env.Roles = assert(loadfile(plugin_root .. "/module/control.lua"))() --- @type ExpRoles
     env.Roles.on_server_startup()
 
@@ -68,6 +78,12 @@ return Framework.suite(function(env)
             ids[index] = assert(role_ids[role_name], "No fixture role named " .. role_name)
         end
         return { name = player_name, role_ids = ids }
+    end
+
+    --- The module's script data, for asserting on internal state
+    function env.script_data()
+        --- @diagnostic disable-next-line: access-invisible
+        return env.Roles._script_data()
     end
 
     --- Load the standard fixture and the given assignments

@@ -26,19 +26,21 @@ local function repr(value, depth)
 end
 
 --- Create a suite of tests, one is made per test file
---- @param extend_env fun(env: table): table Extends the stubs given to each test
+--- @generic T : Stubs
+--- @param extend_env fun(env: Stubs): T Extends the stubs given to each test
+--- @return Suite<T>
 function Framework.suite(extend_env)
-    --- @class Suite
+    --- @class Suite<T>
     local Suite = {
-        tests = {},   -- { name, fn } in declaration order
-        results = {}, -- { name, ok, detail? } accumulated across tests
+        tests = {},   --- @type { name: string, fn: fun(env: T) }[] In declaration order
+        results = {}, --- @type { name: string, ok: boolean, detail: string? }[] Accumulated across tests
     }
 
     local current_test --- @type string?
 
     --- Declare a named test, its function receives a fresh environment
     --- @param name string
-    --- @param fn fun(env: table)
+    --- @param fn fun(env: T)
     function Suite.test(name, fn)
         Suite.tests[#Suite.tests + 1] = { name = name, fn = fn }
     end

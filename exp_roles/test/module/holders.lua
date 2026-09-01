@@ -1,5 +1,5 @@
 --- Tests for listing and printing to the players who hold a role
-local Suite = ... --- @type Suite The suite this file adds its tests to, see test/lua/framework.lua
+local Suite = ... --- @type Suite<ExpRoles.TestEnv> The suite this file adds its tests to, see test/lua/framework.lua
 local test, check, eq = Suite.test, Suite.check, Suite.eq
 
 --- alice and dave are moderators with dave offline, zed has never joined
@@ -30,7 +30,7 @@ test(".get_player_names() counts a player in both lists once", function(env)
     env.R("Regular"):assign(players.alice, { silent = true, local_only = true })
     env.Roles.receive_assignment_updates{ env.assignment("alice", { "Moderator", "Regular" }) }
 
-    local sd = env.Roles._script_data()
+    local sd = env.script_data()
     check(sd.local_players.alice ~= nil and sd.synced_players.alice ~= nil, "the role is held in both lists")
     eq(Suite.sorted(env.R("Regular"):get_player_names()), { "alice", "bob" }, "the player is counted once")
 end)

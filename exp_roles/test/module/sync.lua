@@ -1,6 +1,9 @@
 --- Tests for the sync entry points of module/control.lua
-local Suite = ... --- @type Suite The suite this file adds its tests to, see test/lua/framework.lua
+local Suite = ... --- @type Suite<ExpRoles.TestEnv> The suite this file adds its tests to, see test/lua/framework.lua
 local test, check, eq, empty = Suite.test, Suite.check, Suite.eq, Suite.empty
+
+--- The state given by the admin trigger, reset by setup for every test
+local admin_state = {} --- @type table<string, boolean>
 
 --- alice is a moderator and carol has only the default role, both connected
 local function setup(env)
@@ -8,9 +11,9 @@ local function setup(env)
         alice = env.add_player("alice"),
         carol = env.add_player("carol"),
     }
-    env.admin_state = {}
+    admin_state = {}
     env.Roles.define_permission_trigger("exp_scenario.player.admin", function(player, state)
-        env.admin_state[player.name] = state
+        admin_state[player.name] = state
     end)
     env.initialise{
         env.assignment("alice", { "Moderator" }),
@@ -22,10 +25,12 @@ end
 
 test("initialise() applies triggers and raises empty events", function(env)
     setup(env)
-    eq(env.admin_state, { alice = true, carol = false }, "triggers run for connected players")
+    eq(admin_state, { alice = true, carol = false }, "triggers run for connected players")
     eq(#env.events, 2, "the event is raised once per connected player")
-    empty(env.events[1].assigned, "the events assign nothing")
-    empty(env.events[1].unassigned, "the events unassign nothing")
+    for _, event in ipairs(env.events) do
+        empty(event.assigned, "the events assign nothing")
+        empty(event.unassigned, "the events unassign nothing")
+    end
     empty(env.printed, "initialise is silent")
     empty(env.sent, "initialise sends nothing")
     empty(env.sounds, "initialise plays no sounds")
@@ -44,7 +49,7 @@ test("initialise() is authoritative for pending roles", function(env)
     env.R("Moderator"):assign(players.carol)
     env.R("Jail"):assign(players.carol, { silent = true, local_only = true })
 
-    local sd = env.Roles._script_data()
+    local sd = env.script_data()
     eq(sd.pending.carol, { env.R("Moderator").id }, "the role is pending before initialise")
 
     env.reset_log()
@@ -73,13 +78,22 @@ test("receive_assignment_updates() applies controller changes", function(env)
     eq(env.printed, {
         { "exp-roles.game-message-assign", "carol", "Moderator", "<server>" },
     }, "the change is announced by the server")
-    check(env.admin_state.carol == true, "triggers follow the assignment")
+    check(admin_state.carol == true, "triggers follow the assignment")
 
     env.reset_log()
     env.Roles.receive_assignment_updates{ { name = "carol", role_ids = {}, is_deleted = true } }
     check(not env.R("Moderator"):has_player(players.carol), "a removal applies")
-    eq(env.events[1].unassigned, { env.R("Moderator").id }, "the removal raises the event")
-    check(env.admin_state.carol == false, "triggers follow the removal")
+    eq(env.events, {
+        {
+            name = env.Roles.events.on_player_roles_changed,
+            tick = 1,
+            player_index = players.carol.index,
+            by_player_index = 0,
+            assigned = {},
+            unassigned = { env.R("Moderator").id },
+        },
+    }, "the removal raises the event")
+    check(admin_state.carol == false, "triggers follow the removal")
 end)
 
 test("receive_assignment_updates() for players not on this map raises nothing", function(env)
@@ -99,7 +113,9 @@ test("receive_role_updates() applies to the holders", function(env)
     }
     check(env.R("Regular"):has_permission("exp_scenario.command.jail"), "the permission change applies")
     eq(#env.events, 2, "a role change raises for every connected player")
-    empty(env.events[1].assigned, "role change events are empty")
+    for _, event in ipairs(env.events) do
+        empty(event.assigned, "role change events are empty")
+    end
 
     env.Roles.receive_role_updates{
         { id = regular_id, name = "Regular", permissions = {}, meta = { id = 0, order = 3 }, is_deleted = true },
@@ -146,9 +162,13 @@ end)
 
 test("on_player_joined_game() runs the triggers", function(env)
     local players = setup(env)
-    env.admin_state.alice = nil
-    env.Roles.on_player_joined_game{ player_index = players.alice.index }
-    check(env.admin_state.alice ~= nil, "triggers run when a player joins")
+    admin_state.alice = nil
+    env.Roles.on_player_joined_game{
+        name = defines.events.on_player_joined_game,
+        tick = game.tick,
+        player_index = players.alice.index,
+    }
+    check(admin_state.alice ~= nil, "triggers run when a player joins")
 end)
 
 return Suite.run()

@@ -51,11 +51,15 @@ end
 --- Create an independent set of stubs, installed as the lua globals
 function Stubs.new()
     --- @class Stubs
+    --- @field events table[] Events raised through script.raise_event, name and tick filled in
+    --- @field printed (LocalisedString | { to: string, [1]: LocalisedString })[] Messages from game.print and player.print
+    --- @field sent { channel: string, data: table }[] Payloads sent through the clusterio api
+    --- @field sounds string[] Sounds played to players, as "player:path"
     local stubs = {
-        events = {},  -- events raised through script.raise_event
-        printed = {}, -- game.print and player.print messages
-        sent = {},    -- payloads sent through the clusterio api
-        sounds = {},  -- sounds played to players
+        events = {},
+        printed = {},
+        sent = {},
+        sounds = {},
     }
 
     local next_event_id = 100
@@ -97,8 +101,12 @@ function Stubs.new()
     }, { "player" })
 
     --- Add a player to the stubbed game, indexes are assigned in join order
+    --- @param name string
+    --- @param is_connected boolean? Defaults to connected
+    --- @return Stubs.Player
     function stubs.add_player(name, is_connected)
         local index = #players_by_index + 1
+        --- @class Stubs.Player
         local player = Stubs.strict("LuaPlayer " .. name, {
             name = name,
             index = index,
@@ -118,6 +126,7 @@ function Stubs.new()
     end
 
     --- A player object which represents the server
+    --- @type Stubs.Player
     stubs.server = Stubs.strict("LuaPlayer <server>", { index = 0, name = "<server>" })
 
     --- Modules resolved by the stubbed require, add to them with extend_requires
