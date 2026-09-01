@@ -1,5 +1,5 @@
 --- Tests for listing and printing to the players who hold a role
-local Suite = ... --- The suite this file adds its tests to, see test/lua/framework.lua
+local Suite = ... --- @type Suite The suite this file adds its tests to, see test/lua/framework.lua
 local test, check, eq = Suite.test, Suite.check, Suite.eq
 
 --- alice and dave are moderators with dave offline, zed has never joined

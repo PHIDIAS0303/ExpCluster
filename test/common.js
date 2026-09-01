@@ -1,5 +1,4 @@
 "use strict";
-const assert = require("assert").strict;
 const { compile } = require("@clusterio/lib");
 
 /**
@@ -15,22 +14,37 @@ function testMatrix(...arrays) {
 }
 
 /**
- * Test that a class is round trip json serialisable across multiple test cases.
+ * Test that a class is round trip JSON serialisable across multiple test cases.
  *
  * @template {any[]} T - Constructor arguments
+ * @param {import("tap").Test} t - Parent test.
  * @param {{new(...args: T): object}} Class - The class which has toJSON and fromJSON methods.
- * @param {T[]} tests - The tests inputs to pass to the class constructor.
+ * @param {T[]} tests - The test inputs to pass to the class constructor.
  */
-function testRoundTripJsonSerialisable(Class, tests) {
+function testRoundTripJsonSerialisable(t, Class, tests) {
 	const validate = compile(Class.jsonSchema);
+
 	for (const test of tests) {
-		const original = new Class(...test);
-		const serialised = JSON.stringify(original);
-		const jsonObject = JSON.parse(serialised);
-		const reconstructed = Class.fromJSON(jsonObject);
-		assert.deepEqual(reconstructed, original, JSON.stringify(test));
-		if (!validate(jsonObject)) {
-			throw validate.errors;
+		const name = JSON.stringify(test);
+
+		try {
+			const original = new Class(...test);
+			const jsonObject = JSON.parse(JSON.stringify(original));
+			const reconstructed = Class.fromJSON(jsonObject);
+
+			if (!validate(jsonObject)) {
+				t.fail(`schema validation: ${name}`, {
+					diagnostic: {
+						json: jsonObject,
+						errors: validate.errors,
+					},
+				});
+				continue;
+			}
+
+			t.strictSame(reconstructed, original, `round trip: ${name}`);
+		} catch (error) {
+			t.fail(`round trip: ${name}`, { error });
 		}
 	}
 }

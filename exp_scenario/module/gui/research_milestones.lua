@@ -294,9 +294,9 @@ end
 --- Get the achieved time for a force
 --- @param force LuaForce
 --- @param research_index number
---- @return number
+--- @return number?
 function Elements.container.get_achieved_time(force, research_index)
-    return assert(Elements.container.data[force][research_index])
+    return assert(Elements.container.data[force])[research_index]
 end
 
 --- Calculate the starting research index for a force

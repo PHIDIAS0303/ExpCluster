@@ -8,10 +8,10 @@ returned here becomes `...` in each test file.
 ]]
 
 local shared_root = ... --- @type string
-local source = assert(debug.getinfo(1, "S")).source
-local plugin_root = assert(source:match("^@(.*)/test/lua/env%.lua$"))
+local source = assert(debug.getinfo(1, "S")).source:gsub("\\", "/")
+local plugin_root = assert(source:match("^@(.*)/test/module/env%.lua$"))
 
-local Framework = assert(loadfile(shared_root .. "/framework.lua"))()
+local Framework = assert(loadfile(shared_root .. "/framework.lua"))() --- @type Framework
 
 --- Standard fixture: permission names sent once and referenced by zero based index
 local permission_names = {
@@ -48,7 +48,7 @@ for _, record in ipairs(role_records()) do
 end
 
 return Framework.suite(function(env)
-    env.Roles = assert(loadfile(plugin_root .. "/module/control.lua"))()
+    env.Roles = assert(loadfile(plugin_root .. "/module/control.lua"))() --- @type ExpRoles
     env.Roles.on_server_startup()
 
     --- Get a fixture role by name, failing the test when it does not exist

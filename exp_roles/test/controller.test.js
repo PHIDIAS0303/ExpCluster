@@ -20,6 +20,12 @@ lib.Link.register(messages.AssignmentUpdateRequest);
 
 const logger = { child: () => logger, info: () => {}, warn: () => {}, error: () => {}, verbose: () => {} };
 
+// Silence the singleton logger to avoid polluting the test output
+lib.logger.silent = true;
+t.after(() => {
+	lib.logger.silent = false;
+});
+
 /** Build a plugin around a real controller, which is side effect free while not started. */
 async function startPlugin(t2, { roles = [] } = {}) {
 	const controllerConfig = new lib.ControllerConfig("controller", {
@@ -173,6 +179,18 @@ t.test("class ControllerPlugin", t2 => {
 		t3.strictSame(applied.length, 1, "other player events do not");
 	});
 
+	t2.test(".handleRoleListRequest() returns the current roles", async t3 => {
+		const { plugin } = await startPlugin(t3, {
+			roles: [role(1, "Player"), role(5, "Moderator")],
+		});
+		plugin.roleMeta.set(new messages.RoleMetaRecord(5, 2, 0, "Mod"));
+
+		const response = await plugin.handleRoleListRequest(new messages.RoleListRequest());
+		t3.strictSame(response.length, 2, "the current roles are returned");
+		t3.ok(response.some(record => record.name === "Moderator"));
+		t3.ok(response.some(record => record.name === "Player"));
+	});
+
 	t2.test(".handleRoleMetaUpdateRequest() validates the role", async t3 => {
 		const { plugin } = await startPlugin(t3, { roles: [role(1, "Player"), role(5, "Moderator")] });
 
@@ -185,6 +203,19 @@ t.test("class ControllerPlugin", t2 => {
 			new messages.RoleMetaRecord(5, 2, 0, "Mod"),
 		));
 		t3.strictSame(plugin.roleMeta.get(5).shortHand, "Mod", "the properties are stored");
+	});
+
+	t2.test(".handleAssignmentListRequest() returns the current assignments", async t3 => {
+		const { plugin, controller } = await startPlugin(t3, {
+			roles: [role(1, "Player"), role(5, "Moderator")],
+		});
+		controller.users.createUser("alice").set("roleIds", new Set([5]));
+		controller.users.createUser("bob");
+
+		const response = await plugin.handleAssignmentListRequest(new messages.AssignmentListRequest());
+		t3.strictSame(response.length, 1, "the current assignments are returned");
+		t3.strictSame(response[0].name, "alice");
+		t3.strictSame(response[0].roleIds, new Set([5]), "the default role is not listed");
 	});
 
 	t2.test(".handleAssignmentSubscription() replays only newer records", async t3 => {

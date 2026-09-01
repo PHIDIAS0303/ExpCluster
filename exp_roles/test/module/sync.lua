@@ -1,5 +1,5 @@
 --- Tests for the sync entry points of module/control.lua
-local Suite = ... --- The suite this file adds its tests to, see test/lua/framework.lua
+local Suite = ... --- @type Suite The suite this file adds its tests to, see test/lua/framework.lua
 local test, check, eq, empty = Suite.test, Suite.check, Suite.eq, Suite.empty
 
 --- alice is a moderator and carol has only the default role, both connected

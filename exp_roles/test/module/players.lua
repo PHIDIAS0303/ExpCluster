@@ -1,5 +1,5 @@
 --- Tests for the player checks of module/control.lua
-local Suite = ... --- The suite this file adds its tests to, see test/lua/framework.lua
+local Suite = ... --- @type Suite The suite this file adds its tests to, see test/lua/framework.lua
 local test, check, eq = Suite.test, Suite.check, Suite.eq
 
 --- alice is a moderator, bob is a regular, and carol has only the default role

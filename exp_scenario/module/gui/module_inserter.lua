@@ -459,7 +459,7 @@ local function on_entity_settings_pasted(event)
         -- Get the modules and add them to the planner
         local all_modules = {}
         for i = 1, #module_inventory do
-            local slot = module_inventory[i]
+            local slot = module_inventory[i --[[@as uint]]]
             if slot.valid_for_read and slot.count > 0 then
                 all_modules[i] = { name = slot.name, quality = slot.quality.name }
             else

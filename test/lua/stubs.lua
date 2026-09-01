@@ -50,6 +50,7 @@ end
 
 --- Create an independent set of stubs, installed as the lua globals
 function Stubs.new()
+    --- @class Stubs
     local stubs = {
         events = {},  -- events raised through script.raise_event
         printed = {}, -- game.print and player.print messages

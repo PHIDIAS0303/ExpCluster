@@ -5,8 +5,8 @@ Adds a custom spawn area with chests and afk turrets
 local config = require("modules.exp_legacy.config.spawn_area")
 
 --- Apply an offset to a LuaPosition
---- @param position MapPosition
---- @param offset MapPosition
+--- @param position MapPosition.struct
+--- @param offset MapPosition.struct
 --- @return MapPosition.struct
 local function apply_offset(position, offset)
     return {
@@ -17,7 +17,7 @@ end
 
 --- Apply offset to an array of positions
 --- @param positions table
---- @param offset MapPosition
+--- @param offset MapPosition.struct
 --- @param x_index number
 --- @param y_index number
 local function apply_offset_to_array(positions, offset, x_index, y_index)
@@ -97,14 +97,19 @@ local belt_details = {
 
 --- Makes a 2x2 afk belt at the locations in the config
 --- @param surface LuaSurface
---- @param offset MapPosition
+--- @param offset MapPosition.struct
 local function create_belts(surface, offset)
     local belt_type = config.afk_belts.belt_type
 
+    local entity_pos = { x = 0, y = 0 }
+    local group_offset = { x = 0, y = 0 }
     for _, position in pairs(config.afk_belts.locations) do
-        position = apply_offset(position, offset)
+        group_offset.x = position[1] + offset.x
+        group_offset.y = position[2] + offset.y
         for _, belt in pairs(belt_details) do
-            local pos = apply_offset(position, belt)
+            entity_pos.x = belt[1]
+            entity_pos.y = belt[2]
+            local pos = apply_offset(entity_pos, group_offset)
             local entity = surface.create_entity{ name = belt_type, position = pos, force = "neutral", direction = belt[3] }
             if entity and config.afk_belts.protected then
                 protect_entity(entity)
@@ -115,13 +120,16 @@ end
 
 -- Generates extra tiles in a set pattern as defined in the config
 --- @param surface LuaSurface
---- @param offset MapPosition
+--- @param offset MapPosition.struct
 local function create_pattern_tiles(surface, offset)
     local tiles_to_make = {}
     local pattern_tile = config.pattern.pattern_tile
 
+    local tile_pos = { x = 0, y = 0 }
     for index, position in pairs(config.pattern.locations) do
-        tiles_to_make[index] = { name = pattern_tile, position = apply_offset(position, offset) }
+        tile_pos.x = position[1]
+        tile_pos.y = position[2]
+        tiles_to_make[index] = { name = pattern_tile, position = apply_offset(tile_pos, offset) }
     end
 
     surface.set_tiles(tiles_to_make)
@@ -129,13 +137,16 @@ end
 
 -- Generates extra water as defined in the config
 --- @param surface LuaSurface
---- @param offset MapPosition
+--- @param offset MapPosition.struct
 local function create_water_tiles(surface, offset)
     local tiles_to_make = {}
     local water_tile = config.water.water_tile
 
+    local tile_pos = { x = 0, y = 0 }
     for _, position in pairs(config.water.locations) do
-        table.insert(tiles_to_make, { name = water_tile, position = apply_offset(position, offset) })
+        tile_pos.x = position[1]
+        tile_pos.y = position[2]
+        table.insert(tiles_to_make, { name = water_tile, position = apply_offset(tile_pos, offset) })
     end
 
     surface.set_tiles(tiles_to_make)
@@ -143,11 +154,17 @@ end
 
 --- Generates the entities that are in the config
 --- @param surface LuaSurface
---- @param offset MapPosition
+--- @param offset MapPosition.struct
 local function create_entities(surface, offset)
+    local entity_pos = { x = 0, y = 0 }
     for _, entity_details in pairs(config.entities.locations) do
-        local pos = apply_offset({ entity_details[2], entity_details[3] }, offset)
-        local entity = surface.create_entity{ name = entity_details[1], position = pos, force = "neutral" }
+        entity_pos.x = entity_details[2]
+        entity_pos.y = entity_details[3]
+        local entity = surface.create_entity{
+            name = entity_details[1],
+            position = apply_offset(entity_pos, offset),
+            force = "neutral"
+        }
 
         if entity then
             if config.entities.protected then
@@ -161,7 +178,7 @@ end
 
 --- Generates an area with no water or entities, no water area is larger
 --- @param surface LuaSurface
---- @param offset MapPosition
+--- @param offset MapPosition.struct
 local function clear_spawn_area(surface, offset)
     local get_tile = surface.get_tile
 
@@ -182,7 +199,7 @@ local function clear_spawn_area(surface, offset)
         for y = -fill_radius, fill_radius do -- loop over y
             local y_sqr = (y + 0.5) ^ 2
             local dst = x_sqr + y_sqr
-            local pos = apply_offset({ x, y }, offset)
+            local pos = apply_offset({ x = x, y = y }, offset)
             if dst < tile_radius_sqr then
                 -- If it is inside the decon radius always set the tile
                 tiles_to_make[#tiles_to_make + 1] = { name = decon_tile, position = pos }
@@ -204,14 +221,14 @@ end
 
 --- Spawn the resource tiles
 --- @param surface LuaSurface
---- @param offset MapPosition
+--- @param offset MapPosition.struct
 local function create_resources_tiles(surface, offset)
     for _, resource in ipairs(config.resource_tiles.resources) do
         if resource.enabled then
             local pos = apply_offset(resource.offset, offset)
             for x = pos.x, pos.x + resource.size[1] do
                 for y = pos.y, pos.y + resource.size[2] do
-                    surface.create_entity{ name = resource.name, amount = resource.amount, position = { x, y } }
+                    surface.create_entity{ name = resource.name, amount = resource.amount, position = { x = x, y = y } }
                 end
             end
         end
@@ -220,7 +237,7 @@ end
 
 --- Spawn the resource entities
 --- @param surface LuaSurface
---- @param offset MapPosition
+--- @param offset MapPosition.struct
 local function create_resource_patches(surface, offset)
     for _, resource in ipairs(config.resource_patches.resources) do
         if resource.enabled then

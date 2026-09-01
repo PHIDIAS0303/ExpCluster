@@ -10,6 +10,7 @@ local source = assert(debug.getinfo(1, "S")).source
 local shared_root = assert(source:match("^@(.*)/framework%.lua$"))
 local Stubs = assert(loadfile(shared_root .. "/stubs.lua"))()
 
+--- @class Framework
 local Framework = {}
 
 --- Turn a value into a string for failure messages

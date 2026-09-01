@@ -1,5 +1,5 @@
 --- Tests for the assignment methods of module/control.lua
-local Suite = ... --- The suite this file adds its tests to, see test/lua/framework.lua
+local Suite = ... --- @type Suite The suite this file adds its tests to, see env.lua
 local test, check, eq, empty = Suite.test, Suite.check, Suite.eq, Suite.empty
 
 --- alice is a moderator and bob a regular, with changes sent to the controller

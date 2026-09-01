@@ -19,7 +19,7 @@ local function check_items(player, type, banned_items)
     local inventory = assert(player.get_inventory(type))
     -- Check what items the player has
     for i = 1, #inventory do
-        local item = inventory[i]
+        local item = inventory[i --[[@as uint]]]
         if item.valid_for_read and banned_items[item.name] then
             player.print{ "exp_nuke-protection.chat-found", item.prototype.localised_name }
             items[#items + 1] = item
