@@ -10,7 +10,7 @@ local config = require("modules.exp_legacy.config.preset_player_quickbar") --- @
 local PlayerData = require("modules.exp_legacy.expcore.player_data") --- @dep expcore.player_data
 local PlayerFilters = PlayerData.Settings:combine("QuickbarFilters")
 PlayerFilters:set_metadata{
-    permission = "command/save-quickbar",
+    permission = "exp_scenario.command.save_quickbar",
     stringify = function(value)
         if not value then return "No filters set" end
         local count = 0

@@ -11,7 +11,7 @@ local expand_area = AABB.expand
 local Commands = require("modules/exp_commands")
 local format_player_name = Commands.format_player_name_locale
 
-local Roles = require("modules.exp_legacy.expcore.roles") --- @dep expcore.roles
+local Roles = require("modules/exp_roles")
 local EntityProtection = require("modules.exp_legacy.modules.control.protection") --- @dep modules.control.protection
 
 local format_string = string.format
@@ -218,13 +218,16 @@ SelectEntities:on_stop(on_player_selection_stop)
 
 --- When there is a repeat offence print it in chat
 local function on_repeat_violation(event)
-    Roles.print_to_roles_higher("Regular", {
-        "exp-commands_entity-protection.repeat-offence",
-        format_player_name(event.player_index),
-        event.entity.localised_name,
-        event.entity.position.x,
-        event.entity.position.y
-    })
+    local regular = Roles.get_role_by_name("Regular")
+    for _, role in ipairs(regular and Roles.get_higher_roles(regular) or {}) do
+        role:print{
+            "exp-commands_entity-protection.repeat-offence",
+            format_player_name(event.player_index),
+            event.entity.localised_name,
+            event.entity.position.x,
+            event.entity.position.y
+        }
+    end
 end
 
 return {

@@ -5,7 +5,7 @@ Adds a science info gui that shows production usage and net for the different sc
 local ExpUtil = require("modules/exp_util")
 local Gui = require("modules/exp_gui")
 local Colors = require("modules/exp_util/include/color")
-local Roles = require("modules/exp_legacy/expcore/roles")
+local Roles = require("modules/exp_roles")
 local config = require("modules/exp_legacy/config/gui/science")
 local _format_number = require("util").format_number
 
@@ -571,7 +571,7 @@ Gui.toolbar.create_button{
     sprite = "entity/lab",
     tooltip = { "exp-gui_science-production.tooltip-main" },
     visible = function(player, element)
-        return Roles.player_allowed(player, "gui/science-info")
+        return Roles.player_has_permission(player, "exp_scenario.gui.science_info")
     end
 }
 

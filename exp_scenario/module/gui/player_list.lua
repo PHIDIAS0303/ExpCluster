@@ -4,7 +4,7 @@ Adds a player list to show names and play time; also includes action buttons whi
 
 local ExpUtil = require("modules/exp_util")
 local Gui = require("modules/exp_gui")
-local Roles = require("modules/exp_legacy/expcore/roles")
+local Roles = require("modules/exp_roles")
 local config = require("modules/exp_legacy/config/gui/player_list_actions")
 
 --- @class ExpGui_PlayerList.elements
@@ -203,7 +203,8 @@ function Elements.player_table.calculate_row_data()
     -- Flatten the roles into a single ordered list
     local count = 0
     local row_data = {}
-    for _, role_name in pairs(Roles.config.order) do
+    for _, role in ipairs(Roles.get_ordered_roles()) do
+        local role_name = role.name
         if players[role_name] then
             for _, player in pairs(players[role_name]) do
                 count = count + 1
@@ -360,7 +361,7 @@ function Elements.action_bar.refresh(action_bar, player, selected_player)
         if buttons.auth and not buttons.auth(player, selected_player) then
             flow.visible = false
         else
-            flow.visible = Roles.player_allowed(player, action_name)
+            flow.visible = Roles.player_has_permission(player, action_name)
         end
     end
 end
@@ -492,7 +493,7 @@ Gui.toolbar.create_button{
     sprite = "entity/character",
     tooltip = { "exp-gui_player-list.main-tooltip" },
     visible = function(player, element)
-        return Roles.player_allowed(player, "gui/player-list")
+        return Roles.player_has_permission(player, "exp_scenario.gui.player_list")
     end
 }
 
@@ -534,8 +535,7 @@ return {
     events = {
         [e.on_player_joined_game] = redraw_player_list,
         [e.on_player_left_game] = on_player_left_game,
-        [Roles.events.on_role_assigned] = redraw_player_list,
-        [Roles.events.on_role_unassigned] = redraw_player_list,
+        [Roles.events.on_player_roles_changed] = redraw_player_list,
     },
     on_nth_tick = {
         [1800] = refresh_player_times,

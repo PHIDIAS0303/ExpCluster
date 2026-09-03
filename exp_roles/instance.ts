@@ -48,6 +48,10 @@ export class InstancePlugin extends BaseInstancePlugin {
 			this.instance.sendTo("controller", new messages.AssignmentListRequest()),
 		]);
 
+		if (!roles.some(role => role.isDefault)) {
+			this.logger.warn("No default role is set on the controller, players will hold no roles in game");
+		}
+
 		await this.luaSend("initialise", {
 			...messages.encodeRolesForLua(roles),
 			assignments: assignments.map(assignment => assignment.toJSON()),

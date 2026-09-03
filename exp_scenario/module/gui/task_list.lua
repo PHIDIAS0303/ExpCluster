@@ -3,7 +3,7 @@ Adds a task list to the game which players can add, remove and edit items on
 ]]
 
 local Gui = require("modules/exp_gui")
-local Roles = require("modules.exp_legacy.expcore.roles")
+local Roles = require("modules/exp_roles")
 local config = require("modules.exp_legacy.config.gui.tasks")
 
 local ExpUtil = require("modules/exp_util")
@@ -43,8 +43,8 @@ local function has_permission_create_task(player)
         return true
     elseif allow_add_task == "admin" then
         return player.admin
-    elseif allow_add_task == "expcore.roles" then
-        return Roles.player_allowed(player, config.expcore_roles_allow_add_task)
+    elseif allow_add_task == "exp_roles" then
+        return Roles.player_has_permission(player, config.exp_roles_allow_add_task)
     end
 
     return false
@@ -67,8 +67,8 @@ local function has_permission_edit_task(player, task)
         return true
     elseif allow_edit_task == "admin" then
         return player.admin
-    elseif allow_edit_task == "expcore.roles" then
-        return Roles.player_allowed(player, config.expcore_roles_allow_edit_task)
+    elseif allow_edit_task == "exp_roles" then
+        return Roles.player_has_permission(player, config.exp_roles_allow_edit_task)
     end
 
     return false
@@ -922,7 +922,7 @@ Gui.toolbar.create_button{
     sprite = "utility/not_enough_repair_packs_icon",
     tooltip = { "exp-gui_task-list.tooltip-main" },
     visible = function(player, element)
-        return Roles.player_allowed(player, "gui/task-list")
+        return Roles.player_has_permission(player, "exp_scenario.gui.task_list")
     end
 }
 
@@ -950,7 +950,6 @@ return {
     events = {
         [e.on_player_joined_game] = refresh_player_tasks,
         [e.on_player_changed_force] = refresh_player_tasks,
-        [Roles.events.on_role_assigned] = refresh_player_permissions,
-        [Roles.events.on_role_unassigned] = refresh_player_permissions,
+        [Roles.events.on_player_roles_changed] = refresh_player_permissions,
     }
 }

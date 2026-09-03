@@ -3,7 +3,7 @@ Log certain actions into a file when events are triggered
 ]]
 
 local ExpUtil = require("modules/exp_util")
-local Roles = require("modules.exp_legacy.expcore.roles")
+local Roles = require("modules/exp_roles")
 local config = require("modules.exp_legacy.config.deconlog")
 
 local seconds_time_format = ExpUtil.format_time_factory{ format = "short", hours = true, minutes = true, seconds = true }
@@ -79,7 +79,7 @@ end
 local function get_log_player(event)
     local player = assert(game.get_player(event.player_index))
 
-    if Roles.player_has_flag(player, "deconlog-bypass") then
+    if Roles.player_has_permission(player, "exp_scenario.bypass.deconstruction_log") then
         return nil
     end
 

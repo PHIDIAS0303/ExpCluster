@@ -4,7 +4,7 @@ Various bonus related event handlers
 TODO Refactor this fully, this is temp to get it out of the player bonus gui file
 ]]
 
-local Roles = require("modules/exp_legacy/expcore/roles")
+local Roles = require("modules/exp_roles")
 local config = require("modules/exp_legacy/config/bonus")
 
 --- @param event EventData.on_force_created
@@ -26,7 +26,7 @@ end
 --- @param event EventData.on_player_died
 local function fast_respawn(event)
     local player = assert(game.get_player(event.player_index))
-    if Roles.player_has_flag(player, "instant-respawn") then
+    if Roles.player_has_permission(player, "exp_scenario.player.instant_respawn") then
         player.ticks_to_respawn = 120
     end
 end

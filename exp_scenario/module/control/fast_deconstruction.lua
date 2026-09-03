@@ -4,7 +4,7 @@ Makes trees which are marked for decon "decay" quickly to allow faster building
 
 local Gui = require("modules/exp_gui")
 local Async = require("modules/exp_util/async")
-local Roles = require("modules.exp_legacy.expcore.roles")
+local Roles = require("modules/exp_roles")
 
 local PlayerData = require("modules.exp_legacy.expcore.player_data")
 local HasEnabledDecon = PlayerData.Settings:combine("HasEnabledDecon")
@@ -57,9 +57,9 @@ local remove_trees_async =
 --- @param player LuaPlayer
 --- @return "fast" | "allow" | "disallow"
 local function get_permission(player)
-    if Roles.player_allowed(player, "fast-tree-decon") then
+    if Roles.player_has_permission(player, "exp_scenario.decon.fast_trees") then
         return HasEnabledDecon:get(player) and "fast" or "allow"
-    elseif Roles.player_allowed(player, "standard-decon") then
+    elseif Roles.player_has_permission(player, "exp_scenario.decon.standard") then
         return "allow"
     else
         return "disallow"
@@ -101,7 +101,7 @@ Gui.toolbar.create_button{
     tooltip = { "exp_fast-decon.tooltip-main" },
     auto_toggle = true,
     visible = function(player, _)
-        return Roles.player_allowed(player, "fast-tree-decon")
+        return Roles.player_has_permission(player, "exp_scenario.decon.fast_trees")
     end
 }:on_click(function(def, player, element)
     local state = Gui.toolbar.get_button_toggled_state(def, player)
