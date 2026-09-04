@@ -64,7 +64,7 @@ export default function GroupViewPage() {
 		const assetName = defaultModPack.exportManifest.assets.defines;
 		
 		(async () => {
-			const response = await fetch(`${staticRoot}static/${assetName}`);
+			const response = await fetch(`${staticRoot}${assetName}`);
 			const json = await response.json();
 			setDefinesJson(json.input_action ?? {});
 		})().catch(notifyErrorHandler("Failed to load permissions"));
