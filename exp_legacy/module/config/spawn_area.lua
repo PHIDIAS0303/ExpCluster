@@ -49,7 +49,7 @@ return {
         enabled = true, --- @setting enabled Whether entities will be added to spawn
         protected = true, --- @setting protected Whether entities will be protected from player interaction
         operable = true, --- @setting operable Whether entities can be opened by players, must be true if chests are used
-        offset = { x = 0, y = -2 }, --- @setting offset The position offset to apply to entities
+        offset = { x = 0, y = 0 }, --- @setting offset The position offset to apply to entities
         locations = { --- @setting locations The location and names of entities {name,x,y}
             { "steel-chest", 1, 3 }, { "steel-chest", 1, 4 }, { "steel-chest", 1, 5 },
             { "steel-chest", 3, 1 }, { "steel-chest", 4, 1 }, { "steel-chest", 5, 1 },
@@ -75,7 +75,7 @@ return {
     pattern = {
         enabled = false, --- @setting enabled Whether pattern tiles will be added to spawn
         pattern_tile = "refined-concrete", --- @setting pattern_tile The tile to be used for the pattern
-        offset = { x = 0, y = -2 }, --- @setting offset The position offset to apply to pattern tiles
+        offset = { x = 0, y = 0 }, --- @setting offset The position offset to apply to pattern tiles
         locations = { --- @setting locations The location of the pattern tiles {x,y}
             { -49, -3 }, { -49, -2 }, { -49, 1 }, { -49, 2 }, { -49, 5 }, { -49, 6 }, { -48, -4 }, { -48, -3 }, { -48, -2 }, { -48, 1 }, { -48, 2 }, { -48, 5 }, { -48, 6 }, { -48, 7 }, { -47, -7 }, { -47, -6 }, { -47, -5 }, { -47, -4 }, { -47, -3 }, { -47, -2 }, { -47, 5 }, { -47, 6 }, { -47, 7 }, { -47, 8 }, { -47, 9 }, { -47, 10 }, { -46, -8 }, { -46, -7 }, { -46, -6 }, { -46, -5 },
             { -46, -4 }, { -46, -3 }, { -46, -2 }, { -46, -1 }, { -46, 4 }, { -46, 5 }, { -46, 6 }, { -46, 7 }, { -46, 8 }, { -46, 9 }, { -46, 10 }, { -46, 11 }, { -45, -17 }, { -45, -16 }, { -45, -15 }, { -45, -14 }, { -45, -13 }, { -45, -12 }, { -45, -9 }, { -45, -8 }, { -45, -7 }, { -45, -2 }, { -45, -1 }, { -45, 0 }, { -45, 1 }, { -45, 2 }, { -45, 3 }, { -45, 4 }, { -45, 5 }, { -45, 10 },
