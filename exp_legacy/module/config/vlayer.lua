@@ -8,7 +8,7 @@ return {
 
     unlimited_capacity = false, --- @setting unlimited_capacity When true the vlayer has an unlimited energy capacity, accumulators are not required
     unlimited_surface_area = false, --- @setting unlimited_surface_area When true the vlayer has an unlimited surface area, landfill is not required
-    modded_auto_downgrade = false, --- @setting modded_auto_downgrade When true modded items will be converted into their base game equivalent, original items can not be recovered
+    modded_auto_downgrade = true, --- @setting modded_auto_downgrade When true modded items will be converted into their base game equivalent, original items can not be recovered
     power_on_space = false, --- @setting power_on_space When true allow on spaceship
     power_on_space_research = { --- @setting power_on_space_research the research level needed to use power_on_space
         name = "research-productivity",
