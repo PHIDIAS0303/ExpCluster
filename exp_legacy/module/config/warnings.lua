@@ -1,6 +1,8 @@
 --- Config file for the warning system, this is very similar to reports but is for the use of moderators rather than normal users.
 -- @config Warnings
 
+local config_server_detail = require("modules.exp_legacy.config.server_detail") --- @dep config.server_detail
+
 return {
     --- @type (LocalisedString[] | fun(player: LuaPlayer, by_player_name: string, number_of_warnings: number))[]
     actions = { --- @setting actions what actions are taking at number of warnings
@@ -27,7 +29,7 @@ return {
                 by_player_name,
                 ". You have ",
                 number_of_warnings,
-                " warnings. You were banned for having too many warnings; visit https://www.explosivegaming.nl to request a ban appeal.",
+                " warnings. You were banned for having too many warnings; visit " .. config_server_detail["website"] .. " to request a ban appeal.",
             }
             game.kick_player(player, table.concat(str, "")) -- Does not support locale strings
             -- game.ban_player(player, { "warnings.received", by_player_name, number_of_warnings, { "warnings.ban", { "links.website" } } })
