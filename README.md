@@ -54,7 +54,7 @@ Contact for access.
 
 | Release* | Release Name | Factorio Version** |
 |---|---|---|
-| [6.5][s6.5] | Clusterio Plugin | [2.1.7][f2.1.7] |
+| [6.5][s6.5] | Clusterio Plugin (Beta) | [2.1.7][f2.1.7] |
 | [6.4][s6.4] | Farewell Factorio 1.1 | [1.1.110][f1.1.110] |
 | [6.3][s6.3] | Feature Bundle 2: Electric Boogaloo | [1.1.101][f1.1.101] |
 | [6.2][s6.2] | Mega Feature Bundle | [1.1.32][f1.1.32] |
