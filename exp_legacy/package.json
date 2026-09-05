@@ -1,6 +1,6 @@
 {
 	"name": "@expcluster/legacy",
-	"version": "6.5.0",
+	"version": "7.0.0",
 	"description": "Clusterio plugin implementing the legacy v6 scenario updated for factorio 2.0",
 	"author": "Cooldude2606 <https://github.com/Cooldude2606>",
 	"license": "MIT",
