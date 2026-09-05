@@ -54,7 +54,7 @@ Contact for access.
 
 | Release* | Release Name | Factorio Version** |
 |---|---|---|
-| [6.5][s6.5] | Clusterio Plugin (Beta) | [2.1.7][f2.1.7] |
+| [7.0][s7.0] | Clusterio Plugin (Beta) | [2.1.7][f2.1.7] |
 | [6.4][s6.4] | Farewell Factorio 1.1 | [1.1.110][f1.1.110] |
 | [6.3][s6.3] | Feature Bundle 2: Electric Boogaloo | [1.1.101][f1.1.101] |
 | [6.2][s6.2] | Mega Feature Bundle | [1.1.32][f1.1.32] |
@@ -81,7 +81,7 @@ Contact for access.
 
 \*\* Factorio versions show the version they were made for, often the minimum requirement to run the scenario.
 
-[s6.5]: https://github.com/explosivegaming/scenario/releases/tag/6.5.0
+[s7.0]: https://github.com/explosivegaming/scenario/releases/tag/7.0.0
 [s6.4]: https://github.com/explosivegaming/scenario/releases/tag/6.4.0
 [s6.3]: https://github.com/explosivegaming/scenario/releases/tag/6.3.0
 [s6.2]: https://github.com/explosivegaming/scenario/releases/tag/6.2.0
