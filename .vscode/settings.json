@@ -1,0 +1,13 @@
+{
+    "factorio.versions": [
+        {
+            "name": "Online",
+            "factorioPath": "/opt/factorio/factorio/bin/x64/factorio",
+            "onlineDocs": true
+        }
+    ],
+    "Lua.workspace.userThirdParty": [
+        "c:\\Users\\admin\\AppData\\Roaming\\Code\\User\\workspaceStorage\\ec47732e193a837bc89fdb1a43292252\\justarandomgeek.factoriomod-debug\\sumneko-3rd"
+    ],
+    "Lua.workspace.checkThirdParty": "ApplyInMemory"
+}
