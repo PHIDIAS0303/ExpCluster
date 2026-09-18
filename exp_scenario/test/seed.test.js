@@ -1,10 +1,11 @@
-"use strict";
-const t = require("tap");
-const lib = require("@clusterio/lib");
-const { seedRoles, seedGroups, flattenSeedPermissions } = require("../dist/node/seed");
+import t from "tap";
+import * as lib from "@clusterio/lib";
+import { seedRoles, seedGroups, flattenSeedPermissions } from "../dist/node/seed.js";
 
-// Importing this defines the permissions the seed grants
-require("../dist/node/permissions");
+import { plugin } from "../dist/node/index.js";
+
+// Registering the plugin defines the permissions the seed grants
+lib.registerPluginPermissions([plugin]);
 
 t.test("seedRoles[] grant only defined permissions", t2 => {
 	for (const role of seedRoles) {
