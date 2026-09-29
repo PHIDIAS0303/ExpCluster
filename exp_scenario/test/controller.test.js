@@ -40,13 +40,12 @@ async function startPlugin(t2, { withPlugins = true } = {}) {
 
 	if (withPlugins) {
 		for (const [name, Plugin] of [["exp_roles", RolesPlugin], ["exp_groups", GroupsPlugin]]) {
-			const plugin = new Plugin({ name }, controller, undefined, logger);
+			const plugin = new Plugin({ plugin: { name }, controller, logger });
 			await plugin.init();
-			controller.plugins.set(name, plugin);
 		}
 	}
 
-	const plugin = new ControllerPlugin({ name: "exp_scenario" }, controller, undefined, logger);
+	const plugin = new ControllerPlugin({ plugin: { name: "exp_scenario" }, controller, logger });
 	await plugin.init();
 	return { plugin, controller };
 }
@@ -65,7 +64,7 @@ t.test("class ControllerPlugin", t2 => {
 
 	t2.test(".handleSeedRequest() creates the roles and reuses them by name", async t3 => {
 		const { plugin, controller } = await startPlugin(t3);
-		const rolesPlugin = controller.plugins.get("exp_roles");
+		const rolesPlugin = RolesPlugin.get(controller);
 
 		await plugin.handleSeedRequest();
 		t3.strictSame(controller.roles.size, seedRoles.length, "every seed role exists");
@@ -80,7 +79,7 @@ t.test("class ControllerPlugin", t2 => {
 
 	t2.test(".handleSeedRequest() creates the groups and resets them by name", async t3 => {
 		const { plugin, controller } = await startPlugin(t3);
-		const groupsPlugin = controller.plugins.get("exp_groups");
+		const groupsPlugin = GroupsPlugin.get(controller);
 
 		await plugin.handleSeedRequest();
 		t3.strictSame(groupsPlugin.groups.size, seedGroups.length, "every seed group exists");
@@ -101,7 +100,7 @@ t.test("class ControllerPlugin", t2 => {
 
 	t2.test(".handleSeedRequest() maps each role onto its group by rank", async t3 => {
 		const { plugin, controller } = await startPlugin(t3);
-		const groupsPlugin = controller.plugins.get("exp_groups");
+		const groupsPlugin = GroupsPlugin.get(controller);
 
 		await plugin.handleSeedRequest();
 		const mapped = seedRoles.filter(role => role.group !== undefined);
@@ -123,7 +122,7 @@ t.test("class ControllerPlugin", t2 => {
 
 	t2.test(".handleSeedRequest() reuses mappings and keeps clear of other mappings", async t3 => {
 		const { plugin, controller } = await startPlugin(t3);
-		const groupsPlugin = controller.plugins.get("exp_groups");
+		const groupsPlugin = GroupsPlugin.get(controller);
 
 		groupsPlugin.roleMappings.set(new RoleMappingRecord(99, new Set([0, 1]), 5, 2, true));
 		await plugin.handleSeedRequest();
