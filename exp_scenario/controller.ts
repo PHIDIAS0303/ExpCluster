@@ -1,23 +1,98 @@
 import * as lib from "@clusterio/lib";
+import * as path from "node:path";
 import type { Controller, ControllerPluginContext } from "@clusterio/controller";
 import { RoleMetaRecord } from "@expcluster/roles";
 import { GroupRecord, GroupPermissions, RoleMappingRecord } from "@expcluster/permission-groups";
 import { ControllerPlugin as RolesPlugin } from "@expcluster/roles/dist/node/controller.js";
 import { ControllerPlugin as GroupsPlugin } from "@expcluster/permission-groups/dist/node/controller.js";
 import * as messages from "./messages.js";
+import { features, pruneFeatureValues, validateFeatureValues } from "./features.js";
 import { SeedRole, SeedGroup, seedRoles, seedGroups, flattenSeedPermissions } from "./seed.js";
 
 export class ControllerPlugin {
-	controller: Controller;
-	logger: lib.Logger;
+	private constructor(
+		public controller: Controller,
+		public logger: lib.Logger,
+		public name: string,
+		public features: lib.SubscribableDatastore<messages.FeatureRecord>,
+	) {}
 
-	constructor(context: ControllerPluginContext) {
-		this.controller = context.controller;
-		this.logger = context.logger;
+	static async fromContext(context: ControllerPluginContext) {
+		const controller = context.controller;
+		const databaseDirectory = controller.config.get("controller.database_directory");
+		const features = new lib.SubscribableDatastore(
+			...await new lib.JsonIdDatastoreProvider(
+				path.join(databaseDirectory, "exp_scenario", "features.json"),
+				messages.FeatureRecord.fromJSON.bind(messages.FeatureRecord),
+			).bootstrap()
+		);
+
+		const plugin = new ControllerPlugin(controller, context.logger, context.plugin.name, features);
+		plugin.reconcileFeatures();
+
+		controller.subscriptions.handle(messages.FeatureUpdatedEvent, plugin.handleFeatureSubscription.bind(plugin));
+		features.on("update", plugin.featuresUpdated.bind(plugin));
+
+		controller.handle(messages.SeedRequest, plugin.handleSeedRequest.bind(plugin));
+		controller.handle(messages.FeatureListRequest, plugin.handleFeatureListRequest.bind(plugin));
+		controller.handle(messages.FeatureUpdateRequest, plugin.handleFeatureUpdateRequest.bind(plugin));
+
+		controller.hooks.shutdown.attach(plugin.name, plugin.onShutdown.bind(plugin));
+		return plugin;
 	}
 
-	async init() {
-		this.controller.handle(messages.SeedRequest, this.handleSeedRequest.bind(this));
+	async onShutdown() {
+		await this.features.save();
+	}
+
+	/** Add new features, delete removed ones, and drop stored values which no longer fit a field */
+	reconcileFeatures() {
+		const declared = new Map(features.map(feature => [feature.name, feature]));
+		for (const record of this.features.values()) {
+			const feature = declared.get(record.id);
+			if (!feature) {
+				this.logger.warn(`Dropping stored config of removed feature ${record.id}`);
+				this.features.delete(record);
+				continue;
+			}
+
+			const { kept, dropped } = pruneFeatureValues(feature, record.values);
+			if (dropped.length) {
+				this.logger.warn(`Dropping stored values of ${record.id} which no longer match a setting: ${dropped.join(", ")}`);
+				this.features.set(new messages.FeatureRecord(record.id, record.enabled, kept));
+			}
+		}
+
+		const missing = features.filter(feature => !this.features.has(feature.name));
+		if (missing.length) {
+			this.features.setMany(missing.map(feature => new messages.FeatureRecord(feature.name, true)));
+		}
+	}
+
+	featuresUpdated(updates: messages.FeatureRecord[]) {
+		this.controller.subscriptions.broadcast(new messages.FeatureUpdatedEvent(updates));
+	}
+
+	async handleFeatureSubscription(request: lib.SubscriptionRequest) {
+		const updates = [...this.features.values()].filter(feature => feature.updatedAtMs > request.lastRequestTimeMs);
+		return updates.length ? new messages.FeatureUpdatedEvent(updates) : null;
+	}
+
+	async handleFeatureListRequest() {
+		return [...this.features.values()];
+	}
+
+	async handleFeatureUpdateRequest(request: messages.FeatureUpdateRequest) {
+		let values;
+		try {
+			values = validateFeatureValues(request.id, request.values);
+		} catch (err: any) {
+			throw new lib.RequestError(err.message);
+		}
+
+		const feature = new messages.FeatureRecord(request.id, request.enabled, values);
+		this.features.set(feature);
+		return feature;
 	}
 
 	/**
@@ -157,7 +232,7 @@ export class ControllerPlugin {
 }
 
 export default async function (context: ControllerPluginContext) {
-	await new ControllerPlugin(context).init();
+	await ControllerPlugin.fromContext(context);
 }
 
 function newId(datastore: { has(id: number): boolean }) {
