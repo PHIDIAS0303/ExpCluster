@@ -38,10 +38,10 @@ return Feature.register("spawn_area", {
         offset = { x = 0, y = 0 }, -- The position offset to apply to water tiles
         locations = { -- The location of the water tiles {x,y}
             -- Each is a 3x3 with the closest tile to 0,0 removed
-            { 7, 8 }, { 7, 9 }, { 8, 7 }, { 8, 8 }, { 8, 9 }, { 9, 7 }, { 9, 8 }, { 9, 9 }, -- Bottom Right
-            { 7, -9 }, { 7, -10 }, { 8, -8 }, { 8, -9 }, { 8, -10 }, { 9, -8 }, { 9, -9 }, { 9, -10 }, -- Top Right
-            { -8, -9 }, { -8, -10 }, { -9, -8 }, { -9, -9 }, { -9, -10 }, { -10, -8 }, { -10, -9 }, { -10, -10 }, -- Top Left
-            { -8, 8 }, { -8, 9 }, { -9, 7 }, { -9, 8 }, { -9, 9 }, { -10, 7 }, { -10, 8 }, { -10, 9 }, -- Bottom Left
+            { 5, 6 }, { 5, 7 }, { 6, 5 }, { 6, 6 }, { 6, 7 }, { 7, 5 }, { 7, 6 }, { 7, 7 },
+            { 5, -7 }, { 5, -8 }, { 6, -6 }, { 6, -7 }, { 6, -8 }, { 7, -6 }, { 7, -7 }, { 7, -8 },
+            { -6, 6 }, { -6, 7 }, { -7, 5 }, { -7, 6 }, { -7, 7 }, { -8, 5 }, { -8, 6 }, { -8, 7 },
+            { -6, -7 }, { -6, -8 }, { -7, -6 }, { -7, -7 }, { -7, -8 }, { -8, -6 }, { -8, -7 }, { -8, -8 },
         },
     },
     entities = { -- Settings relating to adding entities to spawn

@@ -2,10 +2,10 @@
 -- @config Server
 
 return {
-    community_name = "Explosive Gaming",
-    discord = "https://discord.explosivegaming.nl",
-    website = "https://www.explosivegaming.nl",
-    status = "https://status.explosivegaming.nl",
+    community_name = "APERX",
+    discord = "https://discord.aperx.org",
+    website = "https://www.aperx.org",
+    status = "https://www.aperx.org",
     github = "https://github.com/explosivegaming/ExpCluster",
-    patreon = "https://www.patreon.com/ExpGaming"
+    patreon = "https://www.aperx.org"
 }
