@@ -14,7 +14,6 @@ local data = {
             ["name"] = "mining-productivity-3",
             ["level"] = 3
         }
-    
     },
     milestone = {
         ["base"] = {
