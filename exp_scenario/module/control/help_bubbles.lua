@@ -16,7 +16,7 @@ local locations = {
     ["Spawn"] = {
         spawn_position = { x = 0, y = 0 },
         spawn_surface = "nauvis",
-        entity_name = "small-biter",
+        entity_name = "behemoth-biter",
         messages = {
             { "info.website", config_server_detail["website"] },
             { "info.read-readme" },

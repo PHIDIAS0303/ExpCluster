@@ -13,7 +13,7 @@ local feature = Feature.register("inventory_clear")
 --- The events which clear the inventory of the player
 local events = {
     defines.events.on_player_banned,
-    defines.events.on_player_kicked,
+    -- defines.events.on_player_kicked,
 }
 
 --- @param event { player_index: number }
