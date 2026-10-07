@@ -74,7 +74,7 @@ return Feature.register("spawn_area", {
         },
     },
     pattern = {
-        enabled = true, -- Whether pattern tiles will be added to spawn
+        enabled = false, -- Whether pattern tiles will be added to spawn
         pattern_tile = "refined-concrete", -- The tile to be used for the pattern
         offset = { x = 0, y = -2 }, -- The position offset to apply to pattern tiles
         locations = { -- The location of the pattern tiles {x,y}
