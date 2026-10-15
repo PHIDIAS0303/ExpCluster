@@ -13,12 +13,20 @@
 		"coverage": "tap --coverage-report=text test/*.test.js"
 	},
 	"engines": {
-		"node": ">=18"
+		"node": ">=22"
 	},
 	"peerDependencies": {
 		"@clusterio/controller": "workspace:^",
 		"@clusterio/host": "workspace:^",
 		"@clusterio/lib": "workspace:^"
+	},
+	"peerDependenciesMeta": {
+		"@clusterio/controller": {
+			"optional": true
+		},
+		"@clusterio/host": {
+			"optional": true
+		}
 	},
 	"devDependencies": {
 		"@clusterio/controller": "workspace:^",
@@ -43,6 +51,7 @@
 		"@expcluster/lib_gui": "workspace:^",
 		"@expcluster/permission-groups": "workspace:^",
 		"@expcluster/roles": "workspace:^",
+		"@expcluster/server-list": "workspace:^",
 		"@sinclair/typebox": "catalog:"
 	},
 	"publishConfig": {

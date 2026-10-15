@@ -1,7 +1,8 @@
 import t from "tap";
+import path from "node:path";
 import * as lib from "@clusterio/lib";
 import { Controller } from "@clusterio/controller";
-import { ControllerPlugin } from "../dist/node/controller.js";
+import entrypoint from "../dist/node/controller.js";
 import * as messages from "../dist/node/messages.js";
 import { seedRoles, seedGroups } from "../dist/node/seed.js";
 import { features } from "../dist/node/features.js";
@@ -29,7 +30,7 @@ t.after(() => {
 	lib.logger.silent = false;
 });
 
-/** Build the plugin around a real controller, which is side effect free while not started. */
+/** Run the plugin on a real controller, which is side effect free while not started, returns the handlers it registered. */
 async function startPlugin(t2, { withPlugins = true, databaseDirectory = t2.testdir() } = {}) {
 	const controllerConfig = new lib.ControllerConfig("controller", {
 		"controller.database_directory": databaseDirectory,
@@ -45,42 +46,77 @@ async function startPlugin(t2, { withPlugins = true, databaseDirectory = t2.test
 		}
 	}
 
-	const plugin = await ControllerPlugin.fromContext({ plugin: { name: "exp_scenario" }, controller, logger });
-	return { plugin, controller };
+	const handlers = new Map();
+	const handle = controller.handle.bind(controller);
+	controller.handle = (Class, handler) => {
+		handlers.set(Class, handler);
+		handle(Class, handler);
+	};
+	const subscriptionHandle = controller.subscriptions.handle.bind(controller.subscriptions);
+	controller.subscriptions.handle = (Class, handler) => {
+		handlers.set(Class, handler);
+		subscriptionHandle(Class, handler);
+	};
+
+	await entrypoint({ plugin: { name: "exp_scenario" }, controller, logger });
+	return {
+		controller,
+		seed: () => handlers.get(messages.SeedRequest)(new messages.SeedRequest()),
+		listFeatures: () => handlers.get(messages.FeatureListRequest)(new messages.FeatureListRequest()),
+		updateFeature: request => handlers.get(messages.FeatureUpdateRequest)(request),
+		featureSubscription: request => handlers.get(messages.FeatureUpdatedEvent)(request),
+		shutdown: () => controller.hooks.shutdown.invoke(),
+		save: () => controller.hooks.save.invoke(),
+		/** Call the handler of a message as it would be called for a request or event */
+		send: message => handlers.get(message.constructor)(message),
+	};
+}
+
+/** Write the stored features as a previous run would have left them. */
+async function storeFeatures(databaseDirectory, records) {
+	await new lib.JsonIdDatastoreProvider(
+		path.join(databaseDirectory, "exp_scenario", "features.json"),
+		messages.FeatureRecord.fromJSON.bind(messages.FeatureRecord),
+	).save(new Map(records.map(record => [record.id, record])));
+}
+
+/** The feature record with the given id. */
+async function getFeature(listFeatures, id) {
+	return (await listFeatures()).find(record => record.id === id);
 }
 
 const byName = (datastore, name) => [...datastore.values()].find(other => other.name === name);
 
-t.test("class ControllerPlugin", t2 => {
-	t2.test(".handleSeedRequest() throws when the seeded plugins are missing", async t3 => {
-		const { plugin } = await startPlugin(t3, { withPlugins: false });
+t.test("controller plugin", t2 => {
+	t2.test("SeedRequest throws when the seeded plugins are missing", async t3 => {
+		const { seed } = await startPlugin(t3, { withPlugins: false });
 		await t3.rejects(
-			plugin.handleSeedRequest(),
+			seed(),
 			{ message: "Seeding requires the exp_roles and exp_groups plugins" },
 			"the request is rejected",
 		);
 	});
 
-	t2.test(".handleSeedRequest() creates the roles and reuses them by name", async t3 => {
-		const { plugin, controller } = await startPlugin(t3);
+	t2.test("SeedRequest creates the roles and reuses them by name", async t3 => {
+		const { seed, controller } = await startPlugin(t3);
 		const rolesPlugin = RolesPlugin.get(controller);
 
-		await plugin.handleSeedRequest();
+		await seed();
 		t3.strictSame(controller.roles.size, seedRoles.length, "every seed role exists");
 
 		const moderator = byName(controller.roles, "Moderator");
 		t3.ok(moderator.permissions.has("exp_scenario.command.jail"), "parent permissions are flattened in");
 		t3.strictSame(rolesPlugin.roleMeta.get(moderator.id).shortHand, "Mod", "the role properties match the seed");
 
-		await plugin.handleSeedRequest();
+		await seed();
 		t3.strictSame(controller.roles.size, seedRoles.length, "seeding again reuses the roles");
 	});
 
-	t2.test(".handleSeedRequest() creates the groups and resets them by name", async t3 => {
-		const { plugin, controller } = await startPlugin(t3);
+	t2.test("SeedRequest creates the groups and resets them by name", async t3 => {
+		const { seed, controller } = await startPlugin(t3);
 		const groupsPlugin = GroupsPlugin.get(controller);
 
-		await plugin.handleSeedRequest();
+		await seed();
 		t3.strictSame(groupsPlugin.groups.size, seedGroups.length, "every seed group exists");
 
 		const restricted = byName(groupsPlugin.groups, "Restricted");
@@ -89,7 +125,7 @@ t.test("class ControllerPlugin", t2 => {
 
 		const admin = byName(groupsPlugin.groups, "Admin");
 		groupsPlugin.groups.set(new GroupRecord(admin.id, admin.name, new GroupPermissions(true, [])));
-		await plugin.handleSeedRequest();
+		await seed();
 		t3.strictSame(groupsPlugin.groups.size, seedGroups.length, "seeding again reuses the groups");
 		t3.ok(
 			byName(groupsPlugin.groups, "Admin").permissions.permissions.includes("toggle_map_editor"),
@@ -97,11 +133,11 @@ t.test("class ControllerPlugin", t2 => {
 		);
 	});
 
-	t2.test(".handleSeedRequest() maps each role onto its group by rank", async t3 => {
-		const { plugin, controller } = await startPlugin(t3);
+	t2.test("SeedRequest maps each role onto its group by rank", async t3 => {
+		const { seed, controller } = await startPlugin(t3);
 		const groupsPlugin = GroupsPlugin.get(controller);
 
-		await plugin.handleSeedRequest();
+		await seed();
 		const mapped = seedRoles.filter(role => role.group !== undefined);
 		t3.strictSame(groupsPlugin.roleMappings.size, mapped.length, "every role with a group is mapped");
 
@@ -119,75 +155,179 @@ t.test("class ControllerPlugin", t2 => {
 		t3.strictSame(priorities.length, new Set(priorities).size, "priorities are unique");
 	});
 
-	t2.test(".handleSeedRequest() reuses mappings and keeps clear of other mappings", async t3 => {
-		const { plugin, controller } = await startPlugin(t3);
+	t2.test("SeedRequest reuses mappings and keeps clear of other mappings", async t3 => {
+		const { seed, controller } = await startPlugin(t3);
 		const groupsPlugin = GroupsPlugin.get(controller);
 
 		groupsPlugin.roleMappings.set(new RoleMappingRecord(99, new Set([0, 1]), 5, 2, true));
-		await plugin.handleSeedRequest();
+		await seed();
 		const first = new Map([...groupsPlugin.roleMappings.values()].map(mapping => [mapping.id, mapping.priority]));
 
-		await plugin.handleSeedRequest();
+		await seed();
 		const second = new Map([...groupsPlugin.roleMappings.values()].map(mapping => [mapping.id, mapping.priority]));
 		t3.strictSame(second, first, "seeding again reuses the mappings");
 		t3.strictSame(groupsPlugin.roleMappings.get(99).priority, 2, "other mappings are left alone");
 		t3.notOk([...first.values()].filter(priority => priority === 2).length > 1, "seed priorities skip taken ones");
 	});
 
-	t2.test(".fromContext() adds every feature with its defaults", async t3 => {
-		const { plugin } = await startPlugin(t3, { withPlugins: false });
-		const records = await plugin.handleFeatureListRequest();
+	t2.test("startup adds every feature with its defaults", async t3 => {
+		const { listFeatures } = await startPlugin(t3, { withPlugins: false });
+		const records = await listFeatures();
 		t3.strictSame(records.map(record => record.id), features.map(feature => feature.name), "one record per feature");
 		t3.ok(records.every(record => record.enabled && !Object.keys(record.values).length), "enabled with no overrides");
 	});
 
-	t2.test(".reconcileFeatures() drops stored values and features which no longer exist", async t3 => {
+	t2.test("startup drops stored values and features which no longer exist", async t3 => {
 		const databaseDirectory = t3.testdir();
-		const { plugin } = await startPlugin(t3, { withPlugins: false, databaseDirectory });
-		plugin.features.set(new messages.FeatureRecord("afk_kick", false, { afk_minutes: 5, trust_time: 600 }));
-		plugin.features.set(new messages.FeatureRecord("gone", true, {}));
-		await plugin.onShutdown();
+		await storeFeatures(databaseDirectory, [
+			new messages.FeatureRecord("afk_kick", false, { afk_minutes: 5, trust_time: 600 }),
+			new messages.FeatureRecord("gone", true, {}),
+		]);
 
-		const { plugin: restarted } = await startPlugin(t3, { withPlugins: false, databaseDirectory });
-		const record = restarted.features.get("afk_kick");
+		const { listFeatures } = await startPlugin(t3, { withPlugins: false, databaseDirectory });
+		const record = await getFeature(listFeatures, "afk_kick");
 		t3.strictSame([record.enabled, record.values], [false, { afk_minutes: 5 }], "the stale value is dropped, the rest kept");
-		t3.notOk(restarted.features.has("gone"), "the removed feature is deleted");
-		t3.ok(features.every(feature => restarted.features.has(feature.name)), "every declared feature still has a record");
+		const ids = new Set((await listFeatures()).map(other => other.id));
+		t3.notOk(ids.has("gone"), "the removed feature is deleted");
+		t3.ok(features.every(feature => ids.has(feature.name)), "every declared feature still has a record");
 	});
 
-	t2.test(".handleFeatureUpdateRequest() stores the values which differ from the default", async t3 => {
-		const { plugin } = await startPlugin(t3, { withPlugins: false });
+	t2.test("FeatureUpdateRequest stores the values which differ from the default", async t3 => {
+		const { controller, listFeatures, updateFeature, featureSubscription } = await startPlugin(t3, { withPlugins: false });
 		const broadcasts = [];
-		plugin.controller.subscriptions.broadcast = event => broadcasts.push(event);
+		controller.subscriptions.broadcast = event => broadcasts.push(event);
 
-		const record = await plugin.handleFeatureUpdateRequest(new messages.FeatureUpdateRequest(
+		const record = await updateFeature(new messages.FeatureUpdateRequest(
 			"death_markers", false, { show_map_markers: false, collect_corpses: true },
 		));
 		t3.strictSame(record.values, { show_map_markers: false }, "the default value is dropped");
-		t3.equal(plugin.features.get("death_markers").enabled, false, "the feature is disabled");
+		t3.equal((await getFeature(listFeatures, "death_markers")).enabled, false, "the feature is disabled");
 		t3.strictSame(broadcasts.map(event => event.updates.map(update => update.id)), [["death_markers"]], "the update is broadcast");
 
-		const subscription = await plugin.handleFeatureSubscription({ lastRequestTimeMs: record.updatedAtMs - 1 });
+		const subscription = await featureSubscription({ lastRequestTimeMs: record.updatedAtMs - 1 });
 		t3.strictSame(subscription.updates.map(update => update.id), ["death_markers"], "subscribers catch up on the change");
 	});
 
-	t2.test(".handleFeatureUpdateRequest() rejects invalid values", async t3 => {
-		const { plugin } = await startPlugin(t3, { withPlugins: false });
+	t2.test("FeatureUpdateRequest rejects invalid values", async t3 => {
+		const { updateFeature } = await startPlugin(t3, { withPlugins: false });
 		await t3.rejects(
-			plugin.handleFeatureUpdateRequest(new messages.FeatureUpdateRequest("death_markers", true, { unknown: 1 })),
+			updateFeature(new messages.FeatureUpdateRequest("death_markers", true, { unknown: 1 })),
 			{ message: "Feature death_markers has no setting unknown" },
 		);
 	});
 
-	t2.test(".fromContext() keeps stored features across restarts", async t3 => {
+	t2.test("stored features are kept across restarts", async t3 => {
 		const databaseDirectory = t3.testdir();
-		const { plugin } = await startPlugin(t3, { withPlugins: false, databaseDirectory });
-		await plugin.handleFeatureUpdateRequest(new messages.FeatureUpdateRequest("afk_kick", false, { afk_minutes: 5 }));
-		await plugin.onShutdown();
+		const { updateFeature, shutdown } = await startPlugin(t3, { withPlugins: false, databaseDirectory });
+		await updateFeature(new messages.FeatureUpdateRequest("afk_kick", false, { afk_minutes: 5 }));
+		await shutdown();
 
-		const { plugin: restarted } = await startPlugin(t3, { withPlugins: false, databaseDirectory });
-		const record = restarted.features.get("afk_kick");
+		const { listFeatures } = await startPlugin(t3, { withPlugins: false, databaseDirectory });
+		const record = await getFeature(listFeatures, "afk_kick");
 		t3.strictSame([record.enabled, record.values], [false, { afk_minutes: 5 }], "the stored record is loaded");
+	});
+
+	t2.end();
+});
+
+/** Read players.json as the next run would. */
+async function loadPlayers(databaseDirectory) {
+	return new lib.JsonIdDatastoreProvider(
+		path.join(databaseDirectory, "exp_scenario", "players.json"),
+		messages.PlayerRecord.fromJSON.bind(messages.PlayerRecord),
+	).load();
+}
+
+t.test("player settings", t2 => {
+	t2.test("PlayerGetRequest returns an empty record for unknown players", async t3 => {
+		const { send } = await startPlugin(t3, { withPlugins: false });
+		const record = await send(new messages.PlayerGetRequest("Alice"));
+		t3.equal(record.id, "Alice");
+		t3.strictSame(record.toJSON(), { id: "Alice" }, "nothing is set");
+	});
+
+	t2.test("JoinMessageSetRequest sets, trims, and clears the message", async t3 => {
+		const { send } = await startPlugin(t3, { withPlugins: false });
+		await send(new messages.JoinMessageSetRequest("Alice", "  Hello there  "));
+		t3.equal((await send(new messages.PlayerGetRequest("Alice"))).joinMessage, "Hello there");
+
+		await send(new messages.JoinMessageSetRequest("Alice", null));
+		t3.equal((await send(new messages.PlayerGetRequest("Alice"))).joinMessage, undefined, "null clears it");
+
+		await send(new messages.JoinMessageSetRequest("Alice", "Hi"));
+		await send(new messages.JoinMessageSetRequest("Alice", "   "));
+		t3.equal((await send(new messages.PlayerGetRequest("Alice"))).joinMessage, undefined, "blank clears it");
+	});
+
+	t2.test("players are saved on the save hook and empty records are removed", async t3 => {
+		const databaseDirectory = t3.testdir();
+		const { send, save, shutdown } = await startPlugin(t3, { withPlugins: false, databaseDirectory });
+		await send(new messages.JoinMessageSetRequest("Alice", "Hi"));
+		await send(new messages.JoinMessageSetRequest("Bob", "Hey"));
+		await send(new messages.JoinMessageSetRequest("Bob", null));
+		await save();
+
+		const stored = await loadPlayers(databaseDirectory);
+		t3.strictSame([...stored.keys()], ["Alice"], "only players with a setting are stored");
+		t3.equal(stored.get("Alice").joinMessage, "Hi");
+
+		await send(new messages.JoinMessageSetRequest("Alice", "Bye"));
+		await shutdown();
+		const restarted = await startPlugin(t3, { withPlugins: false, databaseDirectory });
+		const record = await restarted.send(new messages.PlayerGetRequest("Alice"));
+		t3.equal(record.joinMessage, "Bye", "kept across restarts");
+	});
+
+	t2.test("PlayerLocaleEvent stores the locale next to the join message", async t3 => {
+		const { send } = await startPlugin(t3, { withPlugins: false });
+		await send(new messages.JoinMessageSetRequest("Alice", "Hi"));
+		await send(new messages.PlayerLocaleEvent("Alice", "pt-BR"));
+		const record = await send(new messages.PlayerGetRequest("Alice"));
+		t3.strictSame([record.joinMessage, record.locale], ["Hi", "pt-BR"]);
+
+		await send(new messages.JoinMessageSetRequest("Alice", null));
+		const cleared = await send(new messages.PlayerGetRequest("Alice"));
+		t3.equal(cleared.locale, "pt-BR", "clearing the message keeps the locale");
+	});
+
+	t2.test("PlayerToolbarEvent stores the toolbar and it is saved", async t3 => {
+		const databaseDirectory = t3.testdir();
+		const { send, save } = await startPlugin(t3, { withPlugins: false, databaseDirectory });
+		await send(new messages.PlayerToolbarEvent("Alice", "abc"));
+		t3.equal((await send(new messages.PlayerGetRequest("Alice"))).toolbar, "abc");
+
+		await save();
+		const stored = await loadPlayers(databaseDirectory);
+		const alice = stored.get("Alice");
+		t3.strictSame(alice.toJSON(), { id: "Alice", toolbar: "abc", updated_at_ms: alice.updatedAtMs });
+	});
+
+	t2.test("permissions", async t3 => {
+		const user = (name, granted = []) => ({
+			name,
+			checkPermission(permission) {
+				if (!granted.includes(permission)) {
+					throw new lib.PermissionError("denied");
+				}
+			},
+		});
+		const request = name => ({ data: { player_name: name } });
+
+		const set = messages.JoinMessageSetRequest.permission;
+		t3.throws(() => set(user("Alice"), request("alice")), "own message needs the set permission");
+		t3.doesNotThrow(() => set(user("Alice", ["exp_scenario.join_message.set"]), request("alice")), "own message");
+		t3.throws(
+			() => set(user("Alice", ["exp_scenario.join_message.set"]), request("Bob")),
+			"someone else's message needs set_other",
+		);
+		t3.doesNotThrow(
+			() => set(user("Alice", ["exp_scenario.join_message.set_other"]), request("Bob")), "with set_other",
+		);
+
+		const get = messages.PlayerGetRequest.permission;
+		t3.doesNotThrow(() => get(user("Alice"), request("alice")), "own settings");
+		t3.throws(() => get(user("Alice"), request("Bob")), "someone else's");
+		t3.doesNotThrow(() => get(user("Alice", ["core.user.get"]), request("Bob")), "with core.user.get");
 	});
 
 	t2.end();
