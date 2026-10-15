@@ -82,6 +82,19 @@ export const features: Feature[] = [
 		],
 	},
 	{
+		name: "community_details",
+		title: "Community Details",
+		description: "The community name and links shown in chat, the readme, help bubbles, and the greeting. These are always used, the switch has no effect",
+		fields: [
+			str("community_name", "Community name", "Name of the community", "Explosive Gaming"),
+			str("discord", "Discord", "Invite link to the Discord server", "https://discord.explosivegaming.nl"),
+			str("website", "Website", "Link to the website", "https://www.explosivegaming.nl"),
+			str("status", "Status page", "Link to the server status page", "https://status.explosivegaming.nl"),
+			str("github", "GitHub", "Link to the source code", "https://github.com/explosivegaming/ExpCluster"),
+			str("patreon", "Patreon", "Link to donate", "https://www.patreon.com/ExpGaming"),
+		],
+	},
+	{
 		name: "custom_start",
 		title: "Custom Start",
 		description: "Map settings applied when the map is created, and the items new players start with",
@@ -160,6 +173,12 @@ export const features: Feature[] = [
 			str("file_name", "File name", "Path of the log file within script-output", "log/logging.log"),
 			num("rocket_launch_display_rate", "Rocket log interval", "After the first few launches, log every this many rockets", 500, 1, "rockets"),
 		],
+	},
+	{
+		name: "greetings",
+		title: "Greetings",
+		description: "Greet players when they join and show the join message they set, the messages are edited on the user page",
+		fields: [],
 	},
 	{
 		name: "help_bubbles",

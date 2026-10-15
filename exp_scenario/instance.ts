@@ -1,86 +1,132 @@
-import type { Instance, InstancePluginContext } from "@clusterio/host";
+import type { InstancePluginContext } from "@clusterio/host";
 import * as lib from "@clusterio/lib";
 import * as messages from "./messages.js";
 import { features, FeatureValue } from "./features.js";
 
-/** Sends feature config to the lua side, see module/features.lua. */
-export class InstancePlugin {
+/** Sent by the lua side when a player sets or removes their join message, see module/control/greetings.lua */
+export type IpcJoinMessageSet = { player_name: string, message?: string };
+/** Sent by the lua side when a player asks for their join message */
+export type IpcJoinMessageGet = { player_name: string };
+/** Sent by the lua side when a player joins or changes language, see module/control/player_settings.lua */
+export type IpcLocale = { player_name: string, locale: string };
+/** Sent by the lua side when a player leaves */
+export type IpcToolbar = { player_name: string, toolbar: string };
+
+/** Json as a lua expression for a table, inside a long bracket the json does not contain */
+export function luaJson(value: unknown) {
+	const json = JSON.stringify(value);
+	let level = "=";
+	while (json.includes(`]${level}]`)) {
+		level += "=";
+	}
+	return `helpers.json_to_table[${level}[${json}]${level}]`;
+}
+
+/** Sends feature config and player settings to the lua side, see module/features.lua. */
+export default async function (context: InstancePluginContext) {
+	const { instance, logger, plugin } = context;
 	/** Rcon is up and the lua side can take updates */
-	started = false;
-
-	private constructor(
-		public instance: Instance,
-		public logger: lib.Logger,
-		public name: string,
-	) {}
-
-	static async fromContext(context: InstancePluginContext) {
-		const instance = context.instance;
-		const plugin = new InstancePlugin(instance, context.logger, context.plugin.name);
-
-		instance.handle(messages.FeatureUpdatedEvent, plugin.handleFeatureUpdatedEvent.bind(plugin));
-		instance.hooks.start.attach(plugin.name, plugin.onStart.bind(plugin));
-		instance.hooks.exit.attach(plugin.name, plugin.onExit.bind(plugin));
-		instance.hooks.controllerConnectionEvent.attach(plugin.name, plugin.onControllerConnectionEvent.bind(plugin));
-		return plugin;
-	}
-
-	async onStart() {
-		this.started = true;
-		await this.syncFeatures();
-	}
-
-	async onExit() {
-		this.started = false;
-	}
-
-	/** A new session means the controller restarted and forgot the subscription. */
-	async onControllerConnectionEvent(event: "connect" | "drop" | "resume" | "close") {
-		if (event === "connect" && this.started) {
-			await this.syncFeatures();
-		}
-	}
+	let started = false;
+	/** Enabled state of features which need it on this side, by name */
+	const featureEnabled = new Map<string, boolean>();
 
 	/** Subscribe, then send every feature */
-	async syncFeatures() {
-		await this.instance.sendTo("controller", new lib.SubscriptionRequest(
+	async function syncFeatures() {
+		await instance.sendTo("controller", new lib.SubscriptionRequest(
 			`exp_scenario:${messages.FeatureUpdatedEvent.name}`, "subscribe", Date.now(),
 		));
-		const features = await this.instance.sendTo("controller", new messages.FeatureListRequest());
-		await this.luaSendFeatures(features);
-	}
-
-	async handleFeatureUpdatedEvent(event: messages.FeatureUpdatedEvent) {
-		if (this.started) {
-			await this.luaSendFeatures(event.updates.filter(feature => !feature.isDeleted));
-		}
+		const records = await instance.sendTo("controller", new messages.FeatureListRequest());
+		await luaSendFeatures(records);
 	}
 
 	/** Every value of each feature is sent, so the lua side sets them all */
-	async luaSendFeatures(records: messages.FeatureRecord[]) {
+	async function luaSendFeatures(records: messages.FeatureRecord[]) {
 		if (!records.length) {
 			return;
 		}
 
 		const updates = records.map(record => {
+			featureEnabled.set(record.id, record.enabled);
 			const values: Record<string, FeatureValue> = { enabled: record.enabled };
 			for (const field of features.find(feature => feature.name === record.id)?.fields ?? []) {
 				values[field.name] = field.name in record.values ? record.values[field.name] : field.default;
 			}
 			return { name: record.id, values };
 		});
-		const json = JSON.stringify(updates);
-		// Pick a long bracket the json does not contain
-		let level = "=";
-		while (json.includes(`]${level}]`)) {
-			level += "=";
+		await instance.sendRcon(`/sc exp_scenario.features.receive_update(${luaJson(updates)})`, true);
+	}
+
+	/** Run lua with the player as `p` if they are still in the game, the data is available as `d` */
+	async function luaWithPlayer(name: string, data: Record<string, unknown>, code: string) {
+		if (instance.status !== "running") {
+			return;
 		}
-		await this.instance.sendRcon(
-			`/sc exp_scenario.features.receive_update(helpers.json_to_table[${level}[${json}]${level}])`, true,
+		await instance.sendRcon(
+			`/sc local d = ${luaJson({ ...data, name })} local p = game.get_player(d.name) if p then ${code} end`, true,
 		);
 	}
-}
 
-export default async function (context: InstancePluginContext) {
-	await InstancePlugin.fromContext(context);
+	async function onPlayerJoin(name: string) {
+		const record = await instance.sendTo("controller", new messages.PlayerGetRequest(name));
+		if (record.joinMessage && featureEnabled.get("greetings") !== false) {
+			await luaWithPlayer(name, { message: record.joinMessage }, "game.print(d.message, { color = p.color })");
+		}
+		if (record.toolbar) {
+			await luaWithPlayer(
+				name, { toolbar: record.toolbar }, "exp_scenario.player_settings.receive_toolbar(d.name, d.toolbar)",
+			);
+		}
+	}
+
+	instance.handle(messages.FeatureUpdatedEvent, async event => {
+		if (started) {
+			await luaSendFeatures(event.updates.filter(feature => !feature.isDeleted));
+		}
+	});
+
+	instance.server.handle("exp_scenario:join_message_set", async (event: IpcJoinMessageSet) => {
+		const request = new messages.JoinMessageSetRequest(event.player_name, event.message ?? null);
+		await instance.sendTo("controller", request);
+	});
+
+	instance.server.handle("exp_scenario:join_message_get", async (event: IpcJoinMessageGet) => {
+		const record = await instance.sendTo("controller", new messages.PlayerGetRequest(event.player_name));
+		await luaWithPlayer(
+			event.player_name,
+			record.joinMessage ? { message: record.joinMessage } : {},
+			"p.print(d.message and { \"exp_greetings.message-get\", d.message } or { \"exp_greetings.message-none\" })",
+		);
+	});
+
+	instance.server.handle("exp_scenario:locale", async (event: IpcLocale) => {
+		instance.sendTo("controller", new messages.PlayerLocaleEvent(event.player_name, event.locale));
+	});
+
+	instance.server.handle("exp_scenario:toolbar", async (event: IpcToolbar) => {
+		instance.sendTo("controller", new messages.PlayerToolbarEvent(event.player_name, event.toolbar));
+	});
+
+	instance.hooks.playerEvent.attach(plugin.name, async event => {
+		if (event.type === "join") {
+			await onPlayerJoin(event.name).catch(err => logger.error(
+				`Error sending the settings of ${event.name}:\n${err.stack ?? err.message}`,
+			));
+		}
+	});
+
+	instance.hooks.start.attach(plugin.name, async () => {
+		started = true;
+		await syncFeatures();
+	});
+
+	instance.hooks.exit.attach(plugin.name, async () => {
+		started = false;
+	});
+
+	// A new session means the controller restarted and forgot the subscription
+	instance.hooks.controllerConnectionEvent.attach(plugin.name, async event => {
+		if (event === "connect" && started) {
+			await syncFeatures();
+		}
+	});
 }

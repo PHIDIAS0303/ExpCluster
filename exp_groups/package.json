@@ -11,13 +11,20 @@
 		"prepare": "tsc --build && webpack-cli --env production"
 	},
 	"engines": {
-		"node": ">=18"
+		"node": ">=22"
 	},
 	"peerDependencies": {
 		"@clusterio/controller": "workspace:^",
 		"@clusterio/host": "workspace:^",
-		"@clusterio/lib": "workspace:^",
-		"@clusterio/web_ui": "workspace:^"
+		"@clusterio/lib": "workspace:^"
+	},
+	"peerDependenciesMeta": {
+		"@clusterio/controller": {
+			"optional": true
+		},
+		"@clusterio/host": {
+			"optional": true
+		}
 	},
 	"devDependencies": {
 		"@ant-design/icons": "^6.2.3",
