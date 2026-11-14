@@ -93,6 +93,7 @@ const definitions = [
 	["exp_scenario.gui.autofill", "Autofill", "Open the autofill GUI, which fills placed entities from your inventory.", true],
 	["exp_scenario.gui.bonus", "Bonus", "Open the bonus GUI to adjust your personal bonuses."],
 	["exp_scenario.gui.module", "Module inserter", "Open the module inserter GUI.", true],
+	["exp_scenario.gui.rate_calculator", "Rate calculator", "Calculate the rate of selected machines.", true],
 	["exp_scenario.gui.player_list", "Player list", "Open the player list GUI.", true],
 	["exp_scenario.gui.player_list.ban", "Player list: ban", "Ban a player from the cluster via the player list."],
 	["exp_scenario.gui.player_list.kick", "Player list: kick", "Kick a player from the server via the player list."],
