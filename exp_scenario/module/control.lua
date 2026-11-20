@@ -73,6 +73,7 @@ add(require("modules/exp_scenario/control/vlayer"))
 
 --- Guis
 add(require("modules/exp_scenario/gui/autofill"))
+add(require("modules/exp_scenario/gui/auto_outpost"))
 add(require("modules/exp_scenario/gui/elements"))
 add(require("modules/exp_scenario/gui/module_inserter"))
 add(require("modules/exp_scenario/gui/player_bonus"))
